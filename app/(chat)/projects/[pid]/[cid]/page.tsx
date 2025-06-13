@@ -11,7 +11,7 @@ import type { Attachment, UIMessage } from 'ai';
 
 export default async function Page(props: any) {
   const { params } = props;
-  const { cid } = params; // Chat ID from URL params
+  const { pid, cid } = params; // ids from URL params
 
   try {
     const chat = await getChatById({ id: cid });
@@ -42,6 +42,7 @@ export default async function Page(props: any) {
 
     function convertToUIMessages(messages: Array<Message>): Array<UIMessage> {
       return messages.map((message) => ({
+        projectId: pid,
         id: message.id,
         parts: message.parts as UIMessage['parts'],
         role: message.role as UIMessage['role'],
@@ -60,7 +61,8 @@ export default async function Page(props: any) {
       return (
         <>
           <Chat
-            cid={chat.id}
+            projectId={pid}
+            cid={cid}
             initialMessages={convertToUIMessages(messagesFromDb)}
             initialChatModel={DEFAULT_CHAT_MODEL}
             initialVisibilityType={chat.visibility}
@@ -68,7 +70,7 @@ export default async function Page(props: any) {
             session={session}
             autoResume={true}
           />
-          <DataStreamHandler cid={chat.id} />
+          <DataStreamHandler cid={cid} />
         </>
       );
     }
@@ -76,7 +78,8 @@ export default async function Page(props: any) {
     return (
       <>
         <Chat
-          cid={chat.id}
+          projectId={pid}
+          cid={cid}
           initialMessages={convertToUIMessages(messagesFromDb)}
           initialChatModel={chatModelFromCookie.value}
           initialVisibilityType={chat.visibility}
@@ -84,7 +87,7 @@ export default async function Page(props: any) {
           session={session}
           autoResume={true}
         />
-        <DataStreamHandler cid={chat.id} />
+        <DataStreamHandler cid={cid} />
       </>
     );
   } catch (error) {

@@ -22,6 +22,7 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 
 export function Chat({
+  projectId,
   cid,
   initialMessages,
   initialChatModel,
@@ -30,6 +31,7 @@ export function Chat({
   session,
   autoResume,
 }: {
+  projectId: string;
   cid: string;
   initialMessages: Array<UIMessage>;
   initialChatModel: string;
@@ -96,7 +98,7 @@ export function Chat({
       });
 
       setHasAppendedQuery(true);
-      window.history.replaceState({}, '', `/chat/${cid}`);
+      window.history.replaceState({}, '', `/chat/projects/${projectId}/${cid}`);
     }
   }, [query, append, hasAppendedQuery, cid]);
 

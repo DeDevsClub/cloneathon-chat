@@ -28,6 +28,7 @@ import {
   type Chat,
   stream,
 } from './schema';
+import { createDefaultProjectWithTutorial } from './project';
 import type { ArtifactKind } from '@/components/chat/artifact';
 import { generateUUID } from '../utils';
 import { generateHashedPassword } from './utils';
@@ -57,8 +58,18 @@ export async function createUser(email: string, password: string) {
   const hashedPassword = generateHashedPassword(password);
 
   try {
-    return await db.insert(user).values({ email, password: hashedPassword });
+    // Create the user
+    const [newUser] = await db
+      .insert(user)
+      .values({ email, password: hashedPassword })
+      .returning();
+    
+    // Create a default project with tutorial content
+    await createDefaultProjectWithTutorial(newUser.id);
+    
+    return newUser;
   } catch (error) {
+    console.error('User creation error:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to create user');
   }
 }
@@ -68,11 +79,18 @@ export async function createGuestUser() {
   const password = generateHashedPassword(generateUUID());
 
   try {
-    return await db.insert(user).values({ email, password }).returning({
-      id: user.id,
-      email: user.email,
-    });
+    // Create the guest user
+    const [newUser] = await db
+      .insert(user)
+      .values({ email, password })
+      .returning();
+    
+    // Create a default project with tutorial content
+    await createDefaultProjectWithTutorial(newUser.id);
+    
+    return [newUser];
   } catch (error) {
+    console.error('Guest user creation error:', error);
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to create guest user',

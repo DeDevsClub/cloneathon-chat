@@ -91,9 +91,9 @@ export default function Page() {
     <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -top-48 -right-48 size-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div
-          className="absolute -bottom-48 -left-48 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-48 -left-48 size-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '8s' }}
         />
       </div>
@@ -143,7 +143,7 @@ export default function Page() {
                     >
                       {isSuccessful ? (
                         <>
-                          <Check className="h-4 w-4 mr-1" />
+                          <Check className="size-4 mr-1" />
                           Success!
                         </>
                       ) : (

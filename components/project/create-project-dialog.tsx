@@ -28,10 +28,16 @@ import { Textarea } from '@/components/ui/textarea';
 
 // Form validation schema
 const formSchema = z.object({
-  name: z.string().min(1, 'Project name is required').max(255, 'Project name is too long'),
+  name: z
+    .string()
+    .min(1, 'Project name is required')
+    .max(255, 'Project name is too long'),
   description: z.string().optional(),
   icon: z.string().max(10, 'Icon should be at most 10 characters').optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color')
+    .optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -107,17 +113,13 @@ export function CreateProjectDialog({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="My Project" 
-                      {...field} 
-                      autoFocus 
-                    />
+                    <Input placeholder="My Project" {...field} autoFocus />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="description"
@@ -125,10 +127,10 @@ export function CreateProjectDialog({
                 <FormItem>
                   <FormLabel>Description (optional)</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Description of your project" 
-                      className="resize-none" 
-                      {...field} 
+                    <Textarea
+                      placeholder="Description of your project"
+                      className="resize-none"
+                      {...field}
                       value={field.value || ''}
                     />
                   </FormControl>
@@ -136,7 +138,7 @@ export function CreateProjectDialog({
                 </FormItem>
               )}
             />
-            
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -145,9 +147,9 @@ export function CreateProjectDialog({
                   <FormItem>
                     <FormLabel>Icon (emoji)</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="📁" 
-                        {...field} 
+                      <Input
+                        placeholder="📁"
+                        {...field}
                         value={field.value || ''}
                       />
                     </FormControl>
@@ -155,7 +157,7 @@ export function CreateProjectDialog({
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="color"
@@ -164,16 +166,16 @@ export function CreateProjectDialog({
                     <FormLabel>Color</FormLabel>
                     <FormControl>
                       <div className="flex gap-2 items-center">
-                        <Input 
+                        <Input
                           type="color"
-                          className="w-10 h-10 p-1 cursor-pointer"
-                          {...field} 
+                          className="size-10 p-1 cursor-pointer"
+                          {...field}
                           value={field.value || '#4f46e5'}
                         />
-                        <Input 
-                          placeholder="#4f46e5" 
-                          {...field} 
-                          value={field.value || '#4f46e5'} 
+                        <Input
+                          placeholder="#4f46e5"
+                          {...field}
+                          value={field.value || '#4f46e5'}
                           className="flex-1"
                         />
                       </div>
@@ -185,9 +187,9 @@ export function CreateProjectDialog({
             </div>
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >

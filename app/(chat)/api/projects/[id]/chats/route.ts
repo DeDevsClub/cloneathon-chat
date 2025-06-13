@@ -3,10 +3,9 @@ import { getProject } from '@/lib/db/project';
 import { getChatsByProjectId } from '@/lib/db/chat';
 import { getUser } from '@/lib/db/queries';
 
-// GET /api/projects/[id]/chats - Get all chats for a specific project
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const sessionCookie = request.cookies.get('user-session');

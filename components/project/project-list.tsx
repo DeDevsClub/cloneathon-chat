@@ -24,18 +24,18 @@ export const ProjectList = ({
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  
+
   // Fetch projects on component mount
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setIsLoading(true);
         const response = await fetch('/api/projects');
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch projects');
         }
-        
+
         const data = await response.json();
         setProjects(data.projects || []);
       } catch (error) {
@@ -45,13 +45,13 @@ export const ProjectList = ({
         setIsLoading(false);
       }
     };
-    
+
     fetchProjects();
   }, []);
-  
+
   // Handle project creation success
   const handleProjectCreated = (newProject: Project) => {
-    setProjects(prev => [newProject, ...prev]);
+    setProjects((prev) => [newProject, ...prev]);
     setIsCreateDialogOpen(false);
     toast.success('Project created successfully!');
   };
@@ -60,21 +60,23 @@ export const ProjectList = ({
     <div className={className}>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium">Projects</h3>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-7 w-7 p-0"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="size-7 p-0"
           onClick={() => setIsCreateDialogOpen(true)}
         >
-          <FolderPlus className="h-4 w-4" />
+          <FolderPlus className="size-4" />
           <span className="sr-only">Create project</span>
         </Button>
       </div>
-      
+
       <Separator className="my-2" />
-      
+
       {isLoading ? (
-        <div className="py-2 text-sm text-muted-foreground">Loading projects...</div>
+        <div className="py-2 text-sm text-muted-foreground">
+          Loading projects...
+        </div>
       ) : projects.length === 0 ? (
         <div className="py-2 text-sm text-muted-foreground">
           No projects found. Create your first project to get started!
@@ -91,7 +93,7 @@ export const ProjectList = ({
           ))}
         </div>
       )}
-      
+
       <CreateProjectDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}

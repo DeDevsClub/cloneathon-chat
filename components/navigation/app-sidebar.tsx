@@ -40,7 +40,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               className="flex flex-row gap-3 items-center w-full"
             >
               <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer flex flex-row gap-2 items-center">
-                <Icon icon="mdi:chat" className="w-6 h-6" />
+                <Icon icon="mdi:chat" className="size-6" />
                 th3.chat
               </span>
             </Link>

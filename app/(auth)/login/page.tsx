@@ -93,8 +93,8 @@ export default function LoginPage() {
     <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-accent/10 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -left-48 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-48 -right-48 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute -top-48 -left-48 size-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-48 -right-48 size-96 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
       {/* Logo or branding mark */}
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 <div className="mt-1 relative rounded-md">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail
-                      className={`h-5 w-5 ${focusedField === 'email' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
+                      className={`size-5 ${focusedField === 'email' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
                     />
                   </div>
                   <Input
@@ -176,7 +176,7 @@ export default function LoginPage() {
                 <div className="mt-1 relative rounded-md">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock
-                      className={`h-5 w-5 ${focusedField === 'password' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
+                      className={`size-5 ${focusedField === 'password' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
                     />
                   </div>
                   <Input
@@ -217,7 +217,7 @@ export default function LoginPage() {
                   ) : (
                     <>
                       Sign In
-                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </span>

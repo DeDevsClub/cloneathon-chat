@@ -9,7 +9,7 @@ export const db = drizzle(client);
 
 // Export everything from the database modules
 export * from './chat';
-export * from './migrate';
+// migrate.ts has no named exports
 export * from './project';
 export * from './queries';
 export * from './schema';

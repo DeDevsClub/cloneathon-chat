@@ -137,7 +137,7 @@ const EditProjectPage = ({ params }: { params: { id: string } }) => {
   if (isLoading) {
     return (
       <div className="container py-10 flex items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <Loader2 className="size-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -150,7 +150,7 @@ const EditProjectPage = ({ params }: { params: { id: string } }) => {
           {error || 'Failed to load project'}
         </p>
         <Button className="mt-4" onClick={() => router.push('/projects')}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 size-4" />
           Back to Projects
         </Button>
       </div>
@@ -164,7 +164,7 @@ const EditProjectPage = ({ params }: { params: { id: string } }) => {
         className="mb-6"
         onClick={() => router.push(`/projects/${params.id}`)}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
+        <ArrowLeft className="mr-2 size-4" />
         Back to Project
       </Button>
 
@@ -218,7 +218,7 @@ const EditProjectPage = ({ params }: { params: { id: string } }) => {
                       <FormLabel>Project Icon (emoji)</FormLabel>
                       <FormControl>
                         <div className="flex gap-3 items-center">
-                          <div className="w-12 h-12 flex items-center justify-center text-3xl border rounded-md">
+                          <div className="size-12 flex items-center justify-center text-3xl border rounded-md">
                             {field.value || '📁'}
                           </div>
                           <Input
@@ -244,7 +244,7 @@ const EditProjectPage = ({ params }: { params: { id: string } }) => {
                         <div className="flex gap-3 items-center">
                           <Input
                             type="color"
-                            className="w-12 h-12 p-1 cursor-pointer rounded-md"
+                            className="size-12 p-1 cursor-pointer rounded-md"
                             {...field}
                             value={field.value || '#4f46e5'}
                           />

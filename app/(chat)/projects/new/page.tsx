@@ -92,7 +92,7 @@ const NewProjectPage = () => {
         className="mb-6"
         onClick={() => router.push('/projects')}
       >
-        <ArrowLeft className="mr-2 h-4 w-4" />
+        <ArrowLeft className="mr-2 size-4" />
         Back to Projects
       </Button>
 
@@ -149,7 +149,7 @@ const NewProjectPage = () => {
                       <FormLabel>Project Icon (emoji)</FormLabel>
                       <FormControl>
                         <div className="flex gap-3 items-center">
-                          <div className="w-12 h-12 flex items-center justify-center text-3xl border rounded-md">
+                          <div className="size-12 flex items-center justify-center text-3xl border rounded-md">
                             {field.value || '📁'}
                           </div>
                           <Input
@@ -175,7 +175,7 @@ const NewProjectPage = () => {
                         <div className="flex gap-3 items-center">
                           <Input
                             type="color"
-                            className="w-12 h-12 p-1 cursor-pointer rounded-md"
+                            className="size-12 p-1 cursor-pointer rounded-md"
                             {...field}
                             value={field.value || '#4f46e5'}
                           />

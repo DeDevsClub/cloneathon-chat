@@ -50,14 +50,14 @@ const ProjectsPage = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Projects</h1>
         <Button onClick={() => setOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="size-4 mr-2" />
           New Project
         </Button>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="size-8 animate-spin text-primary" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

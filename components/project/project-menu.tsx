@@ -58,7 +58,7 @@ export const ProjectMenu = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleEdit}>
-          <FolderEdit className="mr-2 h-4 w-4" />
+          <FolderEdit className="mr-2 size-4" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -66,7 +66,7 @@ export const ProjectMenu = ({
           className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
           onClick={handleDelete}
         >
-          <Trash2 className="mr-2 h-4 w-4" />
+          <Trash2 className="mr-2 size-4" />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

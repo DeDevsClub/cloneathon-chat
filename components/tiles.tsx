@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +22,7 @@ const TilesComponent: React.FC<{
       {rows.map((_, i) => (
         <motion.div
           key={`row${i}`}
-          className={`md:w-12 sm:h-12 w-9 h-9 border-l dark:border-neutral-900 border-neutral-200 relative`}
+          className={`md:w-12 sm:h-12 size-9 border-l dark:border-neutral-900 border-neutral-200 relative`}
         >
           {cols.map((_, j) => (
             <motion.div
@@ -34,7 +34,7 @@ const TilesComponent: React.FC<{
                 transition: { duration: 2 },
               }}
               key={`col${j}`}
-              className="md:w-12 sm:h-12 w-9 h-9 border-r border-t dark:border-neutral-900 border-neutral-200 relative"
+              className="md:w-12 sm:h-12 size-9 border-r border-t dark:border-neutral-900 border-neutral-200 relative"
             />
           ))}
         </motion.div>
@@ -43,4 +43,4 @@ const TilesComponent: React.FC<{
   );
 };
 
-export const Tiles = React.memo(TilesComponent);
+export const Tiles = memo(TilesComponent);

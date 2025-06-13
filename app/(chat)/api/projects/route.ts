@@ -15,18 +15,29 @@ const createProjectSchema = z.object({
 // GET /api/projects - Get all projects for the current user
 export async function GET(request: NextRequest) {
   try {
-    // Get user email from the session cookie
-    const sessionCookie = request.cookies.get('user-session');
-
+    // Using console.error for better visibility in server logs
+    console.error('DEBUG - GET - ALL COOKIES:', JSON.stringify([...request.cookies.getAll().map(c => ({name: c.name, value: c.value?.slice(0, 10) + '...'}))]));  
+    
+    // Try multiple possible session cookie names
+    const sessionCookie = 
+      request.cookies.get('user-session') || 
+      request.cookies.get('next-auth.session-token') || 
+      request.cookies.get('__Secure-next-auth.session-token') ||
+      request.cookies.get('authjs.session-token');
+      
     if (!sessionCookie?.value) {
+      console.error('DEBUG - GET - No valid session cookie found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    
+    console.error('DEBUG - GET - Using session cookie:', sessionCookie.name);
 
     // Parse the session cookie value to get user email
     const sessionData = JSON.parse(decodeURIComponent(sessionCookie.value));
     const email = sessionData.email;
 
     if (!email) {
+      console.error('DEBUG - GET - Invalid session');
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
@@ -51,13 +62,32 @@ export async function GET(request: NextRequest) {
 // POST /api/projects - Create a new project
 export async function POST(request: NextRequest) {
   try {
-    const sessionCookie = request.cookies.get('user-session');
-
+    // Using console.error for better visibility in server logs
+    console.error('DEBUG - POST - ALL COOKIES:', JSON.stringify([...request.cookies.getAll().map(c => ({name: c.name, value: c.value?.slice(0, 10) + '...'}))])); 
+    
+    // Try multiple possible session cookie names
+    const sessionCookie = 
+      request.cookies.get('user-session') || 
+      request.cookies.get('next-auth.session-token') || 
+      request.cookies.get('__Secure-next-auth.session-token') ||
+      request.cookies.get('authjs.session-token');
+      
     if (!sessionCookie?.value) {
+      console.error('DEBUG - POST - No valid session cookie found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    
+    console.error('DEBUG - POST - Using session cookie:', sessionCookie.name);
 
-    const [user] = await getUser(sessionCookie.value);
+    // Parse the session cookie value to get user email - matching GET function
+    const sessionData = JSON.parse(decodeURIComponent(sessionCookie.value));
+    const email = sessionData.email;
+    console.error({ email });
+    if (!email) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
+    const [user] = await getUser(email);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

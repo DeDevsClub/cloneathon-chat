@@ -69,7 +69,8 @@ export function CreateProjectDialog({
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
-    // console.log({ user: session?.user });
+    console.log({ user: session?.user });
+    console.log('Available cookies:', document.cookie);
     const isGuest = session?.user?.type === 'guest';
     try {
       const response = await fetch('/api/projects', {

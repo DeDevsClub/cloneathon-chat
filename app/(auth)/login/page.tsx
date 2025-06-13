@@ -52,9 +52,13 @@ export default function LoginPage() {
 
       if (res?.error) {
         // Check for specific error types to provide more helpful feedback
-        if (res.error.includes('password') || res.error.toLowerCase().includes('credentials')) {
+        if (
+          res.error.includes('password') ||
+          res.error.toLowerCase().includes('credentials')
+        ) {
           toast.error('Authentication Failed', {
-            description: 'The password you entered is incorrect. Please try again.',
+            description:
+              'The password you entered is incorrect. Please try again.',
             action: {
               label: 'Retry',
               onClick: () => {
@@ -68,7 +72,8 @@ export default function LoginPage() {
           });
         } else {
           toast.error('Sign In Failed', {
-            description: res.error || 'Unable to sign in with these credentials',
+            description:
+              res.error || 'Unable to sign in with these credentials',
           });
         }
         return;
@@ -109,7 +114,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-accent/10 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-accent/10 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-48 -left-48 size-96 bg-primary/5 rounded-full blur-3xl" />

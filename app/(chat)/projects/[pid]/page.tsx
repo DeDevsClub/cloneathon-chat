@@ -123,7 +123,7 @@ export default function ProjectPage(props: any) {
 
   useEffect(() => {
     fetchProjectDetails();
-  }, [params.pid]);
+  }, [params.pid, projectId, fetchProjectDetails]);
 
   if (loading) {
     return (

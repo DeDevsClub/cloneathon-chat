@@ -85,7 +85,7 @@ const HomePage = () => {
         <div className="flex flex-col items-center justify-center h-64">
           <Loader2 className="size-12 animate-spin text-purple-500 mb-4" />
           <p className="text-lg text-muted-foreground animate-pulse">
-            Loading your creative space...
+            Loading your projects...
           </p>
         </div>
       ) : (
@@ -111,7 +111,7 @@ const HomePage = () => {
                 <Sparkles className="size-20 text-purple-400" />
               </motion.div>
               <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-purple-400 mb-4 dark:text-white">
-                Start Your Creative Journey
+                Create Projects
               </h2>
               <p className="text-lg text-center text-primary max-w-lg mb-8 px-6 dark:text-gray-600">
                 Create your first project to organize your chats. Experience the
@@ -168,7 +168,7 @@ const HomePage = () => {
       />
 
       {/* Background grid for synthwave effect */}
-      <div className="fixed inset-0 -z-10 h-full w-full bg-grid-white/[0.02] pointer-events-none" />
+      <div className="fixed inset-0 -z-10 size-full bg-grid-white/[0.02] pointer-events-none" />
     </div>
   );
 };

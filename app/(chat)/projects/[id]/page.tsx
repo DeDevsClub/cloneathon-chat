@@ -117,7 +117,7 @@ export default function ProjectPage(props: any) {
 
   useEffect(() => {
     fetchProjectDetails();
-  }, [params.id, fetchProjectDetails]);
+  }, [params.id]);
 
   if (loading) {
     return (
@@ -201,7 +201,7 @@ export default function ProjectPage(props: any) {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chats in this Project</h2>
         <Button
-          onClick={() => router.push(`/chat/new?projectId=${project.id}`)}
+          onClick={() => router.push(`/projects/${project.id}/chat/new`)}
         >
           <MessageSquare className="mr-2 size-4" />
           New Chat
@@ -216,7 +216,7 @@ export default function ProjectPage(props: any) {
           </p>
           <Button
             className="mt-4"
-            onClick={() => router.push(`/chat/new?projectId=${project.id}`)}
+            onClick={() => router.push(`/projects/${project.id}/chat/new`)}
           >
             <MessageSquare className="mr-2 size-4" />
             Create your first chat
@@ -239,7 +239,7 @@ export default function ProjectPage(props: any) {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => router.push(`/chat/${chat.id}`)}
+                  onClick={() => router.push(`/projects/${project.id}/chat/${chat.id}`)}
                 >
                   Open Chat
                 </Button>

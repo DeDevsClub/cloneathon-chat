@@ -88,7 +88,7 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-48 -right-48 size-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />

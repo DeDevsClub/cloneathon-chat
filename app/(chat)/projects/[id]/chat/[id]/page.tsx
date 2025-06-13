@@ -9,34 +9,36 @@ import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import type { DBMessage } from '@/lib/db/schema';
 import type { Attachment, UIMessage } from 'ai';
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export default async function Page(props: any) {
+  const { params } = props;
   const { id } = params;
-  const chat = await getChatById({ id });
+  
+  try {
+    const chat = await getChatById({ id });
 
-  if (!chat) {
-    notFound();
-  }
-
-  const session = await auth();
-
-  if (!session) {
-    redirect('/api/auth/guest');
-  }
-
-  if (chat.visibility === 'private') {
-    if (!session.user) {
-      return notFound();
+    if (!chat) {
+      notFound();
     }
 
-    if (session.user.id !== chat.userId) {
-      return notFound();
-    }
-  }
+    const session = await auth();
 
-  const messagesFromDb = await getMessagesByChatId({
-    id,
-  });
+    if (!session) {
+      redirect('/api/auth/guest');
+    }
+
+    if (chat.visibility === 'private') {
+      if (!session.user) {
+        return notFound();
+      }
+
+      if (session.user.id !== chat.userId) {
+        return notFound();
+      }
+    }
+
+    const messagesFromDb = await getMessagesByChatId({
+      id,
+    });
 
   function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
     return messages.map((message) => ({
@@ -85,4 +87,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       <DataStreamHandler id={id} />
     </>
   );
+  } catch (error) {
+    console.error('Error loading chat:', error);
+    return notFound();
+  }
 }

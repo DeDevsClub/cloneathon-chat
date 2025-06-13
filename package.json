@@ -1,10 +1,14 @@
 {
-  "name": "ai-chatbot",
-  "version": "3.0.23",
+  "name": "cloneathon-chat",
+  "version": "0.0.1",
   "private": true,
+  "author": "DeDevsClub",
+  "license": "MIT",
   "scripts": {
+    "bdev": "next build && next dev --turbo",
     "dev": "next dev --turbo",
-    "build": "tsx lib/db/migrate && next build",
+    "build": "next build",
+    "db:build": "tsx lib/db/migrate && next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",

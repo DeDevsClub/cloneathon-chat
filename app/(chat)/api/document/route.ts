@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     return new ChatSDKError('unauthorized:document').toResponse();
   }
 
-  const documents = await getDocumentsById({ cid: id });
+  const documents = await getDocumentsById({ id });
 
   const [document] = documents;
 
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
   }: { content: string; title: string; kind: ArtifactKind } =
     await request.json();
 
-  const documents = await getDocumentsById({ cid: id });
+  const documents = await getDocumentsById({ id });
 
   if (documents.length > 0) {
     const [document] = documents;
@@ -109,7 +109,7 @@ export async function DELETE(request: Request) {
     return new ChatSDKError('unauthorized:document').toResponse();
   }
 
-  const documents = await getDocumentsById({ cid: id });
+  const documents = await getDocumentsById({ id });
 
   const [document] = documents;
 
@@ -118,7 +118,7 @@ export async function DELETE(request: Request) {
   }
 
   const documentsDeleted = await deleteDocumentsByIdAfterTimestamp({
-    cid: id,
+    id,
     timestamp: new Date(timestamp),
   });
 

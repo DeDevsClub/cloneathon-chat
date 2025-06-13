@@ -199,9 +199,9 @@ export async function getChatsByUserId({
   }
 }
 
-export async function getChatById({ cid }: { cid: string }) {
+export async function getChatById({ id }: { id: string }) {
   try {
-    const [selectedChat] = await db.select().from(chat).where(eq(chat.id, cid));
+    const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
     return selectedChat;
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to get chat by id');
@@ -220,12 +220,12 @@ export async function saveMessages({
   }
 }
 
-export async function getMessagesByChatId({ cid }: { cid: string }) {
+export async function getMessagesByChatId({ id }: { id: string }) {
   try {
     return await db
       .select()
       .from(message)
-      .where(eq(message.chatId, cid))
+      .where(eq(message.chatId, id))
       .orderBy(asc(message.createdAt));
   } catch (error) {
     throw new ChatSDKError(
@@ -269,9 +269,9 @@ export async function voteMessage({
   }
 }
 
-export async function getVotesByChatId({ cid }: { cid: string }) {
+export async function getVotesByChatId({ id }: { id: string }) {
   try {
-    return await db.select().from(vote).where(eq(vote.chatId, cid));
+    return await db.select().from(vote).where(eq(vote.chatId, id));
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',
@@ -310,12 +310,12 @@ export async function saveDocument({
   }
 }
 
-export async function getDocumentsById({ cid }: { cid: string }) {
+export async function getDocumentsById({ id }: { id: string }) {
   try {
     const documents = await db
       .select()
       .from(document)
-      .where(eq(document.chatId, cid))
+      .where(eq(document.chatId, id))
       .orderBy(asc(document.createdAt));
 
     return documents;
@@ -327,13 +327,12 @@ export async function getDocumentsById({ cid }: { cid: string }) {
   }
 }
 
-export async function getDocumentById({ cid }: { cid: string }) {
+export async function getDocumentById({ id }: { id: string }) {
   try {
     const [selectedDocument] = await db
       .select()
       .from(document)
-      .where(eq(document.chatId, cid))
-      .orderBy(desc(document.createdAt));
+      .where(eq(document.id, id));
 
     return selectedDocument;
   } catch (error) {
@@ -345,25 +344,22 @@ export async function getDocumentById({ cid }: { cid: string }) {
 }
 
 export async function deleteDocumentsByIdAfterTimestamp({
-  cid,
+  id,
   timestamp,
 }: {
-  cid: string;
+  id: string;
   timestamp: Date;
 }) {
   try {
     await db
       .delete(suggestion)
       .where(
-        and(
-          eq(suggestion.documentId, cid),
-          gt(suggestion.createdAt, timestamp),
-        ),
+        and(eq(suggestion.documentId, id), gt(suggestion.createdAt, timestamp)),
       );
 
     return await db
       .delete(document)
-      .where(and(eq(document.chatId, cid), gt(document.createdAt, timestamp)))
+      .where(and(eq(document.chatId, id), gt(document.createdAt, timestamp)))
       .returning();
   } catch (error) {
     throw new ChatSDKError(

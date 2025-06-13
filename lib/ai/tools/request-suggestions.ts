@@ -23,7 +23,7 @@ export const requestSuggestions = ({
         .describe('The ID of the document to request edits'),
     }),
     execute: async ({ documentId }) => {
-      const document = await getDocumentById({ cid: documentId });
+      const document = await getDocumentById({ id: documentId });
 
       if (!document || !document.content) {
         return {

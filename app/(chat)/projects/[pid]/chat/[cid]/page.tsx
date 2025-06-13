@@ -14,7 +14,7 @@ export default async function Page(props: any) {
   const { cid } = params; // Chat ID from URL params
 
   try {
-    const chat = await getChatById({ cid });
+    const chat = await getChatById({ id: cid });
 
     if (!chat) {
       notFound();
@@ -37,7 +37,7 @@ export default async function Page(props: any) {
     }
 
     const messagesFromDb = await getMessagesByChatId({
-      cid,
+      id: cid,
     });
 
     function convertToUIMessages(messages: Array<Message>): Array<UIMessage> {

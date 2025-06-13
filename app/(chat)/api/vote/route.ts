@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     return new ChatSDKError('unauthorized:vote').toResponse();
   }
 
-  const chat = await getChatById({ cid: chatId });
+  const chat = await getChatById({ id: chatId });
 
   if (!chat) {
     return new ChatSDKError('not_found:chat').toResponse();
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     return new ChatSDKError('forbidden:vote').toResponse();
   }
 
-  const votes = await getVotesByChatId({ cid: chatId });
+  const votes = await getVotesByChatId({ id: chatId });
 
   return Response.json(votes, { status: 200 });
 }
@@ -55,7 +55,7 @@ export async function PATCH(request: Request) {
     return new ChatSDKError('unauthorized:vote').toResponse();
   }
 
-  const chat = await getChatById({ cid: chatId });
+  const chat = await getChatById({ id: chatId });
 
   if (!chat) {
     return new ChatSDKError('not_found:vote').toResponse();

@@ -33,9 +33,9 @@ import {
   type ResumableStreamContext,
 } from 'resumable-stream';
 import { after } from 'next/server';
-import type { Chat } from '@/lib/db/schema';
 import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
+import { Chat } from '@/lib/db';
 
 export const maxDuration = 60;
 
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       return new ChatSDKError('rate_limit:chat').toResponse();
     }
 
-    const chat = await getChatById({ cid: id });
+    const chat = await getChatById({ id });
 
     if (!chat) {
       const title = await generateTitleFromUserMessage({
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const previousMessages = await getMessagesByChatId({ cid: id });
+    const previousMessages = await getMessagesByChatId({ id });
 
     const messages = appendClientMessage({
       // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
@@ -268,7 +268,7 @@ export async function GET(request: Request) {
   let chat: Chat;
 
   try {
-    chat = await getChatById({ cid: chatId });
+    chat = await getChatById({ id: chatId });
   } catch {
     return new ChatSDKError('not_found:chat').toResponse();
   }
@@ -307,7 +307,7 @@ export async function GET(request: Request) {
    * but the resumable stream has concluded at this point.
    */
   if (!stream) {
-    const messages = await getMessagesByChatId({ cid: chatId });
+    const messages = await getMessagesByChatId({ id: chatId });
     const mostRecentMessage = messages.at(-1);
 
     if (!mostRecentMessage) {
@@ -353,7 +353,7 @@ export async function DELETE(request: Request) {
     return new ChatSDKError('unauthorized:chat').toResponse();
   }
 
-  const chat = await getChatById({ cid: id });
+  const chat = await getChatById({ id });
 
   if (chat.userId !== session.user.id) {
     return new ChatSDKError('forbidden:chat').toResponse();

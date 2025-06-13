@@ -56,18 +56,32 @@ export default function ProjectPage(props: any) {
   const [projectId, setProjectId] = useState<string | null>(pid);
   const [chatIds, setChatIds] = useState<string[] | null>(null);
 
-  const fetchProjectDetails = async () => {
+  async function fetchProjectDetails() {
+    if (!pid) {
+      toast.error('Invalid project ID');
+      router.push('/projects');
+      return;
+    }
+
     try {
       setLoading(true);
-      const pid = projectId;
+      // Use the project ID from the component state
+      const currentPid = pid;
 
       // Fetch project details
-      const projectResponse = await fetch(`/api/projects/${pid}`);
+      const projectResponse = await fetch(`/api/projects/${currentPid}`);
+
+      // Add debug logging
+      console.log(`Project fetch status: ${projectResponse.status}`);
 
       if (!projectResponse.ok) {
         if (projectResponse.status === 404) {
           toast.error('Project not found');
           router.push('/projects');
+          return;
+        } else if (projectResponse.status === 401) {
+          toast.error('Authentication required');
+          // Optionally redirect to login
           return;
         }
         throw new Error('Failed to fetch project details');
@@ -76,12 +90,17 @@ export default function ProjectPage(props: any) {
       const projectData = await projectResponse.json();
       const projectDetails = projectData.project;
       setProject(projectDetails);
-      setProjectId(pid);
+      setProjectId(currentPid);
 
-      // Fetch project chats using the path parameter, not state
-      const chatsResponse = await fetch(`/api/projects/${pid}/chats`);
+      // Fetch project chats
+      const chatsResponse = await fetch(`/api/projects/${currentPid}/chats`);
+      console.log(`Chats fetch status: ${chatsResponse.status}`);
 
       if (!chatsResponse.ok) {
+        if (chatsResponse.status === 401) {
+          toast.error('Authentication required for chat access');
+          return;
+        }
         throw new Error('Failed to fetch project chats');
       }
 
@@ -94,7 +113,7 @@ export default function ProjectPage(props: any) {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleDeleteProject = async () => {
     if (!project) return;

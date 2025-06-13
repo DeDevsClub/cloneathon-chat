@@ -31,9 +31,14 @@ interface AppSidebarProps {
 }
 export function AppSidebar({ user }: AppSidebarProps) {
   const router = useRouter();
-  const { toggleSidebar, state, setOpenMobile } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
   const isOpen = state === 'expanded';
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+  const createChat = () => {
+    router.push('/');
+    router.refresh();
+  };
 
   return (
     <>
@@ -42,45 +47,42 @@ export function AppSidebar({ user }: AppSidebarProps) {
         onOpenChange={setIsSearchModalOpen}
       />
       <Sidebar className="group-data-[side=left]:border-r-0">
-        <SidebarHeader>
-          <HeaderIsland
-            isSidebarOpen={isOpen}
-            toggleSidebar={toggleSidebar}
-            openSearchModal={() => setIsSearchModalOpen(true)}
-          />
+        <SidebarHeader className="flex flex-row gap-1 sm:ml-12 h-12 rounded-md justify-start items-center mt-2 max-w-full">
           <SidebarMenu>
-            <div className="flex flex-row justify-between items-center">
-              <Link
-                href="/"
-                onClick={() => {
-                  router.push('/');
-                }}
-                className="flex flex-row gap-3 items-center w-full"
-              >
-                <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer flex flex-row gap-2 items-center">
-                  <Icon icon="mdi:chat" className="size-6" />
-                  th3.chat
-                </span>
-              </Link>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    className="p-2 h-fit"
-                    onClick={() => {
-                      router.push('/');
-                      router.refresh();
-                    }}
-                  >
-                    <PlusIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent align="end">New Chat</TooltipContent>
-              </Tooltip>
-            </div>
+            <HeaderIsland
+              isSidebarOpen={isOpen}
+              toggleSidebar={toggleSidebar}
+              openSearchModal={() => setIsSearchModalOpen(true)}
+            />
+            <Link
+              href="/"
+              onClick={() => {
+                router.push('/');
+              }}
+              className="flex flex-cols justify-center items-center gap-2 bg-muted rounded-md p-2 cursor-pointer"
+            >
+              <Icon icon="mdi:chat" className="size-6" />
+              <span className="text-lg font-semibold hover:bg-muted rounded-md cursor-pointer flex flex-row max-w-full gap-2 items-center">
+                th3.chat
+              </span>
+            </Link>
           </SidebarMenu>
         </SidebarHeader>
+        {/* <Tooltip> */}
+        {/* <Button
+            variant="outline"
+            type="button"
+            className="w-full hover:bg-muted group grid place-items-center"
+            onClick={() => {
+              createChat();
+            }}
+          >
+            <TooltipTrigger asChild>
+              <PlusIcon />
+            </TooltipTrigger>
+            <TooltipContent align="end">New Chat</TooltipContent>
+          </Button> */}
+        {/* </Tooltip> */}
         <SidebarContent>
           <SidebarHistory user={user} />
         </SidebarContent>

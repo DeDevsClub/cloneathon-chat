@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -53,8 +53,18 @@ interface Project {
   color: string | null;
 }
 
-const EditProjectPage = (props: any) => {
-  const { params } = props;
+interface PageParams {
+  pid: string;
+}
+
+interface PageProps {
+  params: Promise<PageParams>;
+}
+
+const EditProjectPage = (props: PageProps) => {
+  // Properly unwrap params using React.use()
+  const unwrappedParams = use(props.params);
+  const projectId = unwrappedParams.pid;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,7 +85,7 @@ const EditProjectPage = (props: any) => {
     async function fetchProject() {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/projects/${params.id}`);
+        const response = await fetch(`/api/projects/${projectId}`);
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -105,13 +115,13 @@ const EditProjectPage = (props: any) => {
     }
 
     fetchProject();
-  }, [params.id, form]);
+  }, [projectId, form]);
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/projects/${params.id}`, {
+      const response = await fetch(`/api/projects/${projectId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +173,7 @@ const EditProjectPage = (props: any) => {
       <Button
         variant="ghost"
         className="mb-6"
-        onClick={() => router.push(`/projects/${params.id}`)}
+        onClick={() => router.push(`/projects/${projectId}`)}
       >
         <ArrowLeft className="mr-2 size-4" />
         Back to Project
@@ -267,7 +277,7 @@ const EditProjectPage = (props: any) => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => router.push(`/projects/${params.id}`)}
+                  onClick={() => router.push(`/projects/${projectId}`)}
                   disabled={isSubmitting}
                 >
                   Cancel

@@ -6,17 +6,29 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
+import { use } from 'react';
+
+interface PageParams {
+  pid: string;
+}
+
+interface PageProps {
+  params: Promise<PageParams>;
+}
 
 /**
  * This page handles the creation of a new chat within a project.
  * It generates a UUID for the chat, creates the chat record in the database,
  * and redirects to the new chat page.
  */
-export default function NewChatPage({ params }: { params: { pid: string } }) {
+export default function NewChatPage(props: PageProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [creating, setCreating] = useState(true);
-  const projectId = params?.pid;
+  
+  // Properly unwrap params using React.use()
+  const unwrappedParams = use(props.params);
+  const projectId = unwrappedParams.pid;
 
   useEffect(() => {
     async function createNewChat() {

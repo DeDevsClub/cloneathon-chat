@@ -29,8 +29,8 @@ export function HeaderIsland({
   // const { addConversation } = useChatStore();
   const { setTheme, theme } = useTheme();
 
-  const handleSettingsClick = () => {
-    router.push('/settings');
+  const handleProjectsClick = () => {
+    router.push('/projects');
   };
 
   return (
@@ -131,9 +131,9 @@ export function HeaderIsland({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleSettingsClick()}
+                onClick={() => handleProjectsClick()}
                 className="h-8 w-8 hover:bg-muted"
-                aria-label="Settings"
+                aria-label="Projects"
               >
                 <Icon
                   icon="line-md:folder-settings-twotone"
@@ -144,7 +144,7 @@ export function HeaderIsland({
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom" sideOffset={5}>
-              Settings
+              Projects
             </TooltipContent>
           </Tooltip>
           <Tooltip>

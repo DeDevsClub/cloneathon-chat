@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { use } from 'react';
 import {
   ArrowLeft,
   Loader2,
@@ -44,10 +45,18 @@ interface Project {
   color: string | null;
 }
 
-export default function ProjectPage(props: any) {
-  // Extract pid directly from params to avoid issues with Next.js params Promise warnings
-  const { params } = props;
-  const pid = params?.pid;
+interface PageParams {
+  pid: string;
+}
+
+interface PageProps {
+  params: Promise<PageParams>;
+}
+
+export default function ProjectPage(props: PageProps) {
+  // Properly unwrap params using React.use()
+  const unwrappedParams = use(props.params);
+  const pid = unwrappedParams.pid; // Safe to access directly since we've properly typed it
 
   const router = useRouter();
   const [loading, setLoading] = useState(true);

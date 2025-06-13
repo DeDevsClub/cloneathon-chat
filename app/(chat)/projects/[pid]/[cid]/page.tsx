@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
+import { use } from 'react';
 
 import { auth } from '@/app/(auth)/auth';
 import { Chat } from '@/components/chat/chat';
@@ -9,9 +10,19 @@ import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import type { Message } from '@/lib/db/schema';
 import type { Attachment, UIMessage } from 'ai';
 
-export default async function Page(props: any) {
-  const { params } = props;
-  const { pid, cid } = params; // ids from URL params
+interface PageParams {
+  pid: string;
+  cid: string;
+}
+
+interface PageProps {
+  params: Promise<PageParams>;
+}
+
+export default async function Page(props: PageProps) {
+  // Properly unwrap params using React.use()
+  const unwrappedParams = use(props.params);
+  const { pid, cid } = unwrappedParams; // ids from URL params
 
   try {
     const chat = await getChatById({ id: cid });

@@ -51,7 +51,7 @@ export default function ProjectPage(props: any) {
   const [project, setProject] = useState<Project | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
   const [projectId, setProjectId] = useState<string | null>(null);
-  // const [chatId, setChatId] = useState<string | null>(null);
+  const [chatIds, setChatIds] = useState<string[] | null>(null);
 
   const fetchProjectDetails = async () => {
     try {
@@ -83,7 +83,8 @@ export default function ProjectPage(props: any) {
       const chatsData = await chatsResponse.json();
       setChats(chatsData.chats || []);
       console.log({ chatsData });
-      // setChatId(chatsData.chats[0].id);
+      setChatIds(chatsData.chats.map((chat: Chat) => chat.id));
+      console.log({ chatIds });
     } catch (error) {
       console.error('Error fetching project details:', error);
       toast.error('Failed to load project details');

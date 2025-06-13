@@ -22,7 +22,7 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 
 export function Chat({
-  id,
+  cid,
   initialMessages,
   initialChatModel,
   initialVisibilityType,
@@ -30,7 +30,7 @@ export function Chat({
   session,
   autoResume,
 }: {
-  id: string;
+  cid: string;
   initialMessages: Array<UIMessage>;
   initialChatModel: string;
   initialVisibilityType: VisibilityType;
@@ -41,7 +41,7 @@ export function Chat({
   const { mutate } = useSWRConfig();
 
   const { visibilityType } = useChatVisibility({
-    chatId: id,
+    chatId: cid,
     initialVisibilityType,
   });
 
@@ -58,14 +58,14 @@ export function Chat({
     experimental_resume,
     data,
   } = useChat({
-    id,
+    id: cid,
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
     experimental_prepareRequestBody: (body) => ({
-      id,
+      id: cid,
       message: body.messages.at(-1),
       selectedChatModel: initialChatModel,
       selectedVisibilityType: visibilityType,
@@ -96,12 +96,12 @@ export function Chat({
       });
 
       setHasAppendedQuery(true);
-      window.history.replaceState({}, '', `/chat/${id}`);
+      window.history.replaceState({}, '', `/chat/${cid}`);
     }
-  }, [query, append, hasAppendedQuery, id]);
+  }, [query, append, hasAppendedQuery, cid]);
 
   const { data: votes } = useSWR<Array<Vote>>(
-    messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
+    messages.length >= 2 ? `/api/vote?chatId=${cid}` : null,
     fetcher,
   );
 
@@ -120,7 +120,7 @@ export function Chat({
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
-          chatId={id}
+          chatId={cid}
           selectedModelId={initialChatModel}
           selectedVisibilityType={initialVisibilityType}
           isReadonly={isReadonly}
@@ -128,7 +128,7 @@ export function Chat({
         />
 
         <Messages
-          chatId={id}
+          chatId={cid}
           status={status}
           votes={votes}
           messages={messages}
@@ -141,7 +141,7 @@ export function Chat({
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
           {!isReadonly && (
             <MultimodalInput
-              chatId={id}
+              chatId={cid}
               input={input}
               setInput={setInput}
               handleSubmit={handleSubmit}
@@ -159,7 +159,7 @@ export function Chat({
       </div>
 
       <Artifact
-        chatId={id}
+        chatId={cid}
         input={input}
         setInput={setInput}
         handleSubmit={handleSubmit}

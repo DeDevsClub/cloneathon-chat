@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       return new ChatSDKError('rate_limit:chat').toResponse();
     }
 
-    const chat = await getChatById({ id });
+    const chat = await getChatById({ cid: id });
 
     if (!chat) {
       const title = await generateTitleFromUserMessage({
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const previousMessages = await getMessagesByChatId({ id });
+    const previousMessages = await getMessagesByChatId({ cid: id });
 
     const messages = appendClientMessage({
       // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
@@ -137,12 +137,14 @@ export async function POST(request: Request) {
           parts: message.parts,
           attachments: message.experimental_attachments ?? [],
           createdAt: new Date(),
+          contentType: null,
+          textContent: null,
         },
       ],
     });
 
     const streamId = generateUUID();
-    await createStreamId({ streamId, chatId: id });
+    await createStreamId({ userId: session.user.id, streamId, chatId: id });
 
     const stream = createDataStream({
       execute: (dataStream) => {
@@ -199,6 +201,8 @@ export async function POST(request: Request) {
                       attachments:
                         assistantMessage.experimental_attachments ?? [],
                       createdAt: new Date(),
+                      contentType: null,
+                      textContent: null,
                     },
                   ],
                 });
@@ -264,7 +268,7 @@ export async function GET(request: Request) {
   let chat: Chat;
 
   try {
-    chat = await getChatById({ id: chatId });
+    chat = await getChatById({ cid: chatId });
   } catch {
     return new ChatSDKError('not_found:chat').toResponse();
   }
@@ -303,7 +307,7 @@ export async function GET(request: Request) {
    * but the resumable stream has concluded at this point.
    */
   if (!stream) {
-    const messages = await getMessagesByChatId({ id: chatId });
+    const messages = await getMessagesByChatId({ cid: chatId });
     const mostRecentMessage = messages.at(-1);
 
     if (!mostRecentMessage) {
@@ -349,7 +353,7 @@ export async function DELETE(request: Request) {
     return new ChatSDKError('unauthorized:chat').toResponse();
   }
 
-  const chat = await getChatById({ id });
+  const chat = await getChatById({ cid: id });
 
   if (chat.userId !== session.user.id) {
     return new ChatSDKError('forbidden:chat').toResponse();

@@ -6,15 +6,15 @@ import { Chat } from '@/components/chat/chat';
 import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import type { DBMessage } from '@/lib/db/schema';
+import type { Message } from '@/lib/db/schema';
 import type { Attachment, UIMessage } from 'ai';
 
 export default async function Page(props: any) {
   const { params } = props;
-  const { id } = params;
-  
+  const { cid } = params; // Chat ID from URL params
+
   try {
-    const chat = await getChatById({ id });
+    const chat = await getChatById({ cid });
 
     if (!chat) {
       notFound();
@@ -37,56 +37,56 @@ export default async function Page(props: any) {
     }
 
     const messagesFromDb = await getMessagesByChatId({
-      id,
+      cid,
     });
 
-  function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
-    return messages.map((message) => ({
-      id: message.id,
-      parts: message.parts as UIMessage['parts'],
-      role: message.role as UIMessage['role'],
-      // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
-      createdAt: message.createdAt,
-      experimental_attachments:
-        (message.attachments as Array<Attachment>) ?? [],
-    }));
-  }
+    function convertToUIMessages(messages: Array<Message>): Array<UIMessage> {
+      return messages.map((message) => ({
+        id: message.id,
+        parts: message.parts as UIMessage['parts'],
+        role: message.role as UIMessage['role'],
+        // Note: content will soon be deprecated in @ai-sdk/react
+        content: '',
+        createdAt: message.createdAt,
+        experimental_attachments:
+          (message.attachments as Array<Attachment>) ?? [],
+      }));
+    }
 
-  const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
+    const cookieStore = await cookies();
+    const chatModelFromCookie = cookieStore.get('chat-model');
 
-  if (!chatModelFromCookie) {
+    if (!chatModelFromCookie) {
+      return (
+        <>
+          <Chat
+            cid={chat.id}
+            initialMessages={convertToUIMessages(messagesFromDb)}
+            initialChatModel={DEFAULT_CHAT_MODEL}
+            initialVisibilityType={chat.visibility}
+            isReadonly={session?.user?.id !== chat.userId}
+            session={session}
+            autoResume={true}
+          />
+          <DataStreamHandler cid={chat.id} />
+        </>
+      );
+    }
+
     return (
       <>
         <Chat
-          id={chat.id}
+          cid={chat.id}
           initialMessages={convertToUIMessages(messagesFromDb)}
-          initialChatModel={DEFAULT_CHAT_MODEL}
+          initialChatModel={chatModelFromCookie.value}
           initialVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
           session={session}
           autoResume={true}
         />
-        <DataStreamHandler id={id} />
+        <DataStreamHandler cid={chat.id} />
       </>
     );
-  }
-
-  return (
-    <>
-      <Chat
-        id={chat.id}
-        initialMessages={convertToUIMessages(messagesFromDb)}
-        initialChatModel={chatModelFromCookie.value}
-        initialVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
-        session={session}
-        autoResume={true}
-      />
-      <DataStreamHandler id={id} />
-    </>
-  );
   } catch (error) {
     console.error('Error loading chat:', error);
     return notFound();

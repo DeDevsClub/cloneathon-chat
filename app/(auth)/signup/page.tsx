@@ -80,7 +80,7 @@ export default function Page() {
       updateSession();
       router.refresh();
     }
-  }, [state]);
+  }, [state, updateSession, router]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
@@ -121,12 +121,12 @@ export default function Page() {
           <CardHeader className="space-y-1 pb-2">
             <motion.div variants={itemVariants}>
               <CardTitle className="text-2xl font-bold text-center text-foreground/90">
-                Join our community
+                Sign Up for th3.chat
               </CardTitle>
             </motion.div>
             <motion.div variants={itemVariants}>
               <CardDescription className="text-center text-muted-foreground">
-                Create your account to get started
+                Create your account to get started.
               </CardDescription>
             </motion.div>
           </CardHeader>
@@ -164,7 +164,7 @@ export default function Page() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/95 px-2 text-muted-foreground">
-                    Already a member?{' '}
+                    Already signed up?{' '}
                     <Link
                       href="/login"
                       className="text-primary hover:text-primary/90 hover:underline"

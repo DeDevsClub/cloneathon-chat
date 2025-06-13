@@ -23,7 +23,7 @@ export const requestSuggestions = ({
         .describe('The ID of the document to request edits'),
     }),
     execute: async ({ documentId }) => {
-      const document = await getDocumentById({ id: documentId });
+      const document = await getDocumentById({ cid: documentId });
 
       if (!document || !document.content) {
         return {
@@ -32,7 +32,10 @@ export const requestSuggestions = ({
       }
 
       const suggestions: Array<
-        Omit<Suggestion, 'userId' | 'createdAt' | 'documentCreatedAt'>
+        Omit<
+          Suggestion,
+          'userId' | 'createdAt' | 'documentCreatedAt' | 'updatedAt'
+        >
       > = [];
 
       const { elementStream } = streamObject({
@@ -56,11 +59,19 @@ export const requestSuggestions = ({
           id: generateUUID(),
           documentId: documentId,
           isResolved: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: session.user?.id,
+          documentCreatedAt: document.createdAt,
         };
 
         dataStream.writeData({
           type: 'suggestion',
-          content: suggestion,
+          content: JSON.stringify(suggestion),
+          metadata: {
+            createdAt: suggestion.createdAt.toISOString(),
+            updatedAt: suggestion.updatedAt.toISOString(),
+          },
         });
 
         suggestions.push(suggestion);
@@ -75,6 +86,7 @@ export const requestSuggestions = ({
             userId,
             createdAt: new Date(),
             documentCreatedAt: document.createdAt,
+            updatedAt: new Date(),
           })),
         });
       }

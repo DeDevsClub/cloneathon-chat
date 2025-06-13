@@ -1,0 +1,102 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * This page handles the creation of a new chat within a project.
+ * It generates a UUID for the chat, creates the chat record in the database,
+ * and redirects to the new chat page.
+ */
+export default function NewChatPage({ params }: { params: { pid: string } }) {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [creating, setCreating] = useState(true);
+  const projectId = params?.pid;
+
+  useEffect(() => {
+    async function createNewChat() {
+      // Wait for session to load
+      if (status === 'loading') return;
+
+      try {
+        if (!projectId) {
+          toast.error('Project ID is required');
+          router.push('/projects');
+          return;
+        }
+
+        if (!session) {
+          toast.error('You must be logged in to create a chat');
+          router.push('/login');
+          return;
+        }
+
+        // Generate a UUID for the new chat
+        const chatId = uuidv4();
+
+        // Create initial chat with default title
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: chatId,
+            selectedVisibilityType: 'private',
+            selectedChatModel: 'default',
+            message: {
+              id: uuidv4(),
+              parts: ['Hello! This is a new chat.'],
+              role: 'user',
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create chat');
+        }
+
+        // Now update the chat with the project ID
+        const projectUpdateResponse = await fetch(`/api/chat/project`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chatId,
+            projectId,
+          }),
+        });
+
+        if (!projectUpdateResponse.ok) {
+          throw new Error('Failed to associate chat with project');
+        }
+
+        // Redirect to the new chat
+        router.push(`/projects/${projectId}/chat/${chatId}`);
+      } catch (error) {
+        console.error('Error creating chat:', error);
+        toast.error('Failed to create chat');
+        router.push(`/projects/${projectId}`);
+      } finally {
+        setCreating(false);
+      }
+    }
+
+    createNewChat();
+  }, [projectId, router, session, status]);
+
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-lg text-muted-foreground">Creating a new chat...</p>
+      </div>
+    </div>
+  );
+}

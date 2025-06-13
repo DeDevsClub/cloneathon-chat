@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -57,7 +57,7 @@ export default function ProjectPage(props: any) {
   const [chatIds, setChatIds] = useState<string[] | null>(null);
 
   async function fetchProjectDetails() {
-    if (!pid) {
+    if (!projectId) {
       toast.error('Invalid project ID');
       router.push('/projects');
       return;
@@ -66,7 +66,7 @@ export default function ProjectPage(props: any) {
     try {
       setLoading(true);
       // Use the project ID from the component state
-      const currentPid = pid;
+      const currentPid = projectId;
 
       // Fetch project details
       const projectResponse = await fetch(`/api/projects/${currentPid}`);
@@ -90,7 +90,6 @@ export default function ProjectPage(props: any) {
       const projectData = await projectResponse.json();
       const projectDetails = projectData.project;
       setProject(projectDetails);
-      setProjectId(currentPid);
 
       // Fetch project chats
       const chatsResponse = await fetch(`/api/projects/${currentPid}/chats`);
@@ -144,10 +143,13 @@ export default function ProjectPage(props: any) {
   };
 
   useEffect(() => {
-    fetchProjectDetails();
-    // Only depend on params.pid to avoid unnecessary rerenders
-    // Remove circular dependency on fetchProjectDetails
-  }, [params.pid]);
+    if (pid) {
+      setProjectId(pid);
+      fetchProjectDetails();
+    }
+    console.log('Project ID:', projectId);
+    // Only depend on specific dependencies to avoid unnecessary rerenders
+  }, [pid, router]);
 
   if (loading) {
     return (

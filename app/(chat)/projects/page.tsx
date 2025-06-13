@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus } from 'lucide-react';
@@ -21,6 +21,9 @@ const ProjectsPage = () => {
     'has-seen-projects-tutorial',
     false,
   );
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const fetchProjects = async () => {
     try {
@@ -70,8 +73,51 @@ const ProjectsPage = () => {
   const handleCreateFromTutorial = () => {
     setShowTutorial(false);
     setHasSeenTutorial(true);
+    setIsSidebarOpen(true);
     setOpen(true);
   };
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
+  }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isSidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        // Check if the click originated from within the HeaderIsland to prevent immediate closure
+        const headerIslandElement = document.querySelector(
+          '.pointer-events-none.fixed.inset-x-0.top-0',
+        );
+        if (headerIslandElement?.contains(event.target as Node)) {
+          // Check if the actual click target is the toggle button itself or its child icon
+          // This is a bit of a heuristic. A more robust way would be to pass a ref for the toggle button.
+          let targetElement = event.target as HTMLElement;
+          let isToggleButton = false;
+          while (targetElement && targetElement !== headerIslandElement) {
+            if (targetElement.getAttribute('aria-label') === 'Toggle sidebar') {
+              isToggleButton = true;
+              break;
+            }
+            targetElement = targetElement.parentElement as HTMLElement;
+          }
+          if (isToggleButton) return; // Don't close if toggle button was clicked
+        }
+        setIsSidebarOpen(false);
+      }
+    };
+
+    if (isSidebarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen]);
 
   return (
     <div className="container py-6 max-w-5xl mx-auto">

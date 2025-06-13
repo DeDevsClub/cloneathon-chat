@@ -4,7 +4,7 @@ import { AppSidebar } from '@/components/navigation/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { auth } from '../(auth)/auth';
 import Script from 'next/script';
-import { AnimatedGridBackgroundSection } from '@/components/animated-grad-bg';
+import { AnimatedGridBackgroundSection } from '@/components/animated-grid';
 
 export const experimental_ppr = true;
 

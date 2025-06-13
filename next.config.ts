@@ -11,6 +11,28 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: async () => [
+    {
+      source: '/login',
+      destination: '/auth/login',
+      permanent: true,
+    },
+    {
+      source: '/signup',
+      destination: '/auth/signup',
+      permanent: true,
+    },
+    {
+      source: '/chat',
+      destination: '/projects',
+      permanent: true,
+    },
+    {
+      source: '/chat/:cid',
+      destination: '/projects',
+      permanent: true,
+    },
+  ],
 };
 
 export default nextConfig;

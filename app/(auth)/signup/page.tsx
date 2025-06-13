@@ -164,12 +164,12 @@ export default function Page() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/95 px-2 text-muted-foreground">
-                    Already signed up?{' '}
+                    Already joined?{' '}
                     <Link
                       href="/login"
-                      className="text-primary hover:text-primary/90 hover:underline"
+                      className="text-primary hover:text-primary/90 hover:underline cursor-pointer font-semibold text-md"
                     >
-                      Login here
+                      Login
                     </Link>
                   </span>
                 </div>

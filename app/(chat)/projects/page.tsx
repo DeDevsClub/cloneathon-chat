@@ -5,15 +5,22 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 
 import { ProjectItem } from '@/components/project/project-item';
 import { CreateProjectDialog } from '@/components/project/create-project-dialog';
+import { ProjectTutorial } from '@/components/tutorials/project-tutorial';
 
 const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<any[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [hasSeenTutorial, setHasSeenTutorial] = useLocalStorage(
+    'has-seen-projects-tutorial',
+    false,
+  );
 
   const fetchProjects = async () => {
     try {
@@ -36,13 +43,34 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+
+    // Show tutorial if this is the first time visiting projects page
+    if (!hasSeenTutorial) {
+      // Small delay to allow projects to load first
+      const timer = setTimeout(() => {
+        setShowTutorial(true);
+      }, 800);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTutorial]);
 
   const handleProjectCreated = (project: any) => {
     // Refresh the project list after a new project is created
     fetchProjects();
     setOpen(false);
     toast.success('Project created successfully');
+  };
+
+  const handleDismissTutorial = () => {
+    setShowTutorial(false);
+    setHasSeenTutorial(true);
+  };
+
+  const handleCreateFromTutorial = () => {
+    setShowTutorial(false);
+    setHasSeenTutorial(true);
+    setOpen(true);
   };
 
   return (
@@ -84,6 +112,14 @@ const ProjectsPage = () => {
         onOpenChange={setOpen}
         onProjectCreated={handleProjectCreated}
       />
+
+      {/* Interactive tutorial */}
+      {showTutorial && (
+        <ProjectTutorial
+          onDismiss={handleDismissTutorial}
+          onCreateProject={handleCreateFromTutorial}
+        />
+      )}
     </div>
   );
 };

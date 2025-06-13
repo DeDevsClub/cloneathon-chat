@@ -85,7 +85,8 @@ export function CreateProjectDialog({
         console.log({ error });
         if (isGuest) {
           toast.error('Authentication Required', {
-            description: 'Please sign in with your account to create and manage projects.',
+            description:
+              'Please sign in with your account to create and manage projects.',
             action: {
               label: 'Sign In',
               onClick: () => router.push('/login'),
@@ -102,9 +103,11 @@ export function CreateProjectDialog({
       onProjectCreated(project);
       router.refresh();
     } catch (error) {
+      console.log({ user: session?.user });
       console.error('Error creating project:', error);
       toast.error('Project Creation Failed', {
-        description: 'There was a problem creating your project. Please try again.',
+        description:
+          'There was a problem creating your project. Please try again.',
       });
     } finally {
       setIsSubmitting(false);

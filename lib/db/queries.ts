@@ -6,10 +6,14 @@ import {
   count,
   desc,
   eq,
+  exists,
   gt,
   gte,
   inArray,
+  isNull,
   lt,
+  not,
+  or,
   type SQL,
 } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -18,6 +22,7 @@ import postgres from 'postgres';
 import {
   user,
   chat,
+  project,
   type User,
   document,
   type Suggestion,
@@ -155,17 +160,62 @@ export async function getChatsByUserId({
   try {
     const extendedLimit = limit + 1;
 
-    const query = (whereCondition?: SQL<any>) =>
-      db
+    // Combined query that gets all chats for the user using either direct ownership or project ownership
+    const query = (whereCondition?: SQL<any>) => {
+      const baseQuery = db
         .select()
         .from(chat)
         .where(
           whereCondition
-            ? and(whereCondition, eq(chat.userId, id))
-            : eq(chat.userId, id),
+            ? and(
+                whereCondition,
+                // Chat is either directly owned by user or is in a project owned by user
+                or(
+                  eq(chat.userId, id),
+                  // Join through projects
+                  and(
+                    // Chat must have a project reference
+                    not(isNull(chat.projectId)),
+                    // And the project must be owned by this user
+                    exists(
+                      db
+                        .select({ id: project.id })
+                        .from(project)
+                        .where(
+                          and(
+                            eq(project.userId, id),
+                            eq(project.id, chat.projectId)
+                          )
+                        )
+                    )
+                  )
+                )
+              )
+            : or(
+                eq(chat.userId, id),
+                // Join through projects
+                and(
+                  // Chat must have a project reference
+                  not(isNull(chat.projectId)),
+                  // And the project must be owned by this user
+                  exists(
+                    db
+                      .select({ id: project.id })
+                      .from(project)
+                      .where(
+                        and(
+                          eq(project.userId, id),
+                          eq(project.id, chat.projectId)
+                        )
+                      )
+                  )
+                )
+              ),
         )
         .orderBy(desc(chat.createdAt))
         .limit(extendedLimit);
+      return baseQuery;
+    };
 
     let filteredChats: Array<Chat> = [];
 
@@ -210,6 +260,7 @@ export async function getChatsByUserId({
       hasMore,
     };
   } catch (error) {
+    console.error('Error in getChatsByUserId:', error);
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get chats by user id',

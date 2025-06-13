@@ -110,9 +110,9 @@ export async function PATCH(request: NextRequest, context: any) {
       id: context.params.id,
       name: schema.data.name,
       //   todo: handle optional fields
-      description: schema.data.description || undefined,
+      description: schema.data.description || '',
       icon: schema.data.icon || undefined,
-      color: schema.data.color || undefined,
+      color: schema.data.color || '#4f46e5',
     });
 
     return NextResponse.json({ project: updatedProject });
@@ -144,6 +144,7 @@ export async function DELETE(request: NextRequest, context: any) {
     }
 
     const validation = await validateUserOwnership(context.params.id, email);
+    // console.log({ validation });
     if ('error' in validation) {
       return NextResponse.json(
         { error: validation.error },

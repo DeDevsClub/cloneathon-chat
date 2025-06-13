@@ -51,7 +51,26 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        toast.error(res.error || 'Failed to sign in');
+        // Check for specific error types to provide more helpful feedback
+        if (res.error.includes('password') || res.error.toLowerCase().includes('credentials')) {
+          toast.error('Authentication Failed', {
+            description: 'The password you entered is incorrect. Please try again.',
+            action: {
+              label: 'Retry',
+              onClick: () => {
+                // Focus the password field for easier retry
+                document.getElementById('password')?.focus();
+                // Clear the password field
+                setFormData((prev) => ({ ...prev, password: '' }));
+              },
+            },
+            duration: 5000,
+          });
+        } else {
+          toast.error('Sign In Failed', {
+            description: res.error || 'Unable to sign in with these credentials',
+          });
+        }
         return;
       }
 

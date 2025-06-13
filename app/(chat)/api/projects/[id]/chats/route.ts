@@ -5,7 +5,7 @@ import { getUser } from '@/lib/db/queries';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const sessionCookie = request.cookies.get('user-session');
@@ -30,7 +30,7 @@ export async function GET(
 
     // Check if project exists and user has access to it
     try {
-      const project = await getProject({ id: params.id });
+      const project = await getProject({ id: context.params.id });
 
       // Check if user owns the project
       if (project.userId !== user.id) {
@@ -42,7 +42,7 @@ export async function GET(
 
       // Get all chats for this project
       const chats = await getChatsByProjectId({
-        projectId: params.id,
+        projectId: context.params.id,
         userId: user.id,
       });
 
@@ -50,7 +50,7 @@ export async function GET(
     } catch (error: any) {
       if (error?.message?.includes('not found')) {
         return NextResponse.json(
-          { error: `Project with id ${params.id} not found` },
+          { error: `Project with id ${context.params.id} not found` },
           { status: 404 },
         );
       }

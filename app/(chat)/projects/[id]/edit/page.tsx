@@ -53,7 +53,8 @@ interface Project {
   color: string | null;
 }
 
-const EditProjectPage = ({ params }: { params: { id: string } }) => {
+const EditProjectPage = (props: any) => {
+  const { params } = props;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);

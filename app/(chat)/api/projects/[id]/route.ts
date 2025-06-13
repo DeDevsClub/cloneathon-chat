@@ -38,10 +38,7 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
 }
 
 // GET /api/projects/[id] - Get a specific project
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(request: NextRequest, context: any) {
   try {
     // Get user email from the session cookie
     const sessionCookie = request.cookies.get('user-session');
@@ -58,7 +55,7 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    const validation = await validateUserOwnership(params.id, email);
+    const validation = await validateUserOwnership(context.params.id, email);
     if ('error' in validation) {
       return NextResponse.json(
         { error: validation.error },
@@ -77,10 +74,7 @@ export async function GET(
 }
 
 // PATCH /api/projects/[id] - Update a project
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PATCH(request: NextRequest, context: any) {
   try {
     // Get user email from the session cookie
     const sessionCookie = request.cookies.get('user-session');
@@ -97,7 +91,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    const validation = await validateUserOwnership(params.id, email);
+    const validation = await validateUserOwnership(context.params.id, email);
     if ('error' in validation) {
       return NextResponse.json(
         { error: validation.error },
@@ -113,7 +107,7 @@ export async function PATCH(
     }
 
     const updatedProject = await updateProject({
-      id: params.id,
+      id: context.params.id,
       name: schema.data.name,
       //   todo: handle optional fields
       description: schema.data.description || undefined,
@@ -132,10 +126,7 @@ export async function PATCH(
 }
 
 // DELETE /api/projects/[id] - Delete a project
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest, context: any) {
   try {
     // Get user email from the session cookie
     const sessionCookie = request.cookies.get('user-session');
@@ -152,7 +143,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    const validation = await validateUserOwnership(params.id, email);
+    const validation = await validateUserOwnership(context.params.id, email);
     if ('error' in validation) {
       return NextResponse.json(
         { error: validation.error },
@@ -160,7 +151,7 @@ export async function DELETE(
       );
     }
 
-    await deleteProject({ id: params.id });
+    await deleteProject({ id: context.params.id });
 
     return NextResponse.json({ success: true });
   } catch (error) {

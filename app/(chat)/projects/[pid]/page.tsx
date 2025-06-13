@@ -50,13 +50,15 @@ export default function ProjectPage(props: any) {
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  // const [chatId, setChatId] = useState<string | null>(null);
 
   const fetchProjectDetails = async () => {
     try {
       setLoading(true);
 
       // Fetch project details
-      const projectResponse = await fetch(`/api/projects/${params.id}`);
+      const projectResponse = await fetch(`/api/projects/${params.pid}`);
 
       if (!projectResponse.ok) {
         if (projectResponse.status === 404) {
@@ -69,9 +71,10 @@ export default function ProjectPage(props: any) {
 
       const projectData = await projectResponse.json();
       setProject(projectData.project);
-
+      setProjectId(projectData.project.id);
+      console.log({ projectId });
       // Fetch project chats
-      const chatsResponse = await fetch(`/api/projects/${params.id}/chats`);
+      const chatsResponse = await fetch(`/api/projects/${projectId}/chats`);
 
       if (!chatsResponse.ok) {
         throw new Error('Failed to fetch project chats');
@@ -79,6 +82,8 @@ export default function ProjectPage(props: any) {
 
       const chatsData = await chatsResponse.json();
       setChats(chatsData.chats || []);
+      console.log({ chatsData });
+      // setChatId(chatsData.chats[0].id);
     } catch (error) {
       console.error('Error fetching project details:', error);
       toast.error('Failed to load project details');
@@ -99,7 +104,7 @@ export default function ProjectPage(props: any) {
     }
 
     try {
-      const response = await fetch(`/api/projects/${params.id}`, {
+      const response = await fetch(`/api/projects/${projectId}`, {
         method: 'DELETE',
       });
 
@@ -117,7 +122,7 @@ export default function ProjectPage(props: any) {
 
   useEffect(() => {
     fetchProjectDetails();
-  }, [params.id]);
+  }, [params.pid]);
 
   if (loading) {
     return (
@@ -159,7 +164,7 @@ export default function ProjectPage(props: any) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => router.push(`/projects/${project.id}/edit`)}
+              onClick={() => router.push(`/projects/${projectId}/edit`)}
             >
               <Pencil className="size-4 mr-2" />
               Edit Project
@@ -200,9 +205,7 @@ export default function ProjectPage(props: any) {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chats in this Project</h2>
-        <Button
-          onClick={() => router.push(`/projects/${project.id}/chat/new`)}
-        >
+        <Button onClick={() => router.push(`/projects/${projectId}/chat/new`)}>
           <MessageSquare className="mr-2 size-4" />
           New Chat
         </Button>
@@ -216,7 +219,7 @@ export default function ProjectPage(props: any) {
           </p>
           <Button
             className="mt-4"
-            onClick={() => router.push(`/projects/${project.id}/chat/new`)}
+            onClick={() => router.push(`/projects/${projectId}/chat/new`)}
           >
             <MessageSquare className="mr-2 size-4" />
             Create your first chat
@@ -225,7 +228,13 @@ export default function ProjectPage(props: any) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {chats.map((chat) => (
-            <Card key={chat.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={chat.id}
+              onClick={() =>
+                router.push(`/projects/${projectId}/chat/${chat.id}`)
+              }
+              className="hover:shadow-md transition-shadow"
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg truncate">{chat.title}</CardTitle>
                 <CardDescription className="text-xs">
@@ -239,7 +248,9 @@ export default function ProjectPage(props: any) {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => router.push(`/projects/${project.id}/chat/${chat.id}`)}
+                  onClick={() =>
+                    router.push(`/projects/${projectId}/chat/${chat.id}`)
+                  }
                 >
                   Open Chat
                 </Button>

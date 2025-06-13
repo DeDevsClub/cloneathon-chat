@@ -24,7 +24,7 @@ import {
   suggestion,
   message,
   vote,
-  type DBMessage,
+  type Message,
   type Chat,
   stream,
 } from './schema';
@@ -211,7 +211,7 @@ export async function getChatById({ id }: { id: string }) {
 export async function saveMessages({
   messages,
 }: {
-  messages: Array<DBMessage>;
+  messages: Array<Message>;
 }) {
   try {
     return await db.insert(message).values(messages);
@@ -236,10 +236,12 @@ export async function getMessagesByChatId({ id }: { id: string }) {
 }
 
 export async function voteMessage({
+  userId,
   chatId,
   messageId,
   type,
 }: {
+  userId: string;
   chatId: string;
   messageId: string;
   type: 'up' | 'down';
@@ -257,6 +259,7 @@ export async function voteMessage({
         .where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
     }
     return await db.insert(vote).values({
+      userId,
       chatId,
       messageId,
       isUpvoted: type === 'up',
@@ -352,10 +355,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
     await db
       .delete(suggestion)
       .where(
-        and(
-          eq(suggestion.documentId, id),
-          gt(suggestion.documentCreatedAt, timestamp),
-        ),
+        and(eq(suggestion.documentId, id), gt(suggestion.createdAt, timestamp)),
       );
 
     return await db
@@ -501,16 +501,18 @@ export async function getMessageCountByUserId({
 }
 
 export async function createStreamId({
+  userId,
   streamId,
   chatId,
 }: {
+  userId: string;
   streamId: string;
   chatId: string;
 }) {
   try {
     await db
       .insert(stream)
-      .values({ id: streamId, chatId, createdAt: new Date() });
+      .values({ userId, chatId, id: streamId, createdAt: new Date() });
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',

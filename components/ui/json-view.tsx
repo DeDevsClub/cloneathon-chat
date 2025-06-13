@@ -118,6 +118,13 @@ const JsonNode = memo(
           <div
             className="flex items-center mr-1 rounded cursor-pointer group hover:bg-gray-800/10 dark:hover:bg-gray-800/20"
             onClick={() => setIsExpanded(!isExpanded)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setIsExpanded(!isExpanded);
+              }
+            }}
           >
             {name && (
               <span className="mr-1 text-gray-600 dark:text-gray-400 dark:group-hover:text-gray-100 group-hover:text-gray-400">

@@ -25,7 +25,7 @@ export const Greeting = () => {
       <div className="absolute inset-0 z-0 opacity-10 dark:opacity-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-600/20 to-transparent" />
         <div
-          className="h-full w-full"
+          className="size-full"
           style={{
             backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent)`,
             backgroundSize: '50px 50px',

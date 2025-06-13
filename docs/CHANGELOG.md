@@ -5,6 +5,31 @@ All notable changes to the cloneathon-chat project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Project-level directory feature for organizing chats
+  - Users can create, update, and delete projects
+  - Projects can have custom names, descriptions, icons, and colors
+  - Chats can be associated with projects for better organization
+  - API endpoints for project management and chat associations
+  - UI components for listing and managing projects
+
+### Changed
+
+- Updated authentication approach in API routes to use session cookies
+- Extended chat creation workflow to support project association
+- Enhanced database schema with new Project table and relations
+
+### Fixed
+
+- Duplicate validation check in project deletion API endpoint
+- Session handling in API routes for consistent authentication
+- Updated project deletion API endpoint to handle project deletion
+
+---
+
 ## [0.1.0] - 2025-06-13
 
 ### Added

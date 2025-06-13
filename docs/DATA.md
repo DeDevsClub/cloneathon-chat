@@ -115,7 +115,7 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 
 ```
 ┌─────────────────────┐
-│ Message_v2          │
+│ Message             │
 ├─────────────────────┤
 │ id: uuid (PK)       │
 │ chatId: uuid (FK)   │
@@ -141,7 +141,7 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 
 ```
 ┌─────────────────────┐
-│ Vote_v2             │
+│ Vote                │
 ├─────────────────────┤
 │ chatId: uuid (PK)   │
 │ messageId: uuid (PK)│

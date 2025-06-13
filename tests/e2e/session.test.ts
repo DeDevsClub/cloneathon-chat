@@ -21,6 +21,7 @@ test.describe
 
       while (request) {
         chain.unshift(request.url());
+        // @ts-ignore
         request = request.redirectedFrom();
       }
 
@@ -63,6 +64,7 @@ test.describe
 
       while (request) {
         chain.unshift(request.url());
+        // @ts-ignore
         request = request.redirectedFrom();
       }
 

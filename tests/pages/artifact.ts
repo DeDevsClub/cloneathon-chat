@@ -1,3 +1,4 @@
+// biome-ignore lint/style/useImportType: <explanation>
 import { expect, Page } from '@playwright/test';
 
 export class ArtifactPage {

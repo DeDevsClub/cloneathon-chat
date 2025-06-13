@@ -55,7 +55,8 @@
         "noForEach": "off", // forEach is too familiar to ban
         "noUselessSwitchCase": "off", // Turned off due to developer preferences
         "noUselessThisAlias": "off", // Turned off due to developer preferences
-        "noBannedTypes": "off"
+        "noBannedTypes": "off",
+        "noUselessTernary": "off"
       },
       "correctness": {
         "noUnusedImports": "warn", // Not in recommended ruleset, turning on manually
@@ -77,7 +78,8 @@
         "noUselessElse": "off" // Stylistic opinion
       },
       "suspicious": {
-        "noExplicitAny": "off" // We trust Vercelians to use any only when necessary
+        "noExplicitAny": "off", // We trust Vercelians to use any only when necessary
+        "noArrayIndexKey": "off"
       },
       "nursery": {
         "noStaticElementInteractions": "warn",

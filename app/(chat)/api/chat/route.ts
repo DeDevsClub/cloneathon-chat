@@ -33,9 +33,9 @@ import {
   type ResumableStreamContext,
 } from 'resumable-stream';
 import { after } from 'next/server';
-import type { Chat } from '@/lib/db/schema';
 import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
+import { Chat } from '@/lib/db';
 
 export const maxDuration = 60;
 
@@ -137,12 +137,14 @@ export async function POST(request: Request) {
           parts: message.parts,
           attachments: message.experimental_attachments ?? [],
           createdAt: new Date(),
+          contentType: null,
+          textContent: null,
         },
       ],
     });
 
     const streamId = generateUUID();
-    await createStreamId({ streamId, chatId: id });
+    await createStreamId({ userId: session.user.id, streamId, chatId: id });
 
     const stream = createDataStream({
       execute: (dataStream) => {
@@ -199,6 +201,8 @@ export async function POST(request: Request) {
                       attachments:
                         assistantMessage.experimental_attachments ?? [],
                       createdAt: new Date(),
+                      contentType: null,
+                      textContent: null,
                     },
                   ],
                 });

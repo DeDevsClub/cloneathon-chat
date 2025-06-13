@@ -1,13 +1,6 @@
 import { config } from 'dotenv';
 import postgres from 'postgres';
-import {
-  chat,
-  message,
-  type MessageDeprecated,
-  messageDeprecated,
-  vote,
-  voteDeprecated,
-} from '../schema';
+import { chat, message, vote } from '../schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { inArray } from 'drizzle-orm';
 import { appendResponseMessages, type UIMessage } from 'ai';
@@ -33,23 +26,31 @@ type NewMessageInsert = {
   role: string;
   attachments: any[];
   createdAt: Date;
+  contentType: string | null;
+  textContent: string | null;
 };
 
 type NewVoteInsert = {
   messageId: string;
   chatId: string;
+  userId: string;
   isUpvoted: boolean;
+  createdAt: Date;
 };
 
-interface MessageDeprecatedContentPart {
+interface MessageContentPart {
   type: string;
   content: unknown;
 }
-
-function getMessageRank(message: MessageDeprecated): number {
+interface Message {
+  role: string;
+  content: MessageContentPart[];
+  createdAt: Date;
+}
+function getMessageRank(message: Message): number {
   if (
     message.role === 'assistant' &&
-    (message.content as MessageDeprecatedContentPart[]).some(
+    (message.content as MessageContentPart[]).some(
       (contentPart) => contentPart.type === 'tool-call',
     )
   ) {
@@ -58,7 +59,7 @@ function getMessageRank(message: MessageDeprecated): number {
 
   if (
     message.role === 'tool' &&
-    (message.content as MessageDeprecatedContentPart[]).some(
+    (message.content as MessageContentPart[]).some(
       (contentPart) => contentPart.type === 'tool-result',
     )
   ) {
@@ -93,34 +94,34 @@ function sanitizeParts<T extends { type: string; [k: string]: any }>(
 }
 
 async function migrateMessages() {
-  const chats = await db.select().from(chat);
+  const allChats = await db.select().from(chat);
 
   let processedCount = 0;
 
-  for (let i = 0; i < chats.length; i += BATCH_SIZE) {
-    const chatBatch = chats.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < allChats.length; i += BATCH_SIZE) {
+    const chatBatch = allChats.slice(i, i + BATCH_SIZE);
     const chatIds = chatBatch.map((chat) => chat.id);
 
     const allMessages = await db
       .select()
-      .from(messageDeprecated)
-      .where(inArray(messageDeprecated.chatId, chatIds));
+      .from(message)
+      .where(inArray(message.chatId, chatIds));
 
     const allVotes = await db
       .select()
-      .from(voteDeprecated)
-      .where(inArray(voteDeprecated.chatId, chatIds));
+      .from(vote)
+      .where(inArray(vote.chatId, chatIds));
 
     const newMessagesToInsert: NewMessageInsert[] = [];
     const newVotesToInsert: NewVoteInsert[] = [];
 
     for (const chat of chatBatch) {
       processedCount++;
-      console.info(`Processed ${processedCount}/${chats.length} chats`);
+      console.info(`Processed ${processedCount}/${allChats.length} chats`);
 
       const messages = allMessages
         .filter((message) => message.chatId === chat.id)
-        .sort((a, b) => {
+        .sort((a: any, b: any) => {
           const differenceInTime =
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           if (differenceInTime !== 0) return differenceInTime;
@@ -174,6 +175,8 @@ async function migrateMessages() {
                   role: message.role,
                   createdAt: message.createdAt,
                   attachments: [],
+                  contentType: null,
+                  textContent: message.content as string,
                 } as NewMessageInsert;
               } else if (message.role === 'assistant') {
                 const cleanParts = sanitizeParts(
@@ -187,6 +190,9 @@ async function migrateMessages() {
                   role: message.role,
                   createdAt: message.createdAt,
                   attachments: [],
+                  contentType: null,
+                  textContent:
+                    cleanParts.find((p) => p.type === 'text')?.text || null,
                 } as NewMessageInsert;
               }
               return null;
@@ -200,9 +206,11 @@ async function migrateMessages() {
               const voteByMessage = votes.find((v) => v.messageId === msg.id);
               if (voteByMessage) {
                 newVotesToInsert.push({
-                  messageId: msg.id,
                   chatId: msg.chatId,
+                  messageId: msg.id,
+                  userId: voteByMessage.userId,
                   isUpvoted: voteByMessage.isUpvoted,
+                  createdAt: new Date(),
                 });
               }
             }
@@ -223,6 +231,8 @@ async function migrateMessages() {
           role: msg.role,
           attachments: msg.attachments,
           createdAt: msg.createdAt,
+          contentType: msg.contentType,
+          textContent: msg.textContent,
         }));
 
         await db.insert(message).values(validMessageBatch);
@@ -232,7 +242,15 @@ async function migrateMessages() {
     for (let j = 0; j < newVotesToInsert.length; j += INSERT_BATCH_SIZE) {
       const voteBatch = newVotesToInsert.slice(j, j + INSERT_BATCH_SIZE);
       if (voteBatch.length > 0) {
-        await db.insert(vote).values(voteBatch);
+        await db.insert(vote).values(
+          voteBatch.map((vote) => ({
+            chatId: vote.chatId,
+            messageId: vote.messageId,
+            userId: vote.userId,
+            isUpvoted: vote.isUpvoted,
+            createdAt: vote.createdAt,
+          })),
+        );
       }
     }
   }

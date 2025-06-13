@@ -25,7 +25,7 @@ export const Greeting = () => {
       <div className="absolute inset-0 z-0 opacity-10 dark:opacity-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-600/20 to-transparent" />
         <div
-          className="h-full w-full"
+          className="size-full"
           style={{
             backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent)`,
             backgroundSize: '50px 50px',
@@ -34,9 +34,9 @@ export const Greeting = () => {
       </div>
 
       {/* Glow elements */}
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      <div className="absolute top-40 left-20 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+      <div className="absolute -bottom-40 -left-40 size-80 bg-purple-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob" />
+      <div className="absolute -bottom-40 -right-40 size-80 bg-pink-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-2000" />
+      <div className="absolute top-40 left-20 size-80 bg-blue-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-4000" />
 
       <div className="relative z-10">
         <motion.div
@@ -68,7 +68,7 @@ export const Greeting = () => {
           transition={{ delay: 1.2 }}
           className="mt-8 flex flex-row gap-2 items-center"
         >
-          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+          <div className="size-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-sm text-zinc-500 dark:text-zinc-400 animate-pulse">
             AI systems ready for interaction
           </span>

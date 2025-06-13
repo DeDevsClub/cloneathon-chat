@@ -6,10 +6,14 @@ import {
   count,
   desc,
   eq,
+  exists,
   gt,
   gte,
   inArray,
+  isNull,
   lt,
+  not,
+  or,
   type SQL,
 } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -18,16 +22,18 @@ import postgres from 'postgres';
 import {
   user,
   chat,
+  project,
   type User,
   document,
   type Suggestion,
   suggestion,
   message,
   vote,
-  type DBMessage,
+  type Message,
   type Chat,
   stream,
 } from './schema';
+import { createDefaultProjectWithTutorial } from './project';
 import type { ArtifactKind } from '@/components/chat/artifact';
 import { generateUUID } from '../utils';
 import { generateHashedPassword } from './utils';
@@ -57,8 +63,18 @@ export async function createUser(email: string, password: string) {
   const hashedPassword = generateHashedPassword(password);
 
   try {
-    return await db.insert(user).values({ email, password: hashedPassword });
+    // Create the user
+    const [newUser] = await db
+      .insert(user)
+      .values({ email, password: hashedPassword })
+      .returning();
+    
+    // Create a default project with tutorial content
+    await createDefaultProjectWithTutorial(newUser.id);
+    
+    return newUser;
   } catch (error) {
+    console.error('User creation error:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to create user');
   }
 }
@@ -68,11 +84,18 @@ export async function createGuestUser() {
   const password = generateHashedPassword(generateUUID());
 
   try {
-    return await db.insert(user).values({ email, password }).returning({
-      id: user.id,
-      email: user.email,
-    });
+    // Create the guest user
+    const [newUser] = await db
+      .insert(user)
+      .values({ email, password })
+      .returning();
+    
+    // Create a default project with tutorial content
+    await createDefaultProjectWithTutorial(newUser.id);
+    
+    return [newUser];
   } catch (error) {
+    console.error('Guest user creation error:', error);
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to create guest user',
@@ -137,17 +160,62 @@ export async function getChatsByUserId({
   try {
     const extendedLimit = limit + 1;
 
-    const query = (whereCondition?: SQL<any>) =>
-      db
+    // Combined query that gets all chats for the user using either direct ownership or project ownership
+    const query = (whereCondition?: SQL<any>) => {
+      const baseQuery = db
         .select()
         .from(chat)
         .where(
           whereCondition
-            ? and(whereCondition, eq(chat.userId, id))
-            : eq(chat.userId, id),
+            ? and(
+                whereCondition,
+                // Chat is either directly owned by user or is in a project owned by user
+                or(
+                  eq(chat.userId, id),
+                  // Join through projects
+                  and(
+                    // Chat must have a project reference
+                    not(isNull(chat.projectId)),
+                    // And the project must be owned by this user
+                    exists(
+                      db
+                        .select({ id: project.id })
+                        .from(project)
+                        .where(
+                          and(
+                            eq(project.userId, id),
+                            eq(project.id, chat.projectId)
+                          )
+                        )
+                    )
+                  )
+                )
+              )
+            : or(
+                eq(chat.userId, id),
+                // Join through projects
+                and(
+                  // Chat must have a project reference
+                  not(isNull(chat.projectId)),
+                  // And the project must be owned by this user
+                  exists(
+                    db
+                      .select({ id: project.id })
+                      .from(project)
+                      .where(
+                        and(
+                          eq(project.userId, id),
+                          eq(project.id, chat.projectId)
+                        )
+                      )
+                  )
+                )
+              ),
         )
         .orderBy(desc(chat.createdAt))
         .limit(extendedLimit);
+      return baseQuery;
+    };
 
     let filteredChats: Array<Chat> = [];
 
@@ -192,6 +260,7 @@ export async function getChatsByUserId({
       hasMore,
     };
   } catch (error) {
+    console.error('Error in getChatsByUserId:', error);
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get chats by user id',
@@ -211,7 +280,7 @@ export async function getChatById({ id }: { id: string }) {
 export async function saveMessages({
   messages,
 }: {
-  messages: Array<DBMessage>;
+  messages: Array<Message>;
 }) {
   try {
     return await db.insert(message).values(messages);
@@ -236,10 +305,12 @@ export async function getMessagesByChatId({ id }: { id: string }) {
 }
 
 export async function voteMessage({
+  userId,
   chatId,
   messageId,
   type,
 }: {
+  userId: string;
   chatId: string;
   messageId: string;
   type: 'up' | 'down';
@@ -257,6 +328,7 @@ export async function voteMessage({
         .where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
     }
     return await db.insert(vote).values({
+      userId,
       chatId,
       messageId,
       isUpvoted: type === 'up',
@@ -312,7 +384,7 @@ export async function getDocumentsById({ id }: { id: string }) {
     const documents = await db
       .select()
       .from(document)
-      .where(eq(document.id, id))
+      .where(eq(document.chatId, id))
       .orderBy(asc(document.createdAt));
 
     return documents;
@@ -329,8 +401,7 @@ export async function getDocumentById({ id }: { id: string }) {
     const [selectedDocument] = await db
       .select()
       .from(document)
-      .where(eq(document.id, id))
-      .orderBy(desc(document.createdAt));
+      .where(eq(document.id, id));
 
     return selectedDocument;
   } catch (error) {
@@ -352,15 +423,12 @@ export async function deleteDocumentsByIdAfterTimestamp({
     await db
       .delete(suggestion)
       .where(
-        and(
-          eq(suggestion.documentId, id),
-          gt(suggestion.documentCreatedAt, timestamp),
-        ),
+        and(eq(suggestion.documentId, id), gt(suggestion.createdAt, timestamp)),
       );
 
     return await db
       .delete(document)
-      .where(and(eq(document.id, id), gt(document.createdAt, timestamp)))
+      .where(and(eq(document.chatId, id), gt(document.createdAt, timestamp)))
       .returning();
   } catch (error) {
     throw new ChatSDKError(
@@ -501,16 +569,18 @@ export async function getMessageCountByUserId({
 }
 
 export async function createStreamId({
+  userId,
   streamId,
   chatId,
 }: {
+  userId: string;
   streamId: string;
   chatId: string;
 }) {
   try {
     await db
       .insert(stream)
-      .values({ id: streamId, chatId, createdAt: new Date() });
+      .values({ userId, chatId, id: streamId, createdAt: new Date() });
   } catch (error) {
     throw new ChatSDKError(
       'bad_request:database',

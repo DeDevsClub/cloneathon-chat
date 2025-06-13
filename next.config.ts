@@ -11,6 +11,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: async () => [
+    {
+      source: '/chat',
+      destination: '/projects',
+      permanent: true,
+    },
+    {
+      source: '/chat/:id',
+      destination: '/projects',
+      permanent: true,
+    },
+  ],
 };
 
 export default nextConfig;

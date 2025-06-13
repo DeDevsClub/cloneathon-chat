@@ -5,12 +5,14 @@
 Cloneathon-chat is a modern real-time chat application that integrates AI capabilities for enhanced conversation experiences. The application allows users to engage in conversations with AI models, manage documents, and collaborate in a multi-modal environment. Key features include:
 
 - User authentication and account management
+- Project-based organization of chats and conversations
 - Real-time chat with AI assistants
 - Document creation, editing, and management
 - Multi-modal interactions supporting text, code, and images
 - Suggestion system for content improvement
 - Chat history and conversation management
 - Public and private visibility settings for chats
+- Guided onboarding with automatic tutorial project creation
 
 The application serves as a platform for interactive AI-assisted communication, document collaboration, and knowledge management in a chat-centric interface. It leverages modern web technologies to provide a responsive, accessible, and feature-rich user experience.
 
@@ -33,14 +35,16 @@ The application also incorporates aspects of:
 - **Component-Based Architecture**: UI is built from reusable, composable components
 - **API-First Design**: Backend functionality is exposed through well-defined API endpoints
 - **Feature-Based Organization**: Code is organized by feature rather than technical function
+- **Hierarchical Data Structure**: Projects contain chats, which contain messages and documents
 
 ### Key Architectural Decisions
 
 1. **Next.js App Router**: For modern routing, server components, and improved SEO
 2. **Server Actions**: For secure server-side mutations directly from client components
 3. **PostgreSQL with Drizzle ORM**: For type-safe database access and schema management
-4. **NextAuth**: For secure authentication and session management
+4. **Session-Based Authentication**: For secure authentication and session management without external dependencies
 5. **AI SDK Integration**: For seamless AI model interactions
+6. **Project-Based Organization**: For structured content organization and improved user experience
 
 ## Components
 
@@ -70,8 +74,14 @@ The application is organized into several core components and modules:
 
 5. **Navigation and Structure** (`components/app-sidebar.tsx`, etc.)
    - Application navigation and routing
+   - Project and chat organization in sidebar
    - History management and sidebar components
    - User preferences and settings
+
+6. **Project Management** (`components/projects/*`)
+   - Project listing and creation interfaces
+   - Project editing and management
+   - Associated chat organization
 
 ### Backend Modules
 
@@ -84,6 +94,8 @@ The application is organized into several core components and modules:
    - Schema definitions and migrations
    - Query functions and data access patterns
    - Relationship management between entities
+   - Project and chat hierarchical structure
+   - Automatic default project creation for new users
 
 3. **AI Integration** (`lib/ai/*`)
    - AI model connections and configurations
@@ -109,11 +121,19 @@ The application follows several key workflows that define the user experience:
 1. User accesses the application and is directed to login/signup if not authenticated
 2. Credentials are validated and a session is established
 3. Next.js middleware protects routes from unauthorized access
-4. Session state is maintained via NextAuth and cookies
+4. Session state is maintained via cookies
+5. New users automatically receive a default project with tutorial content
+
+### Project and Chat Organization Flow
+
+1. User accesses the projects page to view all projects
+2. User selects an existing project or creates a new one
+3. Within a project, user can view, create or select chats
+4. Project context is maintained throughout the chat experience
 
 ### Chat Interaction Flow
 
-1. User creates or selects an existing chat
+1. User selects an existing chat or creates a new one within a project
 2. User inputs a message or query
 3. The message is sent to the appropriate AI model via AI SDK
 4. Responses are streamed back in real-time
@@ -152,7 +172,7 @@ The application follows several key workflows that define the user experience:
 
 ## Dependencies
 
-The application relies on a carefully selected set of dependencies to provide its functionality:
+The application relies on a carefully selected set of dependencies to provide its functionality. Note that some dependencies may have evolved or been replaced since this document was last updated:
 
 ### Core Framework
 
@@ -168,7 +188,7 @@ The application relies on a carefully selected set of dependencies to provide it
 
 ### Authentication
 
-- **NextAuth.js**: Authentication solution for Next.js applications
+- **Session Cookies**: Custom session-based authentication
 - **bcrypt-ts**: For secure password hashing and verification
 
 ### AI and Machine Learning

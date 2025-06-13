@@ -98,6 +98,8 @@ export function PureMessageActions({
                             chatId,
                             messageId: message.id,
                             isUpvoted: true,
+                            createdAt: new Date(),
+                            userId: '',
                           },
                         ];
                       },
@@ -151,6 +153,8 @@ export function PureMessageActions({
                             chatId,
                             messageId: message.id,
                             isUpvoted: false,
+                            createdAt: new Date(),
+                            userId: '',
                           },
                         ];
                       },

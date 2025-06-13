@@ -80,7 +80,7 @@ export default function Page() {
       updateSession();
       router.refresh();
     }
-  }, [state]);
+  }, [state, updateSession, router]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
@@ -88,12 +88,12 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -top-48 -right-48 size-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div
-          className="absolute -bottom-48 -left-48 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-48 -left-48 size-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '8s' }}
         />
       </div>
@@ -121,12 +121,12 @@ export default function Page() {
           <CardHeader className="space-y-1 pb-2">
             <motion.div variants={itemVariants}>
               <CardTitle className="text-2xl font-bold text-center text-foreground/90">
-                Join our community
+                Sign Up for th3.chat
               </CardTitle>
             </motion.div>
             <motion.div variants={itemVariants}>
               <CardDescription className="text-center text-muted-foreground">
-                Create your account to get started
+                Create your account to get started.
               </CardDescription>
             </motion.div>
           </CardHeader>
@@ -143,7 +143,7 @@ export default function Page() {
                     >
                       {isSuccessful ? (
                         <>
-                          <Check className="h-4 w-4 mr-1" />
+                          <Check className="size-4 mr-1" />
                           Success!
                         </>
                       ) : (
@@ -164,12 +164,12 @@ export default function Page() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/95 px-2 text-muted-foreground">
-                    Already a member?{' '}
+                    Already joined?{' '}
                     <Link
                       href="/login"
-                      className="text-primary hover:text-primary/90 hover:underline"
+                      className="text-primary hover:text-primary/90 hover:underline cursor-pointer font-semibold text-md"
                     >
-                      Login here
+                      Login
                     </Link>
                   </span>
                 </div>

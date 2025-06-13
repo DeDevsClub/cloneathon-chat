@@ -60,11 +60,13 @@ export default function NewChatPage(props: PageProps) {
           body: JSON.stringify({
             id: chatId,
             selectedVisibilityType: 'private',
-            selectedChatModel: 'default',
+            selectedChatModel: 'chat-model',
             message: {
               id: uuidv4(),
-              parts: ['Hello! This is a new chat.'],
+              content: 'Hello! This is a new chat.',
+              parts: [{ text: 'Hello! This is a new chat.', type: 'text' }],
               role: 'user',
+              createdAt: new Date(),
             },
           }),
         });

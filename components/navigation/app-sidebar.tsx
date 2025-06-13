@@ -3,10 +3,8 @@
 import type { User } from 'next-auth';
 import { useRouter } from 'next/navigation';
 
-import { PlusIcon } from '@/components/icons';
 import { SidebarHistory } from '@/components/navigation/sidebar-history';
 import { SidebarUserNav } from '@/components/navigation/sidebar-user-nav';
-import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,
@@ -16,16 +14,17 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
+import { HeaderIsland } from './header-island';
+import { SearchModal } from '@/components/modals/search-modal';
+import { useState } from 'react';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Icon } from '@iconify/react';
-import { HeaderIsland } from './header-island';
-import { SearchModal } from '@/components/modals/search-modal';
-import { useState } from 'react';
-
+import { PlusIcon } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 interface AppSidebarProps {
   user: User | undefined;
 }
@@ -68,8 +67,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
             </Link>
           </SidebarMenu>
         </SidebarHeader>
-        {/* <Tooltip> */}
-        {/* <Button
+        <Tooltip>
+          <Button
             variant="outline"
             type="button"
             className="w-full hover:bg-muted group grid place-items-center"
@@ -81,8 +80,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
               <PlusIcon />
             </TooltipTrigger>
             <TooltipContent align="end">New Chat</TooltipContent>
-          </Button> */}
-        {/* </Tooltip> */}
+          </Button>
+        </Tooltip>
         <SidebarContent>
           <SidebarHistory user={user} />
         </SidebarContent>

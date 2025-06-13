@@ -85,24 +85,24 @@ export function HeaderIsland({
                     />
                   </Button>
                 </TooltipTrigger>
-                {/* <TooltipContent side="bottom" sideOffset={5}>
+                <TooltipContent side="bottom" sideOffset={5}>
                   Search (⌘K)
-                </TooltipContent> */}
+                </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* <Button
+                  <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => {
                       const newChatId = `chat_${Date.now().toString()}`;
-                      const newConversationEntry: Conversation = {
-                        id: newChatId,
-                        title: `New Chat ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-                        messages: [],
-                        createdAt: new Date(),
-                      };
-                      addConversation(newConversationEntry);
+                      // const newConversationEntry: Conversation = {
+                      //   id: newChatId,
+                      //   title: `New Chat ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+                      //   messages: [],
+                      //   createdAt: new Date(),
+                      // };
+                      // addConversation(newConversationEntry);
                       router.push(`/chat/${newChatId}`);
                     }}
                     className="h-8 w-8 hover:bg-muted"
@@ -114,11 +114,11 @@ export function HeaderIsland({
                       width={18}
                       height={18}
                     />
-                  </Button> */}
+                  </Button>
                 </TooltipTrigger>
-                {/* <TooltipContent side="bottom" sideOffset={5}>
+                <TooltipContent side="bottom" sideOffset={5}>
                   New
-                </TooltipContent> */}
+                </TooltipContent>
               </Tooltip>
             </div>
           </div>

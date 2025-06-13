@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { use } from 'react';
-
 interface PageParams {
   pid: string;
 }
@@ -15,6 +14,10 @@ interface PageParams {
 interface PageProps {
   params: Promise<PageParams>;
 }
+
+type ErrorMessage = {
+  message: string;
+};
 
 /**
  * This page handles the creation of a new chat within a project.
@@ -25,7 +28,7 @@ export default function NewChatPage(props: PageProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [creating, setCreating] = useState(true);
-  
+
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
   const projectId = unwrappedParams.pid;
@@ -52,23 +55,31 @@ export default function NewChatPage(props: PageProps) {
         const chatId = uuidv4();
 
         // Create initial chat with default title
+        const messageContent = 'Hello! This is a new chat.';
+
+        const messageId = uuidv4();
+        const payload = {
+          id: chatId,
+          selectedVisibilityType: 'private',
+          selectedChatModel: 'chat-model',
+          message: {
+            id: messageId,
+            content: messageContent,
+            parts: [{ text: messageContent, type: 'text' }],
+            role: 'user',
+            createdAt: new Date().toISOString(),
+            experimental_attachments: [],
+          },
+        };
+
+        console.log('Sending chat creation payload:', payload);
+
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            id: chatId,
-            selectedVisibilityType: 'private',
-            selectedChatModel: 'chat-model',
-            message: {
-              id: uuidv4(),
-              content: 'Hello! This is a new chat.',
-              parts: [{ text: 'Hello! This is a new chat.', type: 'text' }],
-              role: 'user',
-              createdAt: new Date(),
-            },
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
@@ -88,14 +99,18 @@ export default function NewChatPage(props: PageProps) {
         });
 
         if (!projectUpdateResponse.ok) {
-          throw new Error('Failed to associate chat with project');
+          throw new Error(
+            `Failed to associate chat with project: ${projectUpdateResponse.status} ${projectUpdateResponse.statusText}`,
+          );
         }
 
         // Redirect to the new chat
         router.push(`/projects/${projectId}/chat/${chatId}`);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error creating chat:', error);
-        toast.error('Failed to create chat');
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown error';
+        toast.error(`Failed to create chat: ${errorMessage}`);
         router.push(`/projects/${projectId}`);
       } finally {
         setCreating(false);

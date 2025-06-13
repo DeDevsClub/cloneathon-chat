@@ -19,7 +19,7 @@ interface PageProps {
   params: Promise<PageParams>;
 }
 
-export default async function Page(props: PageProps) {
+export default async function ChatPage(props: PageProps) {
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
   const { pid, cid } = unwrappedParams; // ids from URL params
@@ -57,7 +57,6 @@ export default async function Page(props: PageProps) {
         id: message.id,
         parts: message.parts as UIMessage['parts'],
         role: message.role as UIMessage['role'],
-        // Note: content will soon be deprecated in @ai-sdk/react
         content: '',
         createdAt: message.createdAt,
         experimental_attachments:

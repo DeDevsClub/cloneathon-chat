@@ -15,9 +15,9 @@ interface SearchModalProps {
 }
 
 export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredConversations, setFilteredConversations] = useState<any[]>([]); // Show top 5 recent initially
+  const [filteredConversations, setFilteredConversations] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     if (searchTerm) {
       setFilteredConversations([]);
     } else {
-      setFilteredConversations([]); // Show recent if search is empty
+      setFilteredConversations([]);
     }
   }, [searchTerm]);
 

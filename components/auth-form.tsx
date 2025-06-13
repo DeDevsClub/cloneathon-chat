@@ -2,6 +2,7 @@ import Form from 'next/form';
 
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Icon } from '@iconify/react';
 
 export function AuthForm({
   action,
@@ -15,13 +16,14 @@ export function AuthForm({
   defaultEmail?: string;
 }) {
   return (
-    <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
-      <div className="flex flex-col gap-2">
+    <Form action={action} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2 w-full">
         <Label
           htmlFor="email"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
+          className="text-zinc-600 font-normal dark:text-zinc-400 flex items-center gap-2"
         >
-          Email Address
+          <Icon icon="mdi:email" className="mr-1" />
+          Email
         </Label>
 
         <Input
@@ -29,7 +31,7 @@ export function AuthForm({
           name="email"
           className="bg-muted text-md md:text-sm"
           type="email"
-          placeholder="user@acme.com"
+          placeholder="lady.ada.lovelace@dedevs.club"
           autoComplete="email"
           required
           autoFocus
@@ -37,11 +39,12 @@ export function AuthForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-full">
         <Label
           htmlFor="password"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
+          className="text-zinc-600 font-normal dark:text-zinc-400 flex items-center gap-2"
         >
+          <Icon icon="mdi:lock" className="mr-1" />
           Password
         </Label>
 
@@ -50,6 +53,7 @@ export function AuthForm({
           name="password"
           className="bg-muted text-md md:text-sm"
           type="password"
+          placeholder="••••••••"
           required
         />
       </div>

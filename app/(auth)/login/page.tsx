@@ -15,7 +15,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { useObjectState } from '@/hooks/use-object-state';
-
+import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 import { Loader, Lock, Mail, ArrowRight } from 'lucide-react';
@@ -49,12 +49,12 @@ export default function LoginPage() {
         password: formData.password,
         redirect: false,
       });
-      
+
       if (res?.error) {
         toast.error(res.error || 'Failed to sign in');
         return;
       }
-      
+
       if (res?.ok) {
         toast.success('Signed in successfully!');
         router.push('/');
@@ -104,7 +104,10 @@ export default function LoginPage() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 10 }}
       >
-        DeDevsClub
+        <div className="flex items-center gap-2">
+          <Icon icon="mdi:chat" className="text-primary" />
+          <span>th3.chat</span>
+        </div>
       </motion.div>
 
       <motion.div
@@ -204,7 +207,7 @@ export default function LoginPage() {
 
             <motion.div variants={itemVariants}>
               <Button
-                className="w-full relative overflow-hidden group bg-primary hover:bg-primary/90 text-white"
+                className="w-full relative overflow-hidden group bg-primary hover:bg-primary/90 text-white dark:bg-accent dark:hover:bg-accent/90 dark:hover:text-secondary"
                 onClick={emailAndPasswordSignIn}
                 disabled={loading}
               >
@@ -231,19 +234,15 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/95 px-2 text-muted-foreground">
-                    New here?
+                    <Link
+                      href="/signup"
+                      className="text-primary hover:text-primary/90 hover:underline"
+                    >
+                      Create Account
+                    </Link>
                   </span>
                 </div>
               </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Link
-                href="/signup"
-                className="text-sm text-center font-medium text-primary hover:text-primary/90 hover:underline block w-full transition-all"
-              >
-                Create an account
-              </Link>
             </motion.div>
           </CardFooter>
         </Card>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
-
+import { Icon } from '@iconify/react';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
 import {
@@ -105,7 +105,10 @@ export default function Page() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 10 }}
       >
-        DeDevsClub
+        <div className="flex items-center gap-2">
+          <Icon icon="mdi:chat" className="text-primary" />
+          <span>th3.chat</span>
+        </div>
       </motion.div>
 
       <motion.div
@@ -130,13 +133,13 @@ export default function Page() {
 
           <CardContent className="space-y-4 pt-4">
             <motion.div variants={itemVariants}>
-              <div className="space-y-2">
-                <AuthForm action={handleSubmit} defaultEmail={email}>
+              <div className="space-y-2 relative">
+                <AuthForm action={handleSubmit}>
                   {/* We can't style the form directly, but we'll style the container */}
-                  <div className="flex justify-center w-full border-2">
+                  <div className="pt-4">
                     <SubmitButton
                       isSuccessful={isSuccessful}
-                      style={{ width: '100%' }}
+                      className="w-full relative overflow-hidden group bg-primary hover:bg-primary/90 text-white dark:bg-accent dark:hover:bg-accent/90 dark:hover:text-primary"
                     >
                       {isSuccessful ? (
                         <>
@@ -144,7 +147,7 @@ export default function Page() {
                           Success!
                         </>
                       ) : (
-                        <>Sign Up</>
+                        <>Join th3.chat</>
                       )}
                     </SubmitButton>
                   </div>

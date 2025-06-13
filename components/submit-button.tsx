@@ -3,17 +3,19 @@
 import { useFormStatus } from 'react-dom';
 
 import { LoaderIcon } from '@/components/icons';
-
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 export function SubmitButton({
   children,
   isSuccessful,
   style,
+  className,
 }: {
   children: React.ReactNode;
   isSuccessful: boolean;
   style?: React.CSSProperties;
+  className?: string;
 }) {
   const { pending } = useFormStatus();
 
@@ -22,7 +24,7 @@ export function SubmitButton({
       type={pending ? 'button' : 'submit'}
       aria-disabled={pending || isSuccessful}
       disabled={pending || isSuccessful}
-      className="relative"
+      className={cn('relative', className)}
       style={style}
     >
       {children}

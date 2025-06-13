@@ -34,9 +34,9 @@ export const Greeting = () => {
       </div>
 
       {/* Glow elements */}
-      <div className="absolute -bottom-40 -left-40 size-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-      <div className="absolute -bottom-40 -right-40 size-80 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      <div className="absolute top-40 left-20 size-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+      <div className="absolute -bottom-40 -left-40 size-80 bg-purple-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob" />
+      <div className="absolute -bottom-40 -right-40 size-80 bg-pink-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-2000" />
+      <div className="absolute top-40 left-20 size-80 bg-blue-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-4000" />
 
       <div className="relative z-10">
         <motion.div

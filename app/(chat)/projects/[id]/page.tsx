@@ -44,7 +44,8 @@ interface Project {
   color: string | null;
 }
 
-export default function ProjectPage({ params }: { params: { id: string } }) {
+export default function ProjectPage(props: any) {
+  const { params } = props;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
@@ -116,7 +117,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchProjectDetails();
-  }, [params.id]);
+  }, [params.id, fetchProjectDetails]);
 
   if (loading) {
     return (

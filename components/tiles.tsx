@@ -14,10 +14,7 @@ const TilesComponent: React.FC<{
 
   return (
     <div
-      className={cn(
-        'relative z-0 flex w-full h-full justify-center',
-        className,
-      )}
+      className={cn('relative z-0 flex size-full justify-center', className)}
     >
       {rows.map((_, i) => (
         <motion.div

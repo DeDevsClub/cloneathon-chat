@@ -9,13 +9,13 @@ export class AuthPage {
     await expect(this.page.getByRole('heading')).toContainText('Sign In');
   }
 
-  async gotoRegister() {
-    await this.page.goto('/register');
+  async gotoSignup() {
+    await this.page.goto('/signup');
     await expect(this.page.getByRole('heading')).toContainText('Sign Up');
   }
 
-  async register(email: string, password: string) {
-    await this.gotoRegister();
+  async signup(email: string, password: string) {
+    await this.gotoSignup();
     await this.page.getByPlaceholder('user@acme.com').click();
     await this.page.getByPlaceholder('user@acme.com').fill(email);
     await this.page.getByLabel('Password').click();

@@ -1,77 +1,253 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import { toast } from '@/components/toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
+import { useObjectState } from '@/hooks/use-object-state';
 
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
+import { toast } from 'sonner';
+import { signIn } from 'next-auth/react';
+import { Loader, Lock, Mail, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-import { login, type LoginActionState } from '../actions';
-import { useSession } from 'next-auth/react';
-
-export default function Page() {
+export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useObjectState({
+    email: '',
+    password: '',
+  });
+  const [mounted, setMounted] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
-
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
-
-  const { update: updateSession } = useSession();
-
+  // Animation delay mount effect
   useEffect(() => {
-    if (state.status === 'failed') {
-      toast({
-        type: 'error',
-        description: 'Invalid credentials!',
-      });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Failed validating your submission!',
-      });
-    } else if (state.status === 'success') {
-      setIsSuccessful(true);
-      updateSession();
-      router.refresh();
-    }
-  }, [state.status]);
+    setMounted(true);
+  }, []);
 
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
+  const emailAndPasswordSignIn = async () => {
+    if (!formData.email || !formData.password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+      
+      if (res?.error) {
+        toast.error(res.error || 'Failed to sign in');
+        return;
+      }
+      
+      if (res?.ok) {
+        toast.success('Signed in successfully!');
+        router.push('/');
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 300, damping: 24 },
+    },
   };
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Use your email and password to sign in
-          </p>
-        </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"Don't have an account? "}
-            <Link
-              href="/register"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-            >
-              Sign up
-            </Link>
-            {' for free.'}
-          </p>
-        </AuthForm>
+    <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-accent/10 overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-48 -left-48 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-48 -right-48 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
       </div>
+
+      {/* Logo or branding mark */}
+      <motion.div
+        className="mb-8 text-3xl font-bold text-primary"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+      >
+        DeDevsClub
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        animate={mounted ? 'visible' : 'hidden'}
+        variants={containerVariants}
+        className="w-full md:max-w-md"
+      >
+        <Card className="backdrop-blur-sm bg-background/75 border border-accent/20 shadow-lg">
+          <CardHeader className="space-y-1 pb-2">
+            <motion.div variants={itemVariants}>
+              <CardTitle className="text-2xl font-bold text-center text-foreground/90">
+                Welcome back
+              </CardTitle>
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <CardDescription className="text-center text-muted-foreground">
+                Enter your credentials to access your account
+              </CardDescription>
+            </motion.div>
+          </CardHeader>
+
+          <CardContent className="space-y-6 pt-4">
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div className="relative">
+                <Label
+                  htmlFor="email"
+                  className={`transition-all ${focusedField === 'email' || formData.email ? 'text-xs text-primary' : ''}`}
+                >
+                  Email
+                </Label>
+                <div className="mt-1 relative rounded-md">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail
+                      className={`h-5 w-5 ${focusedField === 'email' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
+                    />
+                  </div>
+                  <Input
+                    id="email"
+                    autoFocus
+                    className={`pl-10 ${focusedField === 'email' ? 'border-primary ring-1 ring-primary' : ''} transition-all`}
+                    disabled={loading}
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    type="email"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="relative">
+                <Label
+                  htmlFor="password"
+                  className={`transition-all ${focusedField === 'password' || formData.password ? 'text-xs text-primary' : ''}`}
+                >
+                  Password
+                </Label>
+                <div className="mt-1 relative rounded-md">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock
+                      className={`h-5 w-5 ${focusedField === 'password' ? 'text-primary' : 'text-muted-foreground/60'} transition-colors`}
+                    />
+                  </div>
+                  <Input
+                    id="password"
+                    className={`pl-10 ${focusedField === 'password' ? 'border-primary ring-1 ring-primary' : ''} transition-all`}
+                    disabled={loading}
+                    value={formData.password}
+                    placeholder="••••••••"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        emailAndPasswordSignIn();
+                      }
+                    }}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                    type="password"
+                    required
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Button
+                className="w-full relative overflow-hidden group bg-primary hover:bg-primary/90 text-white"
+                onClick={emailAndPasswordSignIn}
+                disabled={loading}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {loading ? (
+                    <Loader className="size-4 animate-spin" />
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </span>
+                <span className="absolute inset-0 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Button>
+            </motion.div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-4 pt-0">
+            <motion.div variants={itemVariants} className="text-center w-full">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-accent/30" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background/95 px-2 text-muted-foreground">
+                    New here?
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Link
+                href="/signup"
+                className="text-sm text-center font-medium text-primary hover:text-primary/90 hover:underline block w-full transition-all"
+              >
+                Create an account
+              </Link>
+            </motion.div>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 }

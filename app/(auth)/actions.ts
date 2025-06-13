@@ -51,7 +51,7 @@ export interface RegisterActionState {
     | 'invalid_data';
 }
 
-export const register = async (
+export const signup = async (
   _: RegisterActionState,
   formData: FormData,
 ): Promise<RegisterActionState> => {

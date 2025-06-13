@@ -40,9 +40,9 @@ export async function createAuthenticatedContext({
   const email = `test-${name}@playwright.com`;
   const password = generateId(16);
 
-  await page.goto('http://localhost:3000/register');
-  await page.getByPlaceholder('user@acme.com').click();
-  await page.getByPlaceholder('user@acme.com').fill(email);
+  await page.goto('http://localhost:3000/signup');
+  await page.getByPlaceholder('alan-turing@devsclub.com').click();
+  await page.getByPlaceholder('alan-turing@devsclub.com').fill(email);
   await page.getByLabel('Password').click();
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign Up' }).click();

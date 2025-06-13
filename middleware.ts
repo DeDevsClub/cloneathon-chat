@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
 
   const isGuest = guestRegex.test(token?.email ?? '');
 
-  if (token && !isGuest && ['/login', '/register'].includes(pathname)) {
+  if (token && !isGuest && ['/login', '/signup'].includes(pathname)) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
@@ -46,7 +46,7 @@ export const config = {
     '/chat/:id',
     '/api/:path*',
     '/login',
-    '/register',
+    '/signup',
 
     /*
      * Match all request paths except for the ones starting with:

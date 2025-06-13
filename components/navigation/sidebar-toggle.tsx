@@ -7,8 +7,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { SidebarLeftIcon } from './icons';
-import { Button } from './ui/button';
+import { SidebarLeftIcon } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 
 export function SidebarToggle({
   className,

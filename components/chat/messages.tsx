@@ -1,6 +1,6 @@
 import type { UIMessage } from 'ai';
 import { PreviewMessage, ThinkingMessage } from './message';
-import { Greeting } from './greeting';
+import { Greeting } from '@/components/chat/greeting';
 import { memo } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import equal from 'fast-deep-equal';

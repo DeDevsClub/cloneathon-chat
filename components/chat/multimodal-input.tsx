@@ -16,17 +16,17 @@ import {
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
-import { PreviewAttachment } from './preview-attachment';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { SuggestedActions } from './suggested-actions';
+import { ArrowUpIcon, PaperclipIcon, StopIcon } from '../icons';
+import { PreviewAttachment } from '@/components/chat/preview-attachment';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { SuggestedActions } from '@/components/chat/suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
-import type { VisibilityType } from './visibility-selector';
+import type { VisibilityType } from '@/components/visibility-selector';
 
 function PureMultimodalInput({
   chatId,

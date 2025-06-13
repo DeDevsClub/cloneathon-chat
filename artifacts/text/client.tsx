@@ -1,6 +1,6 @@
 import { Artifact } from '@/components/create-artifact';
 import { DiffView } from '@/components/diffview';
-import { DocumentSkeleton } from '@/components/document-skeleton';
+import { DocumentSkeleton } from '@/components/chat/document-skeleton';
 import { Editor } from '@/components/text-editor';
 import {
   ClockRewind,
@@ -90,9 +90,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
             onSaveContent={onSaveContent}
           />
 
-          {metadata &&
-          metadata.suggestions &&
-          metadata.suggestions.length > 0 ? (
+          {metadata?.suggestions?.length > 0 ? (
             <div className="md:hidden h-dvh w-12 shrink-0" />
           ) : null}
         </div>

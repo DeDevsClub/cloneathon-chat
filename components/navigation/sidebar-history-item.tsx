@@ -3,7 +3,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from './ui/sidebar';
+} from '@/components/ui/sidebar';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
   CheckCircleFillIcon,
   GlobeIcon,
@@ -22,7 +22,7 @@ import {
   MoreHorizontalIcon,
   ShareIcon,
   TrashIcon,
-} from './icons';
+} from '@/components/icons';
 import { memo } from 'react';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 

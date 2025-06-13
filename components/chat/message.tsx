@@ -6,18 +6,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
-import { PencilEditIcon, SparklesIcon } from './icons';
-import { Markdown } from './markdown';
-import { MessageActions } from './message-actions';
-import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
+import { PencilEditIcon, SparklesIcon } from '@/components/icons';
+import { Markdown } from '@/components/chat/markdown';
+import { MessageActions } from '@/components/chat/message-actions';
+import { PreviewAttachment } from '@/components/chat/preview-attachment';
+import { Weather } from '@/components/weather';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
-import { Button } from './ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { MessageEditor } from './message-editor';
-import { DocumentPreview } from './document-preview';
-import { MessageReasoning } from './message-reasoning';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { MessageEditor } from '@/components/chat/message-editor';
+import { DocumentPreview } from '@/components/chat/document-preview';
+import { MessageReasoning } from '@/components/chat/message-reasoning';
 import type { UseChatHelpers } from '@ai-sdk/react';
 
 const PurePreviewMessage = ({

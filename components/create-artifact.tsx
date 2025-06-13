@@ -2,7 +2,7 @@ import { Suggestion } from '@/lib/db/schema';
 import { UseChatHelpers } from '@ai-sdk/react';
 import { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
 import { DataStreamDelta } from './data-stream-handler';
-import { UIArtifact } from './artifact';
+import { UIArtifact } from './chat/artifact';
 
 export type ArtifactActionContext<M = any> = {
   content: string;

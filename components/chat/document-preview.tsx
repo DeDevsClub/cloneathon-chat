@@ -9,18 +9,21 @@ import {
   useRef,
 } from 'react';
 import { ArtifactKind, UIArtifact } from './artifact';
-import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from './icons';
+import { FileIcon, FullscreenIcon, ImageIcon, LoaderIcon } from '../icons';
 import { cn, fetcher } from '@/lib/utils';
 import { Document } from '@/lib/db/schema';
 import { InlineDocumentSkeleton } from './document-skeleton';
 import useSWR from 'swr';
-import { Editor } from './text-editor';
-import { DocumentToolCall, DocumentToolResult } from './document';
+import { Editor } from '../text-editor';
+import {
+  DocumentToolCall,
+  DocumentToolResult,
+} from '@/components/chat/document';
 import { CodeEditor } from './code-editor';
 import { useArtifact } from '@/hooks/use-artifact';
 import equal from 'fast-deep-equal';
-import { SpreadsheetEditor } from './sheet-editor';
-import { ImageEditor } from './image-editor';
+import { SpreadsheetEditor } from '../sheet-editor';
+import { ImageEditor } from '../image-editor';
 
 interface DocumentPreviewProps {
   isReadonly: boolean;

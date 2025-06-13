@@ -1,8 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getToken } from 'next-auth/jwt';
 
 import { getProject, updateProject, deleteProject } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
+
+// Helper function to extract email from different cookie formats
+async function extractEmailFromCookie(request: NextRequest, cookieName: string) {
+  const cookie = request.cookies.get(cookieName);
+  if (!cookie?.value) return null;
+  
+  try {
+    if (cookieName.includes('auth')) {
+      // Handle JWT token from NextAuth
+      const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+      if (!secret) return null;
+      
+      try {
+        // Use getToken to decode the JWT token
+        const token = await getToken({ 
+          req: request,
+          secret,
+          cookieName,
+        });
+        
+        return (token?.email as string) || null;
+      } catch (jwtError) {
+        console.error(`Failed to decode JWT token: ${jwtError}`);
+        return null;
+      }
+    } else {
+      // Handle JSON formatted cookies
+      const data = JSON.parse(decodeURIComponent(cookie.value));
+      return data.email;
+    }
+  } catch (error) {
+    console.error(`Error extracting email from ${cookieName}:`, error);
+    return null;
+  }
+}
 
 // Schema for project updates
 const updateProjectSchema = z.object({
@@ -40,19 +76,33 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
 // GET /api/projects/[id] - Get a specific project
 export async function GET(request: NextRequest, context: any) {
   try {
-    // Get user email from the session cookie
-    const sessionCookie = request.cookies.get('user-session');
-
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error(`DEBUG - GET project/${context.params.id} - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`);
+    
+    // Try extracting email from different possible session cookie names
+    let email = null;
+    
+    // Try each possible cookie name
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+    
+    for (const cookieName of cookieNames) {
+      if (request.cookies.has(cookieName)) {
+        console.error(`DEBUG - GET project/${context.params.id} - Trying cookie: ${cookieName}`);
+        email = await extractEmailFromCookie(request, cookieName);
+        if (email) {
+          console.error(`DEBUG - GET project/${context.params.id} - Found valid email in cookie ${cookieName}: ${email}`);
+          break;
+        }
+      }
     }
-
-    // Parse the session cookie value to get user email
-    const sessionData = JSON.parse(decodeURIComponent(sessionCookie.value));
-    const email = sessionData.email;
-
+    
     if (!email) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      console.error('DEBUG - GET project details - No valid session found or could not extract email');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const validation = await validateUserOwnership(context.params.id, email);
@@ -76,19 +126,26 @@ export async function GET(request: NextRequest, context: any) {
 // PATCH /api/projects/[id] - Update a project
 export async function PATCH(request: NextRequest, context: any) {
   try {
-    // Get user email from the session cookie
-    const sessionCookie = request.cookies.get('user-session');
-
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Try extracting email from different possible session cookie names
+    let email = null;
+    
+    // Try each possible cookie name
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+    
+    for (const cookieName of cookieNames) {
+      if (request.cookies.has(cookieName)) {
+        email = await extractEmailFromCookie(request, cookieName);
+        if (email) break;
+      }
     }
-
-    // Parse the session cookie value to get user email
-    const sessionData = JSON.parse(decodeURIComponent(sessionCookie.value));
-    const email = sessionData.email;
-
+    
     if (!email) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const validation = await validateUserOwnership(context.params.id, email);
@@ -128,19 +185,26 @@ export async function PATCH(request: NextRequest, context: any) {
 // DELETE /api/projects/[id] - Delete a project
 export async function DELETE(request: NextRequest, context: any) {
   try {
-    // Get user email from the session cookie
-    const sessionCookie = request.cookies.get('user-session');
-
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Try extracting email from different possible session cookie names
+    let email = null;
+    
+    // Try each possible cookie name
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+    
+    for (const cookieName of cookieNames) {
+      if (request.cookies.has(cookieName)) {
+        email = await extractEmailFromCookie(request, cookieName);
+        if (email) break;
+      }
     }
-
-    // Parse the session cookie value to get user email
-    const sessionData = JSON.parse(decodeURIComponent(sessionCookie.value));
-    const email = sessionData.email;
-
+    
     if (!email) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const validation = await validateUserOwnership(context.params.id, email);

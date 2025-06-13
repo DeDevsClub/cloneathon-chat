@@ -6,27 +6,30 @@ import { createProject, getProjects } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
 
 // Helper function to extract email from different cookie formats
-async function extractEmailFromCookie(request: NextRequest, cookieName: string) {
+async function extractEmailFromCookie(
+  request: NextRequest,
+  cookieName: string,
+) {
   const cookie = request.cookies.get(cookieName);
   if (!cookie?.value) return null;
-  
+
   try {
     if (cookieName.includes('auth')) {
       // Handle JWT token from NextAuth
       const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
       if (!secret) return null;
-      
+
       try {
         // Use getToken to decode the JWT token
-        const token = await getToken({ 
+        const token = await getToken({
           req: request,
           secret,
-          cookieName
+          cookieName,
         });
-        
-        return token?.email as string || null;
+
+        return (token?.email as string) || null;
       } catch (jwtError) {
-        console.error(`Failed to decode JWT token: ${jwtError}`);
+        // console.error(`Failed to decode JWT token: ${jwtError}`);
         return null;
       }
     } else {
@@ -35,7 +38,7 @@ async function extractEmailFromCookie(request: NextRequest, cookieName: string) 
       return data.email;
     }
   } catch (error) {
-    console.error(`Error extracting email from ${cookieName}:`, error);
+    // console.error(`Error extracting email from ${cookieName}:`, error);
     return null;
   }
 }
@@ -52,27 +55,36 @@ const createProjectSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     // Using console.error for better visibility in server logs
-    console.error(`DEBUG - GET - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map(c => ({name: c.name, value: `${c.value?.slice(0, 10)}...`}))])}`);  
-    
+    // console.error(`DEBUG - GET - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map(c => ({name: c.name, value: `${c.value?.slice(0, 10)}...`}))])}`);
+
     // Try extracting email from different possible session cookie names
     let email = null;
-    
+
     // Try each possible cookie name
-    const cookieNames = ['user-session', 'next-auth.session-token', '__Secure-next-auth.session-token', 'authjs.session-token'];
-    
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
         console.error(`DEBUG - GET - Trying cookie: ${cookieName}`);
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.error(`DEBUG - GET - Found valid email in cookie ${cookieName}: ${email}`);
+          console.error(
+            `DEBUG - GET - Found valid email in cookie ${cookieName}: ${email}`,
+          );
           break;
         }
       }
     }
-    
+
     if (!email) {
-      console.error('DEBUG - GET - No valid session found or could not extract email');
+      console.error(
+        'DEBUG - GET - No valid session found or could not extract email',
+      );
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -98,27 +110,38 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Using console.error for better visibility in server logs
-    console.error(`DEBUG - POST - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map(c => ({name: c.name, value: `${c.value?.slice(0, 10)}...`}))])}`); 
-    
+    console.error(
+      `DEBUG - POST - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
+    );
+
     // Try extracting email from different possible session cookie names
     let email = null;
-    
+
     // Try each possible cookie name
-    const cookieNames = ['user-session', 'next-auth.session-token', '__Secure-next-auth.session-token', 'authjs.session-token'];
-    
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
         console.error(`DEBUG - POST - Trying cookie: ${cookieName}`);
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.error(`DEBUG - POST - Found valid email in cookie ${cookieName}: ${email}`);
+          console.error(
+            `DEBUG - POST - Found valid email in cookie ${cookieName}: ${email}`,
+          );
           break;
         }
       }
     }
-    
+
     if (!email) {
-      console.error('DEBUG - POST - No valid session found or could not extract email');
+      console.error(
+        'DEBUG - POST - No valid session found or could not extract email',
+      );
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

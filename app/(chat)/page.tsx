@@ -24,15 +24,15 @@ const HomePage = () => {
       setLoading(true);
       const response = await fetch('/api/projects');
       if (!response.ok) {
-        console.log({ response });
-        // throw new Error('Failed to fetch projects');
+        // console.log({ response });
+        throw new Error('Failed to fetch projects');
       }
 
       const data = await response.json();
-      console.log({ data });
+      // console.log({ data });
       setProjects(data.projects || []);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      // console.error('Error fetching projects:', error);
       toast.error('Failed to load projects');
     } finally {
       setLoading(false);

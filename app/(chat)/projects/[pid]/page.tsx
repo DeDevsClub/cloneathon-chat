@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -45,20 +45,24 @@ interface Project {
 }
 
 export default function ProjectPage(props: any) {
+  // Extract pid directly from params to avoid issues with Next.js params Promise warnings
   const { params } = props;
+  const pid = params?.pid;
+
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(pid);
   const [chatIds, setChatIds] = useState<string[] | null>(null);
 
   const fetchProjectDetails = async () => {
     try {
       setLoading(true);
+      const pid = projectId;
 
       // Fetch project details
-      const projectResponse = await fetch(`/api/projects/${params.pid}`);
+      const projectResponse = await fetch(`/api/projects/${pid}`);
 
       if (!projectResponse.ok) {
         if (projectResponse.status === 404) {
@@ -70,11 +74,12 @@ export default function ProjectPage(props: any) {
       }
 
       const projectData = await projectResponse.json();
-      setProject(projectData.project);
-      setProjectId(projectData.project.id);
-      console.log({ projectId });
-      // Fetch project chats
-      const chatsResponse = await fetch(`/api/projects/${projectId}/chats`);
+      const projectDetails = projectData.project;
+      setProject(projectDetails);
+      setProjectId(pid);
+
+      // Fetch project chats using the path parameter, not state
+      const chatsResponse = await fetch(`/api/projects/${pid}/chats`);
 
       if (!chatsResponse.ok) {
         throw new Error('Failed to fetch project chats');
@@ -82,9 +87,7 @@ export default function ProjectPage(props: any) {
 
       const chatsData = await chatsResponse.json();
       setChats(chatsData.chats || []);
-      console.log({ chatsData });
-      setChatIds(chatsData.chats.map((chat: Chat) => chat.id));
-      console.log({ chatIds });
+      setChatIds(chatsData.chats?.map((chat: Chat) => chat.id) || []);
     } catch (error) {
       console.error('Error fetching project details:', error);
       toast.error('Failed to load project details');
@@ -123,7 +126,9 @@ export default function ProjectPage(props: any) {
 
   useEffect(() => {
     fetchProjectDetails();
-  }, [params.pid, projectId, fetchProjectDetails]);
+    // Only depend on params.pid to avoid unnecessary rerenders
+    // Remove circular dependency on fetchProjectDetails
+  }, [params.pid]);
 
   if (loading) {
     return (

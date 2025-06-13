@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useSession } from 'next-auth/react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -55,7 +56,7 @@ export function CreateProjectDialog({
 }: CreateProjectDialogProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { data: session } = useSession();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,7 +69,8 @@ export function CreateProjectDialog({
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
-
+    // console.log({ user: session?.user });
+    const isGuest = session?.user?.type === 'guest';
     try {
       const response = await fetch('/api/projects', {
         method: 'POST',
@@ -80,15 +82,30 @@ export function CreateProjectDialog({
 
       if (!response.ok) {
         const error = await response.json();
+        console.log({ error });
+        if (isGuest) {
+          toast.error('Authentication Required', {
+            description: 'Please sign in with your account to create and manage projects.',
+            action: {
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            },
+            duration: 5000,
+          });
+          setTimeout(() => router.push('/login'), 2000);
+          return;
+        }
         throw new Error(error.message || 'Failed to create project');
       }
 
       const { project } = await response.json();
       onProjectCreated(project);
-      router.refresh(); // Refresh to update the projects list
+      router.refresh();
     } catch (error) {
       console.error('Error creating project:', error);
-      toast.error('Failed to create project');
+      toast.error('Project Creation Failed', {
+        description: 'There was a problem creating your project. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }

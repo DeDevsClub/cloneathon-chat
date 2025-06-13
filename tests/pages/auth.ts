@@ -16,8 +16,8 @@ export class AuthPage {
 
   async signup(email: string, password: string) {
     await this.gotoSignup();
-    await this.page.getByPlaceholder('user@acme.com').click();
-    await this.page.getByPlaceholder('user@acme.com').fill(email);
+    await this.page.getByPlaceholder('alan-turing@devs.club').click();
+    await this.page.getByPlaceholder('alan-turing@devs.club').fill(email);
     await this.page.getByLabel('Password').click();
     await this.page.getByLabel('Password').fill(password);
     await this.page.getByRole('button', { name: 'Sign Up' }).click();
@@ -25,8 +25,8 @@ export class AuthPage {
 
   async login(email: string, password: string) {
     await this.gotoLogin();
-    await this.page.getByPlaceholder('user@acme.com').click();
-    await this.page.getByPlaceholder('user@acme.com').fill(email);
+    await this.page.getByPlaceholder('alan-turing@devs.club').click();
+    await this.page.getByPlaceholder('alan-turing@devs.club').fill(email);
     await this.page.getByLabel('Password').click();
     await this.page.getByLabel('Password').fill(password);
     await this.page.getByRole('button', { name: 'Sign In' }).click();
@@ -51,7 +51,7 @@ export class AuthPage {
     await authMenuItem.click();
 
     const userEmail = this.page.getByTestId('user-email');
-    await expect(userEmail).toContainText('Guest');
+    await expect(userEmail).toContainText('alan-turing@devs.club');
   }
 
   async expectToastToContain(text: string) {

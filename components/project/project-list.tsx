@@ -33,6 +33,7 @@ export const ProjectList = ({
         const response = await fetch('/api/projects');
 
         if (!response.ok) {
+          console.log({ response });
           throw new Error('Failed to fetch projects');
         }
 

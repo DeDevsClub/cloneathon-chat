@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus, Sparkles, Rocket, ArrowRight } from 'lucide-react';
+import { Loader2, Plus, Sparkles, ArrowRight, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 import { ProjectItem } from '@/components/project/project-item';
 import { CreateProjectDialog } from '@/components/project/create-project-dialog';
@@ -15,17 +16,20 @@ const HomePage = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const sessionLoading = status === 'loading';
 
   const fetchProjects = async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/projects');
-
       if (!response.ok) {
-        throw new Error('Failed to fetch projects');
+        console.log({ response });
+        // throw new Error('Failed to fetch projects');
       }
 
       const data = await response.json();
+      console.log({ data });
       setProjects(data.projects || []);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -46,6 +50,15 @@ const HomePage = () => {
     toast.success('Project created successfully');
   };
 
+  const handleCreateProject = () => {
+    if (!session) {
+      toast.error('Please log in to create a project');
+      router.push('/login');
+      return;
+    }
+    setOpen(true);
+  };
+
   return (
     <div className="container py-8 max-w-5xl mx-auto">
       <motion.div
@@ -58,9 +71,10 @@ const HomePage = () => {
           Projects
         </h1>
         <Button
-          onClick={() => setOpen(true)}
+          onClick={handleCreateProject}
           className="bg-purple-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-purple-500/20 transition-all duration-300"
           size="lg"
+          disabled={sessionLoading}
         >
           <Plus className="size-4 mr-2 text-white" />
           <span className="text-white">New Project</span>
@@ -108,14 +122,22 @@ const HomePage = () => {
                 whileTap={{ scale: 0.98 }}
               >
                 <Button
-                  onClick={() => setOpen(true)}
+                  onClick={handleCreateProject}
                   className="bg-purple-700 hover:bg-purple-600 px-8 h-auto text-lg shadow-xl shadow-purple-500/20 transition-all duration-300 group"
-                  // size="default"
                   variant="outline"
+                  disabled={sessionLoading}
                 >
-                  {/* <Rocket className="size-5 mr-2 group-hover:rotate-12 transition-transform duration-300 text-white" /> */}
-                  <span className="text-white">Create Project</span>
-                  <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform duration-300 text-white" />
+                  {!session ? (
+                    <>
+                      <LogIn className="size-5 mr-2 group-hover:rotate-12 transition-transform duration-300 text-white" />
+                      <span className="text-white">Sign In to Create</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-white">Create Project</span>
+                      <ArrowRight className="ml-2 size-5 group-hover:translate-x-1 transition-transform duration-300 text-white" />
+                    </>
+                  )}
                 </Button>
               </motion.div>
             </motion.div>

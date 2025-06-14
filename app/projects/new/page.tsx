@@ -52,7 +52,7 @@ const NewProjectPage = () => {
     defaultValues: {
       name: '',
       description: '',
-      icon: '📁', // Default folder icon
+      icon: '🦋', // Default folder icon
       color: '#4f46e5', // Default indigo color
     },
   });
@@ -75,6 +75,7 @@ const NewProjectPage = () => {
       }
 
       const { project } = await response.json();
+      console.log({ project });
       toast.success('Project created successfully');
       router.push(`/projects/${project.id}`);
     } catch (error: any) {
@@ -150,10 +151,10 @@ const NewProjectPage = () => {
                       <FormControl>
                         <div className="flex gap-3 items-center">
                           <div className="size-12 flex items-center justify-center text-3xl border rounded-md">
-                            {field.value || '📁'}
+                            {field.value || '🦋'}
                           </div>
                           <Input
-                            placeholder="📁"
+                            placeholder="🦋"
                             {...field}
                             value={field.value || ''}
                             className="flex-1"

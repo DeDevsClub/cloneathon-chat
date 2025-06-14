@@ -5,14 +5,14 @@ import {
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { isTestEnvironment } from '../constants';
-import { artifactModel, reasoningModel, titleModel } from './models.test';
+import { artifactModel, reasoningModel } from './models.test';
 
 export const myProvider = isTestEnvironment
   ? customProvider({
       languageModels: {
         'chat-model': openai.chat('gpt-4o'),
         'chat-model-reasoning': reasoningModel,
-        'title-model': titleModel,
+        'title-model': openai.chat('gpt-4o'),
         'artifact-model': artifactModel,
       },
     })

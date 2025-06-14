@@ -104,6 +104,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "ts-safe": "^0.0.5",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.25.64"

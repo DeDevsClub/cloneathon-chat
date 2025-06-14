@@ -4,7 +4,6 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(`MIDDLEWARE DEBUG - Processing path: ${pathname}`);
 
   /*
    * Playwright starts the dev server and requires a 200 status to
@@ -15,13 +14,6 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith('/api/auth')) {
-    console.log('MIDDLEWARE DEBUG - Skipping auth path');
-    return NextResponse.next();
-  }
-
-  // Allow direct access to project chat routes without redirecting
-  if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
-    console.log('MIDDLEWARE DEBUG - Direct access to project chat path');
     return NextResponse.next();
   }
 
@@ -31,33 +23,11 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
-  console.log(
-    `MIDDLEWARE DEBUG - Token check for ${pathname}: ${token ? 'Token found' : 'No token'}`,
-  );
-
-  // Allow all API routes to function without authentication
-  if (pathname.startsWith('/api/')) {
-    console.log(`MIDDLEWARE DEBUG - Allowing API access: ${pathname}`);
-    return NextResponse.next();
-  }
-
   if (!token) {
-    // Skip authentication for development/debugging
-    if (isDevelopmentEnvironment) {
-      console.log(`MIDDLEWARE DEBUG - Dev mode: skipping auth for ${pathname}`);
-      return NextResponse.next();
-    }
-
-    // Skip authentication redirect for project chat routes
-    if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
-      console.log(`MIDDLEWARE DEBUG - Skipping auth for project chat: ${pathname}`);
-      return NextResponse.next();
-    }
-
-    // For other routes, redirect to guest auth
+    // Properly encode the current URL for the redirect
     const redirectUrl = encodeURIComponent(request.url);
-    console.log(`MIDDLEWARE DEBUG - Redirecting to guest auth: ${redirectUrl}`);
 
+    // Create the redirect URL with the encoded current URL as a parameter
     return NextResponse.redirect(
       new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url),
     );
@@ -75,12 +45,11 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
+    '/chat/:id',
     '/api/:path*',
     '/login',
     '/signup',
-    `/chat`,
-    `/vote`,
-    `/projects/:path*`,
+    '/projects/:id',
 
     /*
      * Match all request paths except for the ones starting with:

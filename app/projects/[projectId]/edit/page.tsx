@@ -76,7 +76,7 @@ const EditProjectPage = (props: PageProps) => {
     defaultValues: {
       name: '',
       description: '',
-      icon: '📁',
+      icon: '🦋',
       color: '#4f46e5',
     },
   });
@@ -102,7 +102,7 @@ const EditProjectPage = (props: PageProps) => {
         form.reset({
           name: data.project.name,
           description: data.project.description || '',
-          icon: data.project.icon || '📁',
+          icon: data.project.icon || '🦋',
           color: data.project.color || '#4f46e5',
         });
       } catch (err) {
@@ -230,10 +230,10 @@ const EditProjectPage = (props: PageProps) => {
                       <FormControl>
                         <div className="flex gap-3 items-center">
                           <div className="size-12 flex items-center justify-center text-3xl border rounded-md">
-                            {field.value || '📁'}
+                            {field.value || '🦋'}
                           </div>
                           <Input
-                            placeholder="📁"
+                            placeholder="🦋"
                             {...field}
                             value={field.value || ''}
                             className="flex-1"

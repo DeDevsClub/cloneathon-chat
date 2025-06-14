@@ -32,7 +32,8 @@ export function HeaderIsland({
   };
 
   const createChat = (projectId: string) => {
-    router.push(`/projects/${projectId}/chats/new`);
+    // router.push(`/projects/${projectId}/chats/new`);
+    router.push(`/chats/new`);
     router.refresh();
   };
 

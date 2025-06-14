@@ -22,7 +22,7 @@ enum role {
   system = 'system',
 }
 
-export default function ChatPage(props: PageProps) {
+export default function ChatsPage(props: PageProps) {
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
   const chatId = unwrappedParams.chatId;
@@ -48,7 +48,7 @@ export default function ChatPage(props: PageProps) {
       projectId={projectId}
       chatId={chatId}
       initialMessages={[defaultMessage as UIMessage]}
-      initialChatModel="gpt-4o"
+      initialChatModel="chat-model"
       initialVisibilityType="private"
       isReadonly={false}
       session={session as Session}

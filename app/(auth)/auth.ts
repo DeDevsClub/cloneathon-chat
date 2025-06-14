@@ -14,12 +14,30 @@ declare module 'next-auth' {
       id: string;
       type: UserType;
     } & DefaultSession['user'];
+    chat?: {
+      id: string;
+      messages: Array<{
+        id: string;
+        content: string;
+        role: 'user' | 'assistant' | 'system';
+        createdAt: Date;
+      }>;
+    };
   }
 
   interface User {
     id?: string;
     email?: string | null;
     type: UserType;
+    chat?: {
+      id: string;
+      messages: Array<{
+        id: string;
+        content: string;
+        role: 'user' | 'assistant' | 'system';
+        createdAt: Date;
+      }>;
+    };
   }
 }
 
@@ -27,6 +45,15 @@ declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id: string;
     type: UserType;
+    chat?: {
+      id: string;
+      messages: Array<{
+        id: string;
+        content: string;
+        role: 'user' | 'assistant' | 'system';
+        createdAt: Date;
+      }>;
+    };
   }
 }
 
@@ -67,7 +94,25 @@ export const {
       credentials: {},
       async authorize() {
         const [guestUser] = await createGuestUser();
-        return { ...guestUser, type: 'guest' };
+        
+        // Create initial chat for guest users
+        const initialChat = {
+          id: `chat-${Date.now()}`,
+          messages: [
+            {
+              id: `msg-${Date.now()}`,
+              content: 'Welcome to DeDevs Chat! How can I assist you today?',
+              role: 'assistant' as const,
+              createdAt: new Date(),
+            },
+          ],
+        };
+        
+        return { 
+          ...guestUser, 
+          type: 'guest',
+          chat: initialChat
+        };
       },
     }),
   ],
@@ -76,6 +121,22 @@ export const {
       if (user) {
         token.id = user.id as string;
         token.type = user.type;
+        
+        // Initialize chat with a welcome message
+        if (!token.chat) {
+          const chatId = `chat-${Date.now()}`;
+          token.chat = {
+            id: chatId,
+            messages: [
+              {
+                id: `msg-${Date.now()}`,
+                content: 'Welcome! How can I help you today?',
+                role: 'assistant' as const,
+                createdAt: new Date(),
+              },
+            ],
+          };
+        }
       }
 
       return token;
@@ -84,6 +145,11 @@ export const {
       if (session.user) {
         session.user.id = token.id;
         session.user.type = token.type;
+        
+        // Include chat in session
+        if (token.chat) {
+          session.chat = token.chat;
+        }
       }
 
       return session;

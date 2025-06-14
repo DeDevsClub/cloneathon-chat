@@ -255,7 +255,7 @@ export default function ProjectPage(props: PageProps) {
             className="text-4xl"
             style={{ color: project.color || undefined }}
           >
-            {project.icon || '📁'}
+            {project.icon || '🦋'}
           </span>
           <h1 className="text-3xl font-bold">{project.name}</h1>
         </div>

@@ -48,7 +48,7 @@ export default function NewChatPage(props: PageProps) {
 
         if (!session) {
           toast.error('You must be logged in to create a chat');
-          // router.push('/login');
+          router.push('/login');
           return;
         }
 

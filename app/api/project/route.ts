@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getToken } from 'next-auth/jwt';
 import { updateChatProject } from '@/lib/db/chat';
 import { getUser } from '@/lib/db/queries';
+import { updateProject } from '@/lib/db';
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -48,11 +49,11 @@ const updateChatProjectSchema = z.object({
   projectId: z.string().uuid().nullable(),
 });
 
-// PATCH /api/chat/project - Update a chat's project association
+// PATCH /api/project - Update a project
 export async function PATCH(request: NextRequest) {
   try {
-    console.log('PATCH /api/chat/project - Updating chat project association');
-    
+    console.log('PATCH /api/project - Updating project');
+
     // Try extracting email from different possible session cookie names
     let email = null;
 
@@ -89,7 +90,7 @@ export async function PATCH(request: NextRequest) {
     // Parse and validate request body
     const body = await request.json();
     console.log('Request body:', JSON.stringify(body));
-    
+
     const validationResult = updateChatProjectSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -100,25 +101,23 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { chatId, projectId } = validationResult.data;
-    
+    const { projectId } = validationResult.data;
+
     // Log the validated data
     console.log('Validated chat project update data:', {
-      chatId,
-      projectId: projectId || null,
+      projectId,
     });
 
     // Update the chat's project association
-    const updatedChat = await updateChatProject({
-      chatId,
-      projectId: projectId || null,
+    const updatedProject = await updateProject({
+      id: projectId!,
     });
 
-    return NextResponse.json({ chat: updatedChat }, { status: 200 });
+    return NextResponse.json({ project: updatedProject }, { status: 200 });
   } catch (error) {
-    console.error('Error updating chat project association:', error);
+    console.error('Error updating project:', error);
     return NextResponse.json(
-      { error: 'Failed to update chat project association' },
+      { error: 'Failed to update project' },
       { status: 500 },
     );
   }

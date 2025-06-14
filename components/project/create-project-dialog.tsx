@@ -169,7 +169,7 @@ export function CreateProjectDialog({
                     <FormLabel>Icon (emoji)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="📁"
+                        placeholder="🦋"
                         {...field}
                         value={field.value || ''}
                       />

@@ -17,15 +17,14 @@ export const AppRoutes = {
 
   // Chats
   chats: {
-    list: (projectId: string) => `/projects/${projectId}/chats`,
-    detail: (projectId: string, id: string) =>
-      `/projects/${projectId}/chats/${id}`,
+    list: () => `/chats`,
     projectChat: {
-      list: (projectId: string) => `/projects/${projectId}/chats`,
-      detail: (projectId: string, chatId: string) =>
-        `/projects/${projectId}/chats/${chatId}`,
-      new: (projectId: string) => `/projects/${projectId}/chats/new`,
+      list: () => `/chats`,
+      detail: (chatId: string) => `/chats/${chatId}`,
+      new: () => `/chats/new`,
     },
+    detail: (id: string) => `/chats/${id}`,
+    new: '/chats/new',
   },
 
   // API Routes
@@ -45,24 +44,57 @@ export const AppRoutes = {
     test: {
       endpoints: '/api/test-endpoints',
     },
+    api: {
+      chat: {
+        base: '/api/chat',
+        byId: (id: string) => `/api/chat/${id}`,
+        project: '/api/chat/project',
+        messages: (chatId: string) => `/api/chat/${chatId}/messages`,
+        history: (chatId: string) => `/api/chat/${chatId}/history`,
+      },
+    },
+    chatProject: {
+      update: '/api/chat/project',
+    },
+    chatVisibility: {
+      update: '/api/chat/visibility',
+    },
+    chatModel: {
+      update: '/api/chat/model',
+    },
+    chatVote: {
+      update: '/api/chat/vote',
+    },
+    chatHistory: {
+      update: '/api/chat/history',
+    },
+    chatMessage: {
+      update: '/api/chat/message',
+    },
+    artifact: {
+      update: '/api/artifact',
+    },
+    ai: {
+      chat: '/api/ai/chat',
+    },
+    vote: {
+      update: '/api/vote',
+    },
   },
 };
 
 /**
  * Helper function to navigate to a chat within a project context
  */
-export function navigateToProjectChat(
-  projectId: string,
-  chatId: string,
-): string {
-  return AppRoutes.chats.projectChat.detail(projectId, chatId);
+export function navigateToProjectChat(chatId: string): string {
+  return AppRoutes.chats.projectChat.detail(chatId);
 }
 
 /**
  * Helper function to navigate to chat creation within a project
  */
-export function navigateToNewProjectChat(projectId: string): string {
-  return AppRoutes.chats.projectChat.new(projectId);
+export function navigateToNewProjectChat(): string {
+  return AppRoutes.chats.projectChat.new();
 }
 
 /**

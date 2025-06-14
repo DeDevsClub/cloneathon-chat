@@ -42,7 +42,7 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
     if (projectId && projectId !== 'id') {
       console.log({ user });
       console.log(`Creating chat with project ID: ${projectId}`);
-      router.push(`/projects/${projectId}/chats/new`);
+      router.push(`/chats/new`);
       router.refresh();
     } else {
       console.error('Invalid projectId for chat creation:', projectId);

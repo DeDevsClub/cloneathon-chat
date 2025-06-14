@@ -43,10 +43,19 @@ async function extractEmailFromCookie(
   }
 }
 
-export async function GET(request: NextRequest, context: any) {
+// Using the proper NextJS App Router typing for route parameters
+type RouteParams = { params: { id: string } }
+
+export async function GET(
+  request: NextRequest,
+  context: RouteParams,
+) {
   try {
+    // Extract project ID from context params
+    const projectId = context.params.id;
+
     console.error(
-      `DEBUG - GET project/${await context.params.id}/chats - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
+      `DEBUG - GET project/${projectId}/chats - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
     );
 
     // Try extracting email from different possible session cookie names
@@ -63,7 +72,7 @@ export async function GET(request: NextRequest, context: any) {
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
         console.error(
-          `DEBUG - GET project/${await context.params.id}/chats - Trying cookie: ${cookieName}`,
+          `DEBUG - GET project/${projectId}/chats - Trying cookie: ${cookieName}`,
         );
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
@@ -90,8 +99,11 @@ export async function GET(request: NextRequest, context: any) {
 
     // Check if project exists and user has access to it
     try {
-      const projectId = await context.params.id;
+      // We've already extracted projectId at the beginning of the function
       const project = await getProject({ id: projectId });
+      console.error(
+        `DEBUG - GET project/${projectId}/chats - Project: ${JSON.stringify(project)}`,
+      );
 
       // Check if user owns the project
       if (project?.userId !== user?.id) {
@@ -109,7 +121,7 @@ export async function GET(request: NextRequest, context: any) {
 
       return NextResponse.json({ chats });
     } catch (error: any) {
-      const projectId = await context.params.id;
+      // We've already extracted projectId at the beginning of the function
       console.error(`Error fetching project ${projectId}:`, error);
       if (error?.message?.includes('not found')) {
         return NextResponse.json(

@@ -2,8 +2,6 @@
 
 > This document outlines the **core requirements** for the AI chat application. These features represent the **minimum functionality** needed to qualify for a prize for the [T3 Cloneathon](https://cloneathon.t3.chat).
 
-<!-- <img style="width: 100%; height: auto; justify-content: center; align-items: center;" src="../assets/core-requirements.png" alt="core-requirements" /> -->
-
 ## 1. Chat with Various LLMs
 
 > Implement support for multiple language models and providers.
@@ -52,8 +50,6 @@
   [ ] OAuth integration with popular providers (`Google`, `GitHub`, etc.).
   [ ] Session management and secure token handling.
   [ ] Secure password storage using **bcrypt**.
-
-  - JK, we are using **Clerk**, so don't need to reinvent the wheel, but we should still implement it, then erase it as a fl3x (_if time permits_).
 
 - **User Management**:
 

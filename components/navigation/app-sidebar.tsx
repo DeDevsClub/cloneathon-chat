@@ -27,8 +27,10 @@ import { PlusIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 interface AppSidebarProps {
   user: User | undefined;
+  projectId: string;
 }
-export function AppSidebar({ user }: AppSidebarProps) {
+
+export function AppSidebar({ user, projectId }: AppSidebarProps) {
   const router = useRouter();
   const { toggleSidebar, state } = useSidebar();
   const isOpen = state === 'expanded';
@@ -43,6 +45,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
     <>
       <SearchModal
         isOpen={isSearchModalOpen}
+        projectId={projectId}
         onOpenChange={setIsSearchModalOpen}
       />
       <Sidebar className="group-data-[side=left]:border-r-0">

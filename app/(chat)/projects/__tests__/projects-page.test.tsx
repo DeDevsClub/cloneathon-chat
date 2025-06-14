@@ -3,10 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProjectsPage from '../page';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { expect, it } from '@jest/globals';
-import { describe } from '@jest/globals';
-import { beforeEach } from '@jest/globals';
-import { jest } from '@jest/globals';
+import { expect, it, describe, beforeEach, jest } from '@jest/globals';
 
 // Mock modules
 jest.mock('next-auth/react');

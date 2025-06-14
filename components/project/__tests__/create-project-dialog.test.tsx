@@ -1,11 +1,10 @@
 import React from 'react';
-import { jest } from '@jest/globals';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CreateProjectDialog } from '../create-project-dialog';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the modules
 jest.mock('next/navigation');
@@ -68,9 +67,11 @@ describe('CreateProjectDialog Component', () => {
 
   it('handles successful project creation', async () => {
     // Mock successful API response
+    // @ts-ignore
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       text: jest.fn().mockResolvedValueOnce(
+        // @ts-ignore
         JSON.stringify({
           project: { id: 'new-project-id', name: 'Test Project' },
         }),
@@ -108,11 +109,13 @@ describe('CreateProjectDialog Component', () => {
 
   it('handles API errors correctly', async () => {
     // Mock API error response
+    // @ts-ignore
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
       status: 500,
       text: jest
         .fn()
+        // @ts-ignore
         .mockResolvedValueOnce(JSON.stringify({ error: 'Server error' })),
     });
 
@@ -152,11 +155,13 @@ describe('CreateProjectDialog Component', () => {
     }));
 
     // Mock API error for unauthorized
+    // @ts-ignore
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
       status: 401,
       text: jest
         .fn()
+        // @ts-ignore
         .mockResolvedValueOnce(JSON.stringify({ error: 'Unauthorized' })),
     });
 

@@ -107,7 +107,7 @@ export function Chat({
         `/projects/${projectId}/chats/${chatId}`,
       );
     }
-  }, [query, append, hasAppendedQuery, chatId]);
+  }, [query, append, hasAppendedQuery, chatId, projectId]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${chatId}` : null,
@@ -178,6 +178,7 @@ export function Chat({
 
       <Artifact
         chatId={chatId}
+        projectId={projectId}
         input={input}
         setInput={setInput}
         handleSubmit={handleSubmit}

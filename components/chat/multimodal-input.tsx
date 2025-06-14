@@ -135,6 +135,7 @@ function PureMultimodalInput({
     setAttachments,
     setLocalStorageInput,
     width,
+    projectId,
     chatId,
   ]);
 

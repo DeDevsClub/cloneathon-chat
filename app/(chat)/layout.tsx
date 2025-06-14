@@ -10,8 +10,12 @@ export const experimental_ppr = true;
 
 export default async function Layout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: {
+    projectId: string;
+  };
 }) {
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
@@ -24,7 +28,7 @@ export default async function Layout({
       />
       <AnimatedGridBackgroundSection>
         <SidebarProvider defaultOpen={!isCollapsed}>
-          <AppSidebar user={session?.user} />
+          <AppSidebar user={session?.user} projectId={params.projectId || ''} />
           <SidebarInset>{children}</SidebarInset>
         </SidebarProvider>
       </AnimatedGridBackgroundSection>

@@ -229,7 +229,7 @@ export function ProjectTutorial({
             <div className="relative z-10 text-white space-y-6">
               {/* Icon */}
               <motion.div
-                className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/30"
+                className="size-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/30"
                 {...getIconAnimation(currentStepData.animation)}
               >
                 <IconComponent size={32} className="text-white" />

@@ -64,6 +64,13 @@
       "when": 1749813646345,
       "tag": "0008_bent_revanche",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1749862206646,
+      "tag": "0009_volatile_penance",
+      "breakpoints": true
     }
   ]
 }

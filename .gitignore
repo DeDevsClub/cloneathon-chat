@@ -38,3 +38,6 @@ tsconfig.tsbuildinfo*
 /playwright-report/
 /blob-report/
 /playwright/*
+
+# cookies
+cookies.txt

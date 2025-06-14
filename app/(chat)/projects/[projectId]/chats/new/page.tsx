@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
-import { use } from 'react';
 import { AppRoutes } from '@/lib/routes';
 
 interface PageParams {

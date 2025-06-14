@@ -1,10 +1,9 @@
 import { POST } from '../route'; // Adjust the path if your route file is named differently or located elsewhere
 import { NextRequest } from 'next/server';
-import httpMocks from 'node-mocks-http';
+import { createRequest } from 'node-mocks-http';
 import OpenAI from 'openai'; // Import to allow Jest to mock it
-import { SYSTEM_PROMPT, ORIGINAL_TEXT } from '@/lib/constants';
 import { jest, it, describe, beforeEach, expect } from '@jest/globals';
-
+import { SYSTEM_PROMPT, ORIGINAL_TEXT } from '@/lib/constants';
 // Mock the OpenAI SDK
 // We hoist this mock to the top using jest.mock
 const mockCreateCompletion = jest.fn();
@@ -19,6 +18,12 @@ jest.mock('openai', () => {
       },
     };
   });
+});
+
+const req = createRequest<NextRequest>({
+  method: 'POST',
+  url: '/api/enhance',
+  json: () => Promise.resolve({ text: ORIGINAL_TEXT, apiKey: 'test-api-key' }),
 });
 
 describe('/api/enhance POST', () => {
@@ -36,17 +41,25 @@ describe('/api/enhance POST', () => {
       notes: ['Some note about the enhancement.'],
     });
 
+    // @ts-ignore
     mockCreateCompletion.mockResolvedValueOnce({
+      id: 'chatcmpl-123',
+      object: 'chat.completion',
+      created: Date.now(),
+      model: 'gpt-4o',
       choices: [
         {
+          index: 0,
           message: {
+            role: 'assistant',
             content: mockAiJsonResponse, // OpenAI returns a stringified JSON
           },
+          finish_reason: 'stop',
         },
       ],
-    });
+    } as any);
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       // Simulate NextRequest's json() method
@@ -70,7 +83,7 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 400 if text is missing', async () => {
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () => Promise.resolve({ apiKey: 'test-api-key' }),
@@ -84,7 +97,7 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 400 if text is not a string', async () => {
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () => Promise.resolve({ text: 123, apiKey: 'test-api-key' }),
@@ -98,7 +111,7 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 400 if apiKey is missing', async () => {
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () => Promise.resolve({ text: ORIGINAL_TEXT }),
@@ -112,7 +125,7 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 400 if apiKey is not a string', async () => {
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () => Promise.resolve({ text: ORIGINAL_TEXT, apiKey: 123 }),
@@ -128,10 +141,11 @@ describe('/api/enhance POST', () => {
   it('should return 500 if OpenAI call fails generally', async () => {
     // Simulate a generic error from OpenAI client
     mockCreateCompletion.mockRejectedValueOnce(
-      new Error('Network error or similar'),
+      // @ts-ignore
+      new Error('Network error or similar') as any,
     );
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
@@ -147,15 +161,16 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 500 if OpenAI returns no enhanced text', async () => {
+    // @ts-ignore
     mockCreateCompletion.mockResolvedValueOnce({
       choices: [
         {
           message: { content: null }, // Simulate no content from AI
         },
       ],
-    });
+    } as any);
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
@@ -170,7 +185,7 @@ describe('/api/enhance POST', () => {
   });
 
   it('should handle malformed JSON in request (simulated by req.json() rejecting)', async () => {
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       // Simulate req.json() throwing an error, as if body was malformed
@@ -181,7 +196,7 @@ describe('/api/enhance POST', () => {
     });
 
     // Manually attach the reject to the json method of the req object for this test
-    // because httpMocks.createRequest doesn't directly simulate NextRequest's internal error handling for json()
+    // because createRequest doesn't directly simulate NextRequest's internal error handling for json()
     // In a real NextRequest, if req.json() fails, it would lead to an error caught by the try-catch block.
     // Here, we're testing that our catch block correctly identifies SyntaxError.
 
@@ -195,11 +210,14 @@ describe('/api/enhance POST', () => {
   it('should handle OpenAI API specific error structure (e.g., status and error object)', async () => {
     const apiError = {
       status: 401,
-      error: { message: 'Invalid API key from OpenAI' },
+      error: {
+        message: 'Invalid API key',
+      },
     };
-    mockCreateCompletion.mockRejectedValueOnce(apiError);
+    // @ts-ignore
+    mockCreateCompletion.mockRejectedValueOnce(apiError as any);
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
@@ -223,13 +241,14 @@ describe('/api/enhance POST', () => {
         data: { error: { message: 'Rate limit exceeded' } },
       },
     };
-    mockCreateCompletion.mockRejectedValueOnce(apiError);
+    // @ts-ignore
+    mockCreateCompletion.mockRejectedValueOnce(apiError as any);
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
-        Promise.resolve({ text: 'Original text', apiKey: 'rate-limited-key' }),
+        Promise.resolve({ text: ORIGINAL_TEXT, apiKey: 'rate-limited-key' }),
     });
 
     const response = await POST(req as NextRequest);
@@ -243,17 +262,25 @@ describe('/api/enhance POST', () => {
   });
 
   it('should return 500 if AI response is not valid JSON', async () => {
+    // @ts-ignore
     mockCreateCompletion.mockResolvedValueOnce({
+      id: 'chatcmpl-123',
+      object: 'chat.completion',
+      created: Date.now(),
+      model: 'gpt-4o',
       choices: [
         {
+          index: 0,
           message: {
-            content: 'This is not JSON, but just a plain string.', // AI returns non-JSON
+            role: 'assistant',
+            content: 'This is not JSON, but just a plain string.',
           },
+          finish_reason: 'stop',
         },
       ],
-    });
+    } as any);
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
@@ -274,6 +301,7 @@ describe('/api/enhance POST', () => {
       notes: ['Some note about the enhancement.'],
     });
 
+    // @ts-ignore
     mockCreateCompletion.mockResolvedValueOnce({
       choices: [
         {
@@ -284,7 +312,7 @@ describe('/api/enhance POST', () => {
       ],
     });
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>
@@ -306,6 +334,7 @@ describe('/api/enhance POST', () => {
       notes: ['Some note about the enhancement.'],
     });
 
+    // @ts-ignore
     mockCreateCompletion.mockResolvedValueOnce({
       choices: [
         {
@@ -316,7 +345,7 @@ describe('/api/enhance POST', () => {
       ],
     });
 
-    const req = httpMocks.createRequest<NextRequest>({
+    const req = createRequest<NextRequest>({
       method: 'POST',
       url: '/api/enhance',
       json: () =>

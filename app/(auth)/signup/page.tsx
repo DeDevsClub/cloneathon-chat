@@ -129,11 +129,8 @@ export default function Page() {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
-                  <div className="flex items-center text-primary justify-center font-bold gap-4 w-full bg-gray-950/90 backdrop-blur-sm rounded-md  text-white">
-                    <Icon
-                      icon="mdi:chat"
-                      className="text-white size-6 text-primary"
-                    />
+                  <div className="flex items-center justify-center font-bold gap-4 w-full bg-gray-950/90 backdrop-blur-sm rounded-md  text-white">
+                    <Icon icon="mdi:chat" className="text-white size-6" />
                     Join th3.chat
                   </div>
                 </motion.div>
@@ -182,7 +179,7 @@ export default function Page() {
                     Already joined?{' '}
                     <Link
                       href="/login"
-                      className="text-primary hover:text-primary/90 hover:underline cursor-pointer font-semibold text-md"
+                      className="hover:underline cursor-pointer font-semibold text-md"
                     >
                       Login
                     </Link>

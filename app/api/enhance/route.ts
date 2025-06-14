@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `${text}` },
       ],
+      temperature: 0.65,
+      max_tokens: 2_400,
       // Add other parameters like temperature, max_tokens as needed
     });
 

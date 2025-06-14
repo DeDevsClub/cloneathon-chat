@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
+import { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,6 +26,8 @@ type ErrorMessage = {
  * It generates a UUID for the chat, creates the chat record in the database,
  * and redirects to the new chat page.
  */
+const PAGE_SIZE = 20;
+
 export default function NewChatPage(props: PageProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -64,14 +67,6 @@ export default function NewChatPage(props: PageProps) {
           // Don't include projectId in initial payload to avoid validation issues
           visibility: 'private',
           selectedChatModel: 'chat-model',
-          // message: {
-          //   id: messageId,
-          //   content: messageContent,
-          //   parts: [{ text: messageContent, type: 'text' }],
-          //   role: 'user',
-          //   createdAt: new Date().toISOString(),
-          //   experimental_attachments: [],
-          // },
           messages: [
             {
               id: messageId,
@@ -80,7 +75,7 @@ export default function NewChatPage(props: PageProps) {
               role: 'user',
               createdAt: new Date().toISOString(),
               experimental_attachments: [],
-              model: 'chat-model',
+              model: 'chat-model', // Ensure model is part of the message if needed by backend
             },
           ],
         };
@@ -103,7 +98,7 @@ export default function NewChatPage(props: PageProps) {
         if (projectId) {
           // console.log('Updating chat with project ID: %s', projectId);
           const projectUpdateResponse = await fetch(
-            AppRoutes.api.chat.project,
+            `${AppRoutes.api.chat.base}/${chatId}`,
             {
               method: 'PATCH',
               headers: {
@@ -124,6 +119,8 @@ export default function NewChatPage(props: PageProps) {
         }
         // Redirect to the new chat
         router.push(AppRoutes.chats.detail(chatId));
+        // Revalidate the first page of chat history to update the sidebar
+        mutate(`/api/chat/history?limit=${PAGE_SIZE}`);
       } catch (error: unknown) {
         console.error('Error creating chat:', error);
         const errorMessage =
@@ -136,7 +133,7 @@ export default function NewChatPage(props: PageProps) {
     }
 
     createNewChat();
-  }, [router, session, status]);
+  }, [router, session, status, projectId]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">

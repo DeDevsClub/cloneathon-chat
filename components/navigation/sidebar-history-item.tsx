@@ -45,10 +45,7 @@ const PureChatItem = ({
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
-        <Link
-          href={`/projects/${chat.projectId}/chats/${chat.id}`}
-          onClick={() => setOpenMobile(false)}
-        >
+        <Link href={`/chats/${chat.id}`} onClick={() => setOpenMobile(false)}>
           <span>{chat.title}</span>
         </Link>
       </SidebarMenuButton>

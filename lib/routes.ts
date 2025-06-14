@@ -27,7 +27,6 @@ export const AppRoutes = {
     chat: {
       base: '/api/chat',
       byId: (id: string) => `/api/chat/${id}`,
-      project: '/api/chat/project',
       messages: (chatId: string) => `/api/chat/${chatId}`,
       history: (chatId: string) => `/api/chat/${chatId}`,
     },

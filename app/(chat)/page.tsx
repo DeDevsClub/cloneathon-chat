@@ -53,7 +53,7 @@ const HomePage = () => {
   const handleCreateProject = () => {
     if (!session) {
       toast.error('Please log in to create a project');
-      router.push('/login');
+      // router.push('/login');
       return;
     }
     setOpen(true);

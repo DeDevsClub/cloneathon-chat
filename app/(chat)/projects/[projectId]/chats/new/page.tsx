@@ -49,7 +49,7 @@ export default function NewChatPage(props: PageProps) {
 
         if (!session) {
           toast.error('You must be logged in to create a chat');
-          router.push('/login');
+          // router.push('/login');
           return;
         }
 
@@ -62,6 +62,7 @@ export default function NewChatPage(props: PageProps) {
         const messageId = uuidv4();
         const payload = {
           id: chatId,
+          projectId, // Include projectId in the initial payload
           selectedVisibilityType: 'private',
           selectedChatModel: 'chat-model',
           message: {
@@ -125,7 +126,7 @@ export default function NewChatPage(props: PageProps) {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">
       <div className="flex flex-col items-center justify-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="size-8 animate-spin text-primary" />
         <p className="text-lg text-muted-foreground">Creating a new chat...</p>
       </div>
     </div>

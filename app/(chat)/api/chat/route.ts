@@ -4,6 +4,7 @@ import {
   createDataStream,
   smoothStream,
   streamText,
+  UIMessage,
 } from 'ai';
 import { auth, type UserType } from '@/app/(auth)/auth';
 import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
@@ -66,19 +67,72 @@ export async function POST(request: Request) {
 
   try {
     const json = await request.json();
-    requestBody = postRequestBodySchema.parse(json);
-  } catch (_) {
+    console.log('POST /api/chat - Request body:', JSON.stringify(json));
+
+    try {
+      requestBody = postRequestBodySchema.parse(json);
+    } catch (parseError) {
+      console.error('POST /api/chat - Schema validation error:', parseError);
+      return new ChatSDKError('bad_request:api').toResponse();
+    }
+  } catch (jsonError) {
+    console.error('POST /api/chat - JSON parse error:', jsonError);
     return new ChatSDKError('bad_request:api').toResponse();
   }
 
   try {
     const {
       id,
-      projectId,
+      projectId: rawProjectId,
       message,
       selectedChatModel,
       selectedVisibilityType,
     } = requestBody;
+
+    // Validate and normalize projectId - ensure it's a valid UUID or null
+    let projectId: string | null = null;
+    if (rawProjectId) {
+      if (typeof rawProjectId === 'string' && rawProjectId.trim() !== '') {
+        try {
+          // Simple UUID validation (not comprehensive but catches obvious issues)
+          if (
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+              rawProjectId,
+            )
+          ) {
+            projectId = rawProjectId;
+          } else {
+            console.warn(
+              `Invalid projectId format: ${rawProjectId}, using null instead`,
+            );
+          }
+        } catch (e) {
+          console.error('Error validating projectId:', e);
+        }
+      }
+    }
+
+    // Ensure message has the required content field
+    if (!message.content && message.parts && message.parts.length > 0) {
+      // Extract content from text parts if it exists
+      try {
+        const textParts = message.parts.filter((part) => part.type === 'text');
+        if (textParts.length > 0 && textParts[0].text) {
+          message.content = textParts[0].text;
+        }
+      } catch (e) {
+        console.error('Error extracting content from parts:', e);
+      }
+    }
+
+    // Always ensure we have a content string to satisfy TypeScript
+    if (!message.content) {
+      message.content = message.parts?.[0]?.text || '';
+    }
+
+    console.log(
+      `POST /api/chat - Processing with validated projectId: ${projectId}`,
+    );
 
     const session = await auth();
 
@@ -101,7 +155,7 @@ export async function POST(request: Request) {
 
     if (!chat) {
       const title = await generateTitleFromUserMessage({
-        message,
+        message: message as UIMessage,
       });
 
       await saveChat({
@@ -119,10 +173,33 @@ export async function POST(request: Request) {
 
     const previousMessages = await getMessagesByChatId({ id });
 
+    // Transform database message format to AI message format
+    const formattedMessages = Array.isArray(previousMessages)
+      ? previousMessages.map((dbMsg) => {
+          // Ensure role is one of the expected values
+          const role = ['user', 'assistant', 'system', 'data'].includes(
+            dbMsg.role,
+          )
+            ? (dbMsg.role as 'user' | 'assistant' | 'system' | 'data')
+            : 'user'; // Default to user if unexpected role
+
+          return {
+            id: dbMsg.id,
+            role,
+            content: dbMsg.textContent || '',
+            parts: Array.isArray(dbMsg.parts) ? dbMsg.parts : [],
+            createdAt: dbMsg.createdAt,
+            experimental_attachments: Array.isArray(dbMsg.attachments)
+              ? dbMsg.attachments
+              : [],
+          };
+        })
+      : [];
+
+    // Add client message to the conversation
     const messages = appendClientMessage({
-      // @ts-expect-error: todo add type conversion from DBMessage[] to UIMessage[]
-      messages: previousMessages,
-      message,
+      messages: formattedMessages,
+      message: message as UIMessage,
     });
 
     const { longitude, latitude, city, country } = geolocation(request);
@@ -134,21 +211,42 @@ export async function POST(request: Request) {
       country,
     };
 
-    await saveMessages({
-      messages: [
-        {
-          chatId: id,
-          projectId: projectId || null,
-          id: message.id,
-          role: 'user',
-          parts: message.parts,
-          attachments: message.experimental_attachments ?? [],
-          createdAt: new Date(),
-          contentType: null,
-          textContent: null,
-        },
-      ],
-    });
+    console.log(`Saving user message with projectId: ${projectId}`);
+
+    try {
+      // Always ensure textContent is a string
+      const textContent = message.content || message.parts?.[0]?.text || '';
+      console.log(
+        `Saving user message with ID: ${message.id}, chatId: ${id}, projectId: ${projectId || 'null'}, content: "${textContent.substring(0, 30)}..."`,
+      );
+
+      await saveMessages({
+        messages: [
+          {
+            chatId: id,
+            projectId, // Using our validated projectId - can be null or undefined
+            id: message.id,
+            role: 'user',
+            parts: message.parts || [], // Ensure parts is an array
+            attachments: message.experimental_attachments ?? [],
+            createdAt: new Date(),
+            contentType: 'text',
+            textContent: textContent, // Use the validated content from the message
+          },
+        ],
+      });
+      console.log(`Successfully saved user message with ID: ${message.id}`);
+    } catch (saveError) {
+      console.error(
+        `Error saving user message for chat ${id} with projectId ${projectId}:`,
+        saveError,
+      );
+      // Instead of returning an error, let's log it but continue - this allows the API to create the chat even if message saving fails
+      // The UI will still be able to create the chat and then update its project association
+      console.log(
+        'Continuing despite message save error to allow chat creation',
+      );
+    }
 
     const streamId = generateUUID();
     await createStreamId({ userId: session.user.id, streamId, chatId: id });
@@ -190,32 +288,69 @@ export async function POST(request: Request) {
                 });
 
                 if (!assistantId) {
-                  throw new Error('No assistant message found!');
+                  console.error('No assistant message ID found!');
+                  return;
                 }
-
-                const [, assistantMessage] = appendResponseMessages({
-                  messages: [message],
-                  responseMessages: response.messages,
-                });
-
-                await saveMessages({
-                  messages: [
-                    {
-                      chatId: id,
-                      projectId: projectId || null,
-                      id: assistantMessage.id,
-                      role: 'assistant',
-                      parts: assistantMessage.parts,
-                      attachments:
-                        assistantMessage.experimental_attachments ?? [],
-                      createdAt: new Date(),
-                      contentType: null,
-                      textContent: null,
-                    },
-                  ],
-                });
-              } catch (_) {
-                console.error('Failed to save chat');
+                
+                try {
+                  // Get assistant message from response
+                  const [, assistantMessage] = appendResponseMessages({
+                    messages: [message as UIMessage],
+                    responseMessages: response.messages,
+                  });
+                  
+                  if (!assistantMessage) {
+                    console.error('Failed to extract assistant message');
+                    return;
+                  }
+                  
+                  // Extract content from message
+                  let textContent = '';
+                  
+                  // First try direct content
+                  if (assistantMessage.content) {
+                    textContent = assistantMessage.content;
+                  } 
+                  // Then try to extract from parts if available
+                  else if (assistantMessage.parts && assistantMessage.parts.length > 0) {
+                    // Look for text parts
+                    const textParts = assistantMessage.parts.filter((p: any) => p.type === 'text');
+                    if (textParts.length > 0 && 'text' in textParts[0]) {
+                      textContent = textParts[0].text;
+                    }
+                  }
+                  
+                  console.log(`Saving assistant message with ID: ${assistantMessage.id}, chatId: ${id}, projectId: ${projectId || 'null'}, content length: ${textContent.length}`);
+                  
+                  // Save the assistant message to database
+                  try {
+                    await saveMessages({
+                      messages: [
+                        {
+                          chatId: id,
+                          projectId, // Using our validated projectId
+                          id: assistantMessage.id,
+                          role: 'assistant',
+                          parts: assistantMessage.parts || [], // Ensure parts is an array
+                          attachments: assistantMessage.experimental_attachments ?? [],
+                          createdAt: new Date(),
+                          contentType: 'text',
+                          textContent: textContent, // Use the validated content
+                        },
+                      ],
+                    });
+                    console.log(`Successfully saved assistant message with ID: ${assistantMessage.id}`);
+                  } catch (saveError) {
+                    console.error(`Error saving assistant message for chat ${id}:`, saveError);
+                    // Continue execution - don't return error response here as we're mid-stream
+                  }
+                } catch (processError) {
+                  console.error('Error processing assistant message:', processError);
+                  // Continue execution
+                }
+              } catch (error) {
+                console.error('Error in assistant message handling:', error);
+                // Continue execution
               }
             }
           },

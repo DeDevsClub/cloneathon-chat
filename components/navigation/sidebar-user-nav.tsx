@@ -97,7 +97,11 @@ export function SidebarUserNav({ user }: { user: User }) {
                   }
 
                   if (isGuest) {
-                    router.push('/login');
+                    toast({
+                      type: 'error',
+                      description: 'You must be logged in to sign out',
+                      // router.push('/login');
+                    });
                   } else {
                     signOut({
                       redirectTo: '/',

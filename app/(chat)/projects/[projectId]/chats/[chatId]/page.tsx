@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { Chat } from '@/components/chat/chat';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { Session } from 'next-auth';
 
 interface PageParams {
   chatId: string;
@@ -21,7 +21,8 @@ export default function ChatPage(props: PageProps) {
   const projectId = unwrappedParams.projectId;
   const { data: session } = useSession();
   if (!session) {
-    redirect('/login');
+    console.error('No session found');
+    // redirect('/login');
   }
   console.log('Chat ID:', chatId);
   console.log('Project ID:', projectId);
@@ -43,8 +44,8 @@ export default function ChatPage(props: PageProps) {
       initialChatModel=""
       initialVisibilityType="private"
       isReadonly={false}
-      session={session}
-      autoResume={false}
+      session={session as Session}
+      autoResume={true}
     />
   );
 }

@@ -67,13 +67,16 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
-    experimental_prepareRequestBody: (body) => ({
-      id: chatId,
-      projectId,
-      message: body.messages.at(-1),
-      selectedChatModel: initialChatModel,
-      selectedVisibilityType: visibilityType,
-    }),
+    experimental_prepareRequestBody: (body) => {
+      console.log('Preparing request body with projectId:', projectId);
+      return {
+        id: chatId,
+        projectId, // Ensure projectId is included in every request
+        message: body.messages.at(-1),
+        selectedChatModel: initialChatModel || 'chat-model',
+        selectedVisibilityType: visibilityType,
+      };
+    },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
     },

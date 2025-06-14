@@ -84,19 +84,19 @@ export function CreateProjectDialog({
       if (!response.ok) {
         const error = await response.json();
         console.log({ error });
-        if (isGuest) {
-          toast.error('Authentication Required', {
-            description:
-              'Please sign in with your account to create and manage projects.',
-            action: {
-              label: 'Sign In',
-              onClick: () => router.push('/login'),
-            },
-            duration: 5000,
-          });
-          setTimeout(() => router.push('/login'), 2000);
-          return;
-        }
+        // if (isGuest) {
+        //   toast.error('Authentication Required', {
+        //     description:
+        //       'Please sign in with your account to create and manage projects.',
+        //     action: {
+        //       label: 'Sign In',
+        //       onClick: () => router.push('/login'),
+        //     },
+        //     duration: 5000,
+        //   });
+        //   setTimeout(() => router.push('/login'), 2000);
+        //   return;
+        // }
         throw new Error(error.message || 'Failed to create project');
       }
 

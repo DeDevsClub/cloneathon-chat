@@ -54,9 +54,9 @@ export async function middleware(request: NextRequest) {
 
   const isGuest = guestRegex.test(token?.email ?? '');
 
-  if (token && !isGuest && ['/login', '/signup'].includes(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // if (token && !isGuest && ['/login', '/signup'].includes(pathname)) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
 
   return NextResponse.next();
 }

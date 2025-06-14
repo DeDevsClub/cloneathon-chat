@@ -19,6 +19,7 @@ export const API_PATHS = {
 // URL paths
 export const URL_PATHS = {
   LOGIN: '/login',
+  SIGNUP: '/signup',
   HOME: '/',
   PROJECTS: '/projects',
   CHATS: '/chats',

@@ -1,9 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useTheme } from 'next-themes';
-// import { useChatStore } from "@/lib/store";
-// import type { Conversation } from "@/lib/types"; // Import Conversation type
 import {
   Tooltip,
   TooltipContent,
@@ -13,24 +10,30 @@ import {
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 
 interface HeaderIslandProps {
+  projectId: string;
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   openSearchModal: () => void;
 }
 
 export function HeaderIsland({
+  projectId,
   isSidebarOpen,
   toggleSidebar,
   openSearchModal,
 }: HeaderIslandProps) {
   const router = useRouter();
-  // const { addConversation } = useChatStore();
   const { setTheme, theme } = useTheme();
-
   const handleProjectsClick = () => {
     router.push('/projects');
+  };
+
+  const createChat = (projectId: string) => {
+    router.push(`/projects/${projectId}/chats/new`);
+    router.refresh();
   };
 
   return (
@@ -89,27 +92,25 @@ export function HeaderIsland({
                   Search (⌘K)
                 </TooltipContent>
               </Tooltip>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      const newChatId = `chat_${Date.now().toString()}`;
-                      // const newConversationEntry: Conversation = {
-                      //   id: newChatId,
-                      //   title: `New Chat ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-                      //   messages: [],
-                      //   createdAt: new Date(),
-                      // };
-                      // addConversation(newConversationEntry);
-                      router.push(`/chats/${newChatId}`);
+                      // Make sure projectId is a valid UUID and not the literal string "id"
+                      if (projectId && projectId !== 'id') {
+                        createChat(projectId);
+                      } else {
+                        console.error('Invalid projectId for chat creation:', projectId);
+                      }
                     }}
                     className="size-8 hover:bg-muted"
-                    aria-label="New Chat"
+                    aria-label="Projects"
                   >
                     <Icon
-                      icon="ri:chat-new-fill"
+                      icon="mdi:plus-circle-outline"
                       className="text-muted-foreground"
                       width={18}
                       height={18}
@@ -117,7 +118,7 @@ export function HeaderIsland({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" sideOffset={5}>
-                  New
+                  New Chat
                 </TooltipContent>
               </Tooltip>
             </div>

@@ -36,9 +36,18 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
   const isOpen = state === 'expanded';
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  const createChat = () => {
-    router.push('/');
-    router.refresh();
+  const createChat = (projectId: string) => {
+    // Validate projectId before navigation
+    if (projectId && projectId !== 'id') {
+      console.log({ user });
+      console.log(`Creating chat with project ID: ${projectId}`);
+      router.push(`/projects/${projectId}/chats/new`);
+      router.refresh();
+    } else {
+      console.error('Invalid projectId for chat creation:', projectId);
+      // Fallback to projects page if no valid projectId
+      router.push('/projects');
+    }
   };
 
   return (
@@ -52,6 +61,7 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
         <SidebarHeader className="flex flex-row gap-1 sm:ml-12 h-12 rounded-md justify-start items-center mt-2 max-w-full">
           <SidebarMenu>
             <HeaderIsland
+              projectId={projectId}
               isSidebarOpen={isOpen}
               toggleSidebar={toggleSidebar}
               openSearchModal={() => setIsSearchModalOpen(true)}
@@ -76,7 +86,16 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
             type="button"
             className="w-full hover:bg-muted group grid place-items-center"
             onClick={() => {
-              createChat();
+              // Make sure projectId is a valid UUID and not the literal string "id"
+              if (projectId && projectId !== 'id') {
+                createChat(projectId);
+              } else {
+                console.error(
+                  'Invalid projectId for chat creation:',
+                  projectId,
+                );
+                router.push('/projects');
+              }
             }}
           >
             <TooltipTrigger asChild>

@@ -29,12 +29,15 @@ export function ModelSelector({
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
 
-  const userType = session.user.type;
+  // Default to 'guest' if session or user type is undefined
+  const userType = session?.user?.type || 'guest';
+  console.log({ userType });
   const { availableChatModelIds } = entitlementsByUserType[userType];
-
+  console.log({ availableChatModelIds });
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
   );
+  console.log({ availableChatModels });
 
   const selectedChatModel = useMemo(
     () =>

@@ -72,8 +72,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { id, message, selectedChatModel, selectedVisibilityType } =
-      requestBody;
+    const {
+      id,
+      projectId,
+      message,
+      selectedChatModel,
+      selectedVisibilityType,
+    } = requestBody;
 
     const session = await auth();
 
@@ -104,6 +109,7 @@ export async function POST(request: Request) {
         userId: session.user.id,
         title,
         visibility: selectedVisibilityType,
+        projectId,
       });
     } else {
       if (chat.userId !== session.user.id) {
@@ -132,6 +138,7 @@ export async function POST(request: Request) {
       messages: [
         {
           chatId: id,
+          projectId: projectId || null,
           id: message.id,
           role: 'user',
           parts: message.parts,
@@ -194,9 +201,10 @@ export async function POST(request: Request) {
                 await saveMessages({
                   messages: [
                     {
-                      id: assistantId,
                       chatId: id,
-                      role: assistantMessage.role,
+                      projectId: projectId || null,
+                      id: assistantMessage.id,
+                      role: 'assistant',
                       parts: assistantMessage.parts,
                       attachments:
                         assistantMessage.experimental_attachments ?? [],

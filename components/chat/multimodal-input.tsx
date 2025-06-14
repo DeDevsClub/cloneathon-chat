@@ -287,7 +287,7 @@ function PureMultimodalInput({
             !event.nativeEvent.isComposing
           ) {
             event.preventDefault();
-
+            console.log({ status });
             if (status !== 'ready') {
               toast.error('Please wait for the model to finish its response!');
             } else {

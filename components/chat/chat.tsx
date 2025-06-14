@@ -20,6 +20,7 @@ import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
+import { SuggestedActions } from '@/components/chat/suggested-actions';
 
 export function Chat({
   projectId,
@@ -68,6 +69,7 @@ export function Chat({
     fetch: fetchWithErrorHandlers,
     experimental_prepareRequestBody: (body) => ({
       id: chatId,
+      projectId,
       message: body.messages.at(-1),
       selectedChatModel: initialChatModel,
       selectedVisibilityType: visibilityType,
@@ -159,6 +161,14 @@ export function Chat({
               setAttachments={setAttachments}
               messages={messages}
               setMessages={setMessages}
+              append={append}
+              selectedVisibilityType={visibilityType}
+            />
+          )}
+          {messages.length === 0 && (
+            <SuggestedActions
+              chatId={chatId}
+              projectId={projectId}
               append={append}
               selectedVisibilityType={visibilityType}
             />

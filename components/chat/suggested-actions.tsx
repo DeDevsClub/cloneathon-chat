@@ -10,12 +10,14 @@ interface SuggestedActionsProps {
   chatId: string;
   append: UseChatHelpers['append'];
   selectedVisibilityType: VisibilityType;
+  projectId?: string;
 }
 
 function PureSuggestedActions({
   chatId,
   append,
   selectedVisibilityType,
+  projectId,
 }: SuggestedActionsProps) {
   const suggestedActions = [
     {
@@ -57,7 +59,10 @@ function PureSuggestedActions({
           <Button
             variant="ghost"
             onClick={async () => {
-              window.history.replaceState({}, '', `/chat/${chatId}`);
+              const chatUrl = projectId
+                ? `/projects/${projectId}/chats/${chatId}`
+                : `/chat/${chatId}`;
+              window.history.replaceState({}, '', chatUrl);
 
               append({
                 role: 'user',
@@ -83,6 +88,7 @@ export const SuggestedActions = memo(
     if (prevProps.chatId !== nextProps.chatId) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
+    if (prevProps.projectId !== nextProps.projectId) return false;
 
     return true;
   },

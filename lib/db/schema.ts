@@ -96,6 +96,9 @@ export const message = pgTable(
     chatId: uuid('chatId')
       .notNull()
       .references(() => chat.id, { onDelete: 'cascade' }),
+    projectId: uuid('projectId').references(() => project.id, {
+      onDelete: 'set null',
+    }),
     role: varchar('role', { length: 20 }).notNull(),
     parts: jsonb('parts').notNull(),
     attachments: jsonb('attachments').notNull(),
@@ -268,6 +271,10 @@ export const messageRelations = relations(message, ({ one, many }) => ({
   chat: one(chat, {
     fields: [message.chatId],
     references: [chat.id],
+  }),
+  project: one(project, {
+    fields: [message.projectId],
+    references: [project.id],
   }),
   votes: many(vote),
   documents: many(document),

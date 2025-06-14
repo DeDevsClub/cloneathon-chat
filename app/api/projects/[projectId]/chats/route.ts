@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { z } from 'zod';
 import { getProject, getProjectChats } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
+import { createChat } from '@/lib/db/chat';
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -66,8 +68,24 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
   }
 }
 
+// Schema for chat creation
+const createChatSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1, 'Chat title is required').max(255),
+  visibility: z.enum(['public', 'private']).default('private'),
+  selectedChatModel: z.string().optional(),
+  message: z
+    .object({
+      content: z.string().optional(),
+    })
+    .optional(),
+});
+
 // GET /api/projects/[projectId]/chats - Get all chats for a specific project
-export async function GET(request: NextRequest, context: { params: { projectId: string } }) {
+export async function GET(
+  request: NextRequest,
+  context: { params: { projectId: string } },
+) {
   try {
     const projectId = context.params.projectId;
     console.log('Project ID:', projectId);
@@ -114,6 +132,84 @@ export async function GET(request: NextRequest, context: { params: { projectId: 
     console.error('Error fetching project chats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch project chats' },
+      { status: 500 },
+    );
+  }
+}
+
+// POST /api/projects/[projectId]/chats - Create a new chat for a specific project
+export async function POST(
+  request: NextRequest,
+  context: { params: { projectId: string } },
+) {
+  try {
+    const projectId = context.params.projectId;
+    console.log('Creating chat for Project ID:', projectId);
+
+    // Try extracting email from different possible session cookie names
+    let email = null;
+
+    // Try each possible cookie name
+    const cookieNames = [
+      'user-session',
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+      'authjs.session-token',
+    ];
+
+    for (const cookieName of cookieNames) {
+      if (request.cookies.has(cookieName)) {
+        email = await extractEmailFromCookie(request, cookieName);
+        if (email) {
+          console.log(`Found valid email in cookie ${cookieName}: ${email}`);
+          break;
+        }
+      }
+    }
+
+    if (!email) {
+      console.error('No valid session found or could not extract email');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Validate user ownership of project
+    const validation = await validateUserOwnership(projectId, email);
+    if ('error' in validation) {
+      return NextResponse.json(
+        { error: validation.error },
+        { status: validation.status },
+      );
+    }
+
+    const { user, project } = validation;
+
+    // Parse and validate request body
+    const body = await request.json();
+    const validationResult = createChatSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: validationResult.error.errors },
+        { status: 400 },
+      );
+    }
+
+    const { id, title, visibility } = validationResult.data;
+
+    // Create the chat
+    const newChat = await createChat({
+      id,
+      userId: user.id,
+      title: title || 'New Chat',
+      visibility,
+      projectId,
+    });
+
+    return NextResponse.json({ chat: newChat }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating chat:', error);
+    return NextResponse.json(
+      { error: 'Failed to create chat' },
       { status: 500 },
     );
   }

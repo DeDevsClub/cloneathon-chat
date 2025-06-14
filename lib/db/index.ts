@@ -1,4 +1,5 @@
-import 'server-only';
+// Ensure this code only runs on the server
+const isServer = typeof window === 'undefined';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 

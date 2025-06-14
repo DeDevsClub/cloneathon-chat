@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/tooltip';
 import { PlusIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+
 interface AppSidebarProps {
   user: User | undefined;
   projectId: string;
@@ -87,7 +88,7 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
             className="w-full hover:bg-muted group grid place-items-center"
             onClick={() => {
               // Make sure projectId is a valid UUID and not the literal string "id"
-              if (projectId && projectId !== 'id') {
+              if (projectId && projectId !== 'id' && user?.id) {
                 createChat(projectId);
               } else {
                 console.error(

@@ -70,11 +70,11 @@
 
 ### User Experience (UX)
 
-- **Seamless Login**: Straightforward authentication flow with minimal friction.
-- **Cross-device Access**: Consistent experience across multiple devices.
-- **Persistent Sessions**: Maintaining logged-in state appropriately.
-- **History Access**: Intuitive interface for accessing and searching past conversations.
-- **Privacy Controls**: Options for users to manage or delete their data (EU GDPR — iykyk).
+- [ ] **Seamless Login**: Straightforward authentication flow with minimal friction.
+- [ ] **Cross-device Access**: Consistent experience across multiple devices.
+- [ ] **Persistent Sessions**: Maintaining logged-in state appropriately.
+- [ ] **History Access**: Intuitive interface for accessing and searching past conversations.
+- [ ] **Privacy Controls**: Options for users to manage or delete their data (EU GDPR — iykyk).
 
 ## 3. Chat Interface
 

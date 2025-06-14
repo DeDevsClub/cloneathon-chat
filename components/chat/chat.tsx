@@ -23,7 +23,7 @@ import { ChatSDKError } from '@/lib/errors';
 
 export function Chat({
   projectId,
-  cid,
+  chatId,
   initialMessages,
   initialChatModel,
   initialVisibilityType,
@@ -32,7 +32,7 @@ export function Chat({
   autoResume,
 }: {
   projectId: string;
-  cid: string;
+  chatId: string;
   initialMessages: Array<UIMessage>;
   initialChatModel: string;
   initialVisibilityType: VisibilityType;
@@ -43,7 +43,7 @@ export function Chat({
   const { mutate } = useSWRConfig();
 
   const { visibilityType } = useChatVisibility({
-    chatId: cid,
+    chatId,
     initialVisibilityType,
   });
 
@@ -60,14 +60,14 @@ export function Chat({
     experimental_resume,
     data,
   } = useChat({
-    id: cid,
+    id: chatId,
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
     experimental_prepareRequestBody: (body) => ({
-      id: cid,
+      id: chatId,
       message: body.messages.at(-1),
       selectedChatModel: initialChatModel,
       selectedVisibilityType: visibilityType,
@@ -98,12 +98,17 @@ export function Chat({
       });
 
       setHasAppendedQuery(true);
-      window.history.replaceState({}, '', `/chat/projects/${projectId}/${cid}`);
+      window.history.replaceState(
+        {},
+        '',
+        // todo
+        `/projects/${projectId}/chats/${chatId}`,
+      );
     }
-  }, [query, append, hasAppendedQuery, cid]);
+  }, [query, append, hasAppendedQuery, chatId]);
 
   const { data: votes } = useSWR<Array<Vote>>(
-    messages.length >= 2 ? `/api/vote?chatId=${cid}` : null,
+    messages.length >= 2 ? `/api/vote?chatId=${chatId}` : null,
     fetcher,
   );
 
@@ -122,7 +127,7 @@ export function Chat({
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
-          chatId={cid}
+          chatId={chatId}
           selectedModelId={initialChatModel}
           selectedVisibilityType={initialVisibilityType}
           isReadonly={isReadonly}
@@ -130,7 +135,7 @@ export function Chat({
         />
 
         <Messages
-          chatId={cid}
+          chatId={chatId}
           status={status}
           votes={votes}
           messages={messages}
@@ -143,7 +148,8 @@ export function Chat({
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
           {!isReadonly && (
             <MultimodalInput
-              chatId={cid}
+              chatId={chatId}
+              projectId={projectId}
               input={input}
               setInput={setInput}
               handleSubmit={handleSubmit}
@@ -161,7 +167,7 @@ export function Chat({
       </div>
 
       <Artifact
-        chatId={cid}
+        chatId={chatId}
         input={input}
         setInput={setInput}
         handleSubmit={handleSubmit}

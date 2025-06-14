@@ -6,24 +6,27 @@ import { getChatsByProjectId } from '@/lib/db/chat';
 import { getUser } from '@/lib/db/queries';
 
 // Helper function to extract email from different cookie formats
-async function extractEmailFromCookie(request: NextRequest, cookieName: string) {
+async function extractEmailFromCookie(
+  request: NextRequest,
+  cookieName: string,
+) {
   const cookie = request.cookies.get(cookieName);
   if (!cookie?.value) return null;
-  
+
   try {
     if (cookieName.includes('auth')) {
       // Handle JWT token from NextAuth
       const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
       if (!secret) return null;
-      
+
       try {
         // Use getToken to decode the JWT token
-        const token = await getToken({ 
+        const token = await getToken({
           req: request,
           secret,
           cookieName,
         });
-        
+
         return (token?.email as string) || null;
       } catch (jwtError) {
         console.error(`Failed to decode JWT token: ${jwtError}`);
@@ -40,16 +43,15 @@ async function extractEmailFromCookie(request: NextRequest, cookieName: string) 
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  context: any
-) {
+export async function GET(request: NextRequest, context: any) {
   try {
-    console.error(`DEBUG - GET project/${context.params.id}/chats - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`);
-    
+    console.error(
+      `DEBUG - GET project/${await context.params.id}/chats - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
+    );
+
     // Try extracting email from different possible session cookie names
     let email = null;
-    
+
     // Try each possible cookie name
     const cookieNames = [
       'user-session',
@@ -57,20 +59,26 @@ export async function GET(
       '__Secure-next-auth.session-token',
       'authjs.session-token',
     ];
-    
+
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
-        console.error(`DEBUG - GET project/${context.params.id}/chats - Trying cookie: ${cookieName}`);
+        console.error(
+          `DEBUG - GET project/${await context.params.id}/chats - Trying cookie: ${cookieName}`,
+        );
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.error(`DEBUG - GET project chats - Found valid email in cookie ${cookieName}: ${email}`);
+          console.error(
+            `DEBUG - GET project chats - Found valid email in cookie ${cookieName}: ${email}`,
+          );
           break;
         }
       }
     }
-    
+
     if (!email) {
-      console.error('DEBUG - GET project chats - No valid session found or could not extract email');
+      console.error(
+        'DEBUG - GET project chats - No valid session found or could not extract email',
+      );
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -82,10 +90,11 @@ export async function GET(
 
     // Check if project exists and user has access to it
     try {
-      const project = await getProject({ id: context.params.id });
+      const projectId = await context.params.id;
+      const project = await getProject({ id: projectId });
 
       // Check if user owns the project
-      if (project.userId !== user.id) {
+      if (project?.userId !== user?.id) {
         return NextResponse.json(
           { error: 'You do not have access to this project' },
           { status: 403 },
@@ -94,15 +103,17 @@ export async function GET(
 
       // Get all chats for this project
       const chats = await getChatsByProjectId({
-        projectId: context.params.id,
-        userId: user.id,
+        projectId,
+        userId: user?.id,
       });
 
       return NextResponse.json({ chats });
     } catch (error: any) {
+      const projectId = await context.params.id;
+      console.error(`Error fetching project ${projectId}:`, error);
       if (error?.message?.includes('not found')) {
         return NextResponse.json(
-          { error: `Project with id ${context.params.id} not found` },
+          { error: `Project with id ${projectId} not found` },
           { status: 404 },
         );
       }

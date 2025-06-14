@@ -12,9 +12,14 @@ import { Button } from '../ui/button';
 interface SearchModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  projectId: string;
 }
 
-export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
+export function SearchModal({
+  isOpen,
+  onOpenChange,
+  projectId,
+}: SearchModalProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConversations, setFilteredConversations] = useState<any[]>([]);
@@ -38,10 +43,13 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     }
   }, [searchTerm]);
 
-  const handleSelectConversation = (conversationId: string) => {
+  const handleSelectConversation = (
+    projectId: string,
+    conversationId: string,
+  ) => {
     // const storeSelectConversation = useChatStore(state => state.selectConversation); // If you want to sync global store selection
     // storeSelectConversation(conversationId);
-    router.push(`/chat/${conversationId}`);
+    router.push(`/projects/${projectId}/chats/${conversationId}`);
     onOpenChange(false); // Close modal on selection
   };
 
@@ -56,7 +64,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
       createdAt: new Date(),
     };
     // addConversation(newConversationEntry);
-    router.push(`/chat/${newChatId}`);
+    router.push(`/projects/${projectId}/chats/${newChatId}`);
     onOpenChange(false);
   };
 
@@ -64,7 +72,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogOverlay className="bg-background/80 backdrop-blur-sm" />
       <DialogContent
-        className="fixed left-1/2 top-1/4 w-full max-w-xl -translate-x-1/2 -translate-y-1/4 transform rounded-xl border-border bg-card p-0 text-foreground shadow-2xl outline-none"
+        className="fixed left-1/2 top-1/4 w-full max-w-xl -translate-x-1/2 -translate-y-1/4 rounded-xl border-border bg-card p-0 text-foreground shadow-2xl outline-none"
         onOpenAutoFocus={(e) => e.preventDefault()} // Prevent default autofocus, we handle it manually
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
@@ -80,7 +88,10 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 if (filteredConversations.length > 0 && searchTerm) {
-                  handleSelectConversation(filteredConversations[0].id);
+                  handleSelectConversation(
+                    projectId,
+                    filteredConversations[0].id,
+                  );
                 } else {
                   handleStartNewChat();
                 }
@@ -105,7 +116,9 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
               {filteredConversations.map((convo) => (
                 <li key={convo.id}>
                   <Button
-                    onClick={() => handleSelectConversation(convo.id)}
+                    onClick={() =>
+                      handleSelectConversation(projectId, convo.id)
+                    }
                     className="flex w-full items-center gap-3 rounded-md p-2 text-left text-sm hover:bg-muted"
                   >
                     <MessageSquare

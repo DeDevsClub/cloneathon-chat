@@ -306,28 +306,28 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 
 ### Chat Interface
 
-**Chat List** (`app/(chat)/page.tsx`)
+**Chat List** (`app/(chat)/projects/[id]/chats/page.tsx`)
 
 - **Database Tables**: Chat
 - **Usage**: Lists all chats for the current user
 - **Operations**: Read
 
-**Chat Detail** (`app/(chat)/chat/[id]/page.tsx`)
+**Chat Detail** (`app/(chat)/projects/[id]/chats/[chatId]/page.tsx`)
 
 - **Database Tables**: Chat, Message, Vote, Stream
 - **Usage**: Displays chat conversation and handles message streaming
 - **Operations**: Read, Create (for new messages)
 
-**Project Chat List** (`app/(chat)/projects/[id]/page.tsx`)
+**Project Chat List** (`app/(chat)/projects/[id]/chats/page.tsx`)
 
 - **Database Tables**: Project, Chat
 - **Usage**: Lists chats associated with a specific project
 - **Operations**: Read
 
-**Chat Creation** (`app/(chat)/chat/new/page.tsx`)
+**Chat Creation** (`app/(chat)/projects/[id]/chats/new/page.tsx`)
 
 - **Database Tables**: Chat, Project
-- **Usage**: Creates new chats, optionally associated with a project
+- **Usage**: Creates new chats, associated with a project
 - **Operations**: Create
 
 ### Document & Suggestion Management

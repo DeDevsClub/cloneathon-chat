@@ -7,8 +7,10 @@ import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { use } from 'react';
+import { AppRoutes } from '@/lib/routes';
+
 interface PageParams {
-  pid: string;
+  projectId: string;
 }
 
 interface PageProps {
@@ -31,7 +33,7 @@ export default function NewChatPage(props: PageProps) {
 
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
-  const projectId = unwrappedParams.pid;
+  const projectId = unwrappedParams.projectId;
 
   useEffect(() => {
     async function createNewChat() {
@@ -41,7 +43,7 @@ export default function NewChatPage(props: PageProps) {
       try {
         if (!projectId) {
           toast.error('Project ID is required');
-          router.push('/projects');
+          router.push(AppRoutes.projects.list);
           return;
         }
 
@@ -74,7 +76,7 @@ export default function NewChatPage(props: PageProps) {
 
         console.log('Sending chat creation payload:', payload);
 
-        const response = await fetch('/api/chat', {
+        const response = await fetch(AppRoutes.api.chat.base, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +89,7 @@ export default function NewChatPage(props: PageProps) {
         }
 
         // Now update the chat with the project ID
-        const projectUpdateResponse = await fetch(`/api/chat/project`, {
+        const projectUpdateResponse = await fetch(AppRoutes.api.chat.project, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -105,13 +107,13 @@ export default function NewChatPage(props: PageProps) {
         }
 
         // Redirect to the new chat
-        router.push(`/projects/${projectId}/chat/${chatId}`);
+        router.push(AppRoutes.chats.projectChat.detail(projectId, chatId));
       } catch (error: unknown) {
         console.error('Error creating chat:', error);
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';
         toast.error(`Failed to create chat: ${errorMessage}`);
-        router.push(`/projects/${projectId}`);
+        router.push(AppRoutes.projects.detail(projectId));
       } finally {
         setCreating(false);
       }

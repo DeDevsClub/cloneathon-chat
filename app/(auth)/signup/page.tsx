@@ -78,7 +78,10 @@ export default function Page() {
 
       setIsSuccessful(true);
       updateSession();
-      router.refresh();
+      // Redirect to home page after successful account creation
+      setTimeout(() => {
+        router.push('/');
+      }, 1000); // Short delay to allow the success message to be seen
     }
   }, [state, updateSession, router]);
 

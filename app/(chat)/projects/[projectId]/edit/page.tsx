@@ -54,7 +54,7 @@ interface Project {
 }
 
 interface PageParams {
-  pid: string;
+  projectId: string;
 }
 
 interface PageProps {
@@ -64,7 +64,7 @@ interface PageProps {
 const EditProjectPage = (props: PageProps) => {
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
-  const projectId = unwrappedParams.pid;
+  const projectId = unwrappedParams.projectId;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);

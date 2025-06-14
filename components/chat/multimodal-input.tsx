@@ -30,6 +30,7 @@ import type { VisibilityType } from '@/components/visibility-selector';
 
 function PureMultimodalInput({
   chatId,
+  projectId,
   input,
   setInput,
   status,
@@ -44,6 +45,7 @@ function PureMultimodalInput({
   selectedVisibilityType,
 }: {
   chatId: string;
+  projectId: string;
   input: UseChatHelpers['input'];
   setInput: UseChatHelpers['setInput'];
   status: UseChatHelpers['status'];
@@ -110,7 +112,11 @@ function PureMultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
-    window.history.replaceState({}, '', `/chat/${chatId}`);
+    window.history.replaceState(
+      {},
+      '',
+      `/projects/${projectId}/chats/${chatId}`,
+    );
 
     handleSubmit(undefined, {
       experimental_attachments: attachments,

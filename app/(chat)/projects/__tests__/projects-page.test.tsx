@@ -3,21 +3,27 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProjectsPage from '../page';
 import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
+import { expect, it } from '@jest/globals';
+import { describe } from '@jest/globals';
+import { beforeEach } from '@jest/globals';
+import { jest } from '@jest/globals';
 
 // Mock modules
 jest.mock('next-auth/react');
 jest.mock('sonner');
 jest.mock('@/hooks/use-projects', () => ({
-  useProjects: jest.fn(() => ({ 
-    projects: [], 
-    isLoading: false, 
+  useProjects: jest.fn(() => ({
+    projects: [],
+    isLoading: false,
     error: null,
-    fetchProjects: jest.fn()
-  }))
+    fetchProjects: jest.fn(),
+  })),
 }));
 
 jest.mock('@/components/tutorials/project-tutorial', () => ({
-  ProjectTutorial: () => <div data-testid="project-tutorial">Project Tutorial</div>
+  ProjectTutorial: () => (
+    <div data-testid="project-tutorial">Project Tutorial</div>
+  ),
 }));
 
 describe('ProjectsPage Integration', () => {
@@ -25,7 +31,7 @@ describe('ProjectsPage Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockReset();
-    
+
     // Default to authenticated user
     (useSession as jest.Mock).mockImplementation(() => ({
       data: {
@@ -41,59 +47,65 @@ describe('ProjectsPage Integration', () => {
 
   it('renders the project page with create button', async () => {
     render(<ProjectsPage />);
-    
+
     // Check page content
-    expect(screen.getByText('Projects')).toBeInTheDocument();
-    
+    expect(screen.getByText('Projects')).toMatchInlineSnapshot();
+
     // Check create button exists
     const createButton = screen.getByRole('button', { name: /new project/i });
-    expect(createButton).toBeInTheDocument();
+    expect(createButton).toMatchInlineSnapshot();
   });
 
   it('opens create project dialog when create button is clicked', async () => {
     render(<ProjectsPage />);
-    
+
     // Click the create button
     const createButton = screen.getByRole('button', { name: /new project/i });
     fireEvent.click(createButton);
-    
+
     // Check if dialog is opened
     await waitFor(() => {
-      expect(screen.getByText('Create new project')).toBeInTheDocument();
+      expect(screen.getByText('Create new project')).toMatchInlineSnapshot();
     });
   });
 
   it('successfully creates a project when form is submitted', async () => {
     // Mock successful API response
+    // @ts-ignore
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      text: jest.fn().mockResolvedValueOnce(JSON.stringify({ project: { id: 'new-project-id', name: 'Integration Test Project' } })),
+      text: jest.fn().mockResolvedValueOnce(
+        // @ts-ignore
+        JSON.stringify({
+          project: { id: 'new-project-id', name: 'Integration Test Project' },
+        }),
+      ),
     });
 
     render(<ProjectsPage />);
-    
+
     // Click the create button to open dialog
     const createButton = screen.getByRole('button', { name: /new project/i });
     fireEvent.click(createButton);
-    
+
     // Wait for dialog to appear
     await waitFor(() => {
-      expect(screen.getByText('Create new project')).toBeInTheDocument();
+      expect(screen.getByText('Create new project')).toMatchInlineSnapshot();
     });
-    
+
     // Fill out the form
-    fireEvent.change(screen.getByLabelText('Name'), { 
-      target: { value: 'Integration Test Project' } 
+    fireEvent.change(screen.getByLabelText('Name'), {
+      target: { value: 'Integration Test Project' },
     });
-    
+
     // Submit the form
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
-    
+
     // Wait for toast notification
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith(
         expect.stringContaining('Project created'),
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -102,17 +114,17 @@ describe('ProjectsPage Integration', () => {
     // Import the real hook for this test
     jest.resetModules();
     jest.mock('@/hooks/use-projects', () => ({
-      useProjects: jest.fn(() => ({ 
-        projects: [], 
-        isLoading: false, 
+      useProjects: jest.fn(() => ({
+        projects: [],
+        isLoading: false,
         error: null,
-        fetchProjects: jest.fn()
-      }))
+        fetchProjects: jest.fn(),
+      })),
     }));
-    
+
     render(<ProjectsPage />);
-    
+
     // Check if tutorial is shown
-    expect(screen.getByTestId('project-tutorial')).toBeInTheDocument();
+    expect(screen.getByTestId('project-tutorial')).toMatchInlineSnapshot();
   });
 });

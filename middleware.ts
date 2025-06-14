@@ -43,10 +43,10 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
-    '/chat/:id',
     '/api/:path*',
     '/login',
     '/signup',
+    `/projects/:projectId/chats/:chatId`,
 
     /*
      * Match all request paths except for the ones starting with:

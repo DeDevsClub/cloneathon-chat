@@ -17,11 +17,6 @@ const nextConfig: NextConfig = {
       destination: '/projects',
       permanent: true,
     },
-    {
-      source: '/chat/:id',
-      destination: '/projects',
-      permanent: true,
-    },
   ],
 };
 

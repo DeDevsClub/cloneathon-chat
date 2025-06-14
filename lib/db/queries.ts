@@ -68,10 +68,10 @@ export async function createUser(email: string, password: string) {
       .insert(user)
       .values({ email, password: hashedPassword })
       .returning();
-    
+
     // Create a default project with tutorial content
     await createDefaultProjectWithTutorial(newUser.id);
-    
+
     return newUser;
   } catch (error) {
     console.error('User creation error:', error);
@@ -89,10 +89,10 @@ export async function createGuestUser() {
       .insert(user)
       .values({ email, password })
       .returning();
-    
+
     // Create a default project with tutorial content
     await createDefaultProjectWithTutorial(newUser.id);
-    
+
     return [newUser];
   } catch (error) {
     console.error('Guest user creation error:', error);
@@ -108,11 +108,13 @@ export async function saveChat({
   userId,
   title,
   visibility,
+  projectId,
 }: {
   id: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
+  projectId?: string | null;
 }) {
   try {
     return await db.insert(chat).values({
@@ -121,6 +123,7 @@ export async function saveChat({
       userId,
       title,
       visibility,
+      projectId,
     });
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
@@ -184,12 +187,12 @@ export async function getChatsByUserId({
                         .where(
                           and(
                             eq(project.userId, id),
-                            eq(project.id, chat.projectId)
-                          )
-                        )
-                    )
-                  )
-                )
+                            eq(project.id, chat.projectId),
+                          ),
+                        ),
+                    ),
+                  ),
+                ),
               )
             : or(
                 eq(chat.userId, id),
@@ -205,11 +208,11 @@ export async function getChatsByUserId({
                       .where(
                         and(
                           eq(project.userId, id),
-                          eq(project.id, chat.projectId)
-                        )
-                      )
-                  )
-                )
+                          eq(project.id, chat.projectId),
+                        ),
+                      ),
+                  ),
+                ),
               ),
         )
         .orderBy(desc(chat.createdAt))

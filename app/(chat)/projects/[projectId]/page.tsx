@@ -10,12 +10,14 @@ import {
   Pencil,
   Trash2,
 } from 'lucide-react';
+import { AppRoutes } from '@/lib/routes';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -46,7 +48,7 @@ interface Project {
 }
 
 interface PageParams {
-  pid: string;
+  projectId: string;
 }
 
 interface PageProps {
@@ -56,13 +58,13 @@ interface PageProps {
 export default function ProjectPage(props: PageProps) {
   // Properly unwrap params using React.use()
   const unwrappedParams = use(props.params);
-  const pid = unwrappedParams.pid; // Safe to access directly since we've properly typed it
+  const _projectId = unwrappedParams.projectId; // Safe to access directly since we've properly typed it
 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [projectId, setProjectId] = useState<string | null>(pid);
+  const [projectId, setProjectId] = useState<string>(_projectId);
   const [chatIds, setChatIds] = useState<string[] | null>(null);
 
   async function fetchProjectDetails() {
@@ -77,32 +79,26 @@ export default function ProjectPage(props: PageProps) {
       // Use the project ID from the component state
       const currentPid = projectId;
 
-      // Fetch project details
+      // Fetch project data
       const projectResponse = await fetch(`/api/projects/${currentPid}`);
-
-      // Add debug logging
-      console.log(`Project fetch status: ${projectResponse.status}`);
+      console.log('Project fetch status:', projectResponse.status);
 
       if (!projectResponse.ok) {
-        if (projectResponse.status === 404) {
-          toast.error('Project not found');
-          router.push('/projects');
-          return;
-        } else if (projectResponse.status === 401) {
+        if (projectResponse.status === 401) {
           toast.error('Authentication required');
-          // Optionally redirect to login
           return;
         }
         throw new Error('Failed to fetch project details');
       }
 
       const projectData = await projectResponse.json();
+      console.log('Project data received:', projectData);
       const projectDetails = projectData.project;
       setProject(projectDetails);
 
       // Fetch project chats
       const chatsResponse = await fetch(`/api/projects/${currentPid}/chats`);
-      console.log(`Chats fetch status: ${chatsResponse.status}`);
+      console.log('Chats fetch status:', chatsResponse.status);
 
       if (!chatsResponse.ok) {
         if (chatsResponse.status === 401) {
@@ -113,8 +109,22 @@ export default function ProjectPage(props: PageProps) {
       }
 
       const chatsData = await chatsResponse.json();
-      setChats(chatsData.chats || []);
-      setChatIds(chatsData.chats?.map((chat: Chat) => chat.id) || []);
+      console.log('Fetched chats data:', chatsData);
+
+      // Make sure chats is always an array
+      const projectChats = Array.isArray(chatsData.chats)
+        ? chatsData.chats
+        : [];
+      console.log('Project chats to display:', projectChats);
+
+      if (projectChats.length > 0) {
+        console.log('First chat details:', projectChats[0]);
+      } else {
+        console.log('No chats found for this project');
+      }
+
+      setChats(projectChats);
+      setChatIds(projectChats.map((chat: Chat) => chat.id) || []);
     } catch (error) {
       console.error('Error fetching project details:', error);
       toast.error('Failed to load project details');
@@ -152,13 +162,13 @@ export default function ProjectPage(props: PageProps) {
   };
 
   useEffect(() => {
-    if (pid) {
-      setProjectId(pid);
+    if (projectId) {
+      setProjectId(projectId);
       fetchProjectDetails();
     }
     console.log('Project ID:', projectId);
     // Only depend on specific dependencies to avoid unnecessary rerenders
-  }, [pid, router]);
+  }, [projectId, router]);
 
   if (loading) {
     return (
@@ -184,13 +194,35 @@ export default function ProjectPage(props: PageProps) {
     );
   }
 
+  // Debug function to help diagnose chat issues
+  const debugChatData = async () => {
+    try {
+      const debugResponse = await fetch(`/api/debug?projectId=${projectId}`);
+      const debugData = await debugResponse.json();
+      const chatIds = debugData.chatIds;
+      console.log('Debug data:', debugData);
+      toast.success('Debug data logged to console');
+    } catch (error) {
+      console.error('Debug error:', error);
+      toast.error('Failed to fetch debug data');
+    }
+  };
+
   return (
     <div className="container py-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" onClick={() => router.push('/projects')}>
-          <ArrowLeft className="mr-2 size-4" />
-          Back to Projects
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => router.push(AppRoutes.projects.list)}
+          >
+            <ArrowLeft className="mr-2 size-4" />
+            Back to Projects
+          </Button>
+          <Button variant="outline" size="sm" onClick={debugChatData}>
+            Debug Project Chats
+          </Button>
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -200,7 +232,9 @@ export default function ProjectPage(props: PageProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => router.push(`/projects/${projectId}/edit`)}
+              onClick={() =>
+                projectId && router.push(AppRoutes.projects.edit(projectId))
+              }
             >
               <Pencil className="size-4 mr-2" />
               Edit Project
@@ -241,7 +275,11 @@ export default function ProjectPage(props: PageProps) {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chats in this Project</h2>
-        <Button onClick={() => router.push(`/projects/${projectId}/chat/new`)}>
+        <Button
+          onClick={() =>
+            projectId && router.push(AppRoutes.chats.projectChat.new(projectId))
+          }
+        >
           <MessageSquare className="mr-2 size-4" />
           New Chat
         </Button>
@@ -255,7 +293,10 @@ export default function ProjectPage(props: PageProps) {
           </p>
           <Button
             className="mt-4"
-            onClick={() => router.push(`/projects/${projectId}/chat/new`)}
+            onClick={() =>
+              projectId &&
+              router.push(AppRoutes.chats.projectChat.new(projectId))
+            }
           >
             <MessageSquare className="mr-2 size-4" />
             Create your first chat
@@ -267,25 +308,49 @@ export default function ProjectPage(props: PageProps) {
             <Card
               key={chat.id}
               onClick={() =>
-                router.push(`/projects/${projectId}/chat/${chat.id}`)
+                projectId &&
+                router.push(
+                  AppRoutes.chats.projectChat.detail(projectId, chat.id),
+                )
               }
-              className="hover:shadow-md transition-shadow"
+              className="hover:shadow-md transition-shadow cursor-pointer"
             >
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg truncate">{chat.title}</CardTitle>
+                <CardTitle className="text-lg truncate">
+                  {chat.title || 'Untitled Chat'}
+                </CardTitle>
                 <CardDescription className="text-xs">
-                  {chat.createdAt
+                  {chat.createdAt &&
+                  !Number.isNaN(new Date(chat.createdAt).getTime())
                     ? format(new Date(chat.createdAt), 'PPP')
-                    : 'Unknown'}
+                    : 'Unknown date'}
                 </CardDescription>
               </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    {chat.updatedAt &&
+                    !Number.isNaN(new Date(chat.updatedAt).getTime())
+                      ? format(new Date(chat.updatedAt), 'h:mm a')
+                      : 'No activity'}
+                  </div>
+                  <div>
+                    <span className="text-xs border rounded-full px-2 py-0.5 text-muted-foreground">
+                      Private
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
               <CardFooter className="pt-2">
                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full"
                   onClick={() =>
-                    router.push(`/projects/${projectId}/chat/${chat.id}`)
+                    projectId &&
+                    router.push(
+                      AppRoutes.chats.projectChat.detail(projectId, chat.id),
+                    )
                   }
                 >
                   Open Chat

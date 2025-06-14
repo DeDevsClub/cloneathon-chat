@@ -44,7 +44,7 @@ export function HeaderIsland({
                 variant="ghost"
                 size="icon"
                 onClick={toggleSidebar}
-                className="h-8 w-8 hover:bg-muted"
+                className="size-8 hover:bg-muted"
                 aria-label="Toggle sidebar"
               >
                 <Icon
@@ -74,7 +74,7 @@ export function HeaderIsland({
                     variant="ghost"
                     size="icon"
                     onClick={openSearchModal}
-                    className="h-8 w-8 hover:bg-muted"
+                    className="size-8 hover:bg-muted"
                     aria-label="Search"
                   >
                     <Icon
@@ -103,9 +103,9 @@ export function HeaderIsland({
                       //   createdAt: new Date(),
                       // };
                       // addConversation(newConversationEntry);
-                      router.push(`/chat/${newChatId}`);
+                      router.push(`/chats/${newChatId}`);
                     }}
-                    className="h-8 w-8 hover:bg-muted"
+                    className="size-8 hover:bg-muted"
                     aria-label="New Chat"
                   >
                     <Icon
@@ -132,7 +132,7 @@ export function HeaderIsland({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleProjectsClick()}
-                className="h-8 w-8 hover:bg-muted"
+                className="size-8 hover:bg-muted"
                 aria-label="Projects"
               >
                 <Icon
@@ -153,7 +153,7 @@ export function HeaderIsland({
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="h-8 w-8 hover:bg-muted"
+                className="size-8 hover:bg-muted"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (

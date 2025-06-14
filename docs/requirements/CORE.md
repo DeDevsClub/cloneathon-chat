@@ -48,7 +48,7 @@
 
 - **Authentication Methods**:
 
-  [ ] Email/password authentication.
+  [√] Email/password authentication.
   [ ] OAuth integration with popular providers (`Google`, `GitHub`, etc.).
   [ ] Session management and secure token handling.
   [ ] Secure password storage using **bcrypt**.

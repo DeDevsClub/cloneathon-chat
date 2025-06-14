@@ -282,20 +282,8 @@ function PureMultimodalInput({
         rows={2}
         autoFocus
         onKeyDown={(event) => {
-          console.log({ event });
-          if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing
-          ) {
-            event.preventDefault();
-            console.log({ status });
-            if (status !== 'ready') {
-              // console.log({ error: status });
-              toast.error('Please wait for the model to finish its response!');
-            } else {
-              submitForm();
-            }
+          if (event.key === 'Enter') {
+            submitForm();
           }
         }}
       />

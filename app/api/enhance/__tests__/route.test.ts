@@ -168,7 +168,7 @@ describe('/api/enhance POST', () => {
           message: { content: null }, // Simulate no content from AI
         },
       ],
-    } as any);
+    });
 
     const req = createRequest<NextRequest>({
       method: 'POST',
@@ -278,7 +278,7 @@ describe('/api/enhance POST', () => {
           finish_reason: 'stop',
         },
       ],
-    } as any);
+    });
 
     const req = createRequest<NextRequest>({
       method: 'POST',

@@ -53,7 +53,7 @@ const HomePage = () => {
   const handleCreateProject = () => {
     if (!session) {
       toast.error('Please log in to create a project');
-      // router.push('/login');
+      router.push('/login');
       return;
     }
     setOpen(true);
@@ -70,7 +70,7 @@ const HomePage = () => {
         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-purple-500">
           Projects
         </h1>
-        {/* <Button
+        <Button
           onClick={handleCreateProject}
           className="bg-purple-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-purple-500/20 transition-all duration-300"
           size="lg"
@@ -78,7 +78,7 @@ const HomePage = () => {
         >
           <Plus className="size-4 mr-2 text-white" />
           <span className="text-white">New Project</span>
-        </Button> */}
+        </Button>
       </motion.div>
 
       {loading ? (

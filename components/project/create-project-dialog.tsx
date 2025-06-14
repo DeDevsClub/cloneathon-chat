@@ -62,7 +62,7 @@ export function CreateProjectDialog({
     defaultValues: {
       name: '',
       description: '',
-      icon: '📁', // Default folder icon
+      icon: '🦋', // Default folder icon
       color: '#4f46e5', // Default indigo color
     },
   });

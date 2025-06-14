@@ -2,9 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import {
+  useActionState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useState,
+} from 'react';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, MessageSquare, Zap, Sparkles, Code, Lock } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
@@ -16,10 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
+import Image from 'next/image';
 import { signup, type RegisterActionState } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession } from 'next-auth/react';
+import { GridBeam } from '@/components/grid-beam';
 
 export default function Page() {
   const router = useRouter();
@@ -91,96 +98,141 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 size-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div
-          className="absolute -bottom-48 -left-48 size-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
-          style={{ animationDuration: '8s' }}
-        />
-      </div>
+    <div className="min-h-screen min-w-screen flex justify-center items-center bg-slate-600 backdrop-blur-sm overflow-hidden">
+      {/* Right side: Sign up form */}
+      <GridBeam className="flex items-start justify-start">
+        <div className="relative z-10 w-full flex flex-col justify-center items-center">
+          <motion.div
+            initial="hidden"
+            animate={mounted ? 'visible' : 'hidden'}
+            variants={containerVariants}
+            className="w-full max-w-md"
+          >
+            <Card className="bg-slate-900/90 backdrop-blur-sm border border-blue-500/30 shadow-[0_0_30px_rgba(168,85,247,0.25)] overflow-hidden">
+              {/* Synthwave sun effect behind the card */}
+              <div className="absolute -translate-x-1/2 w-64 h-64 bg-slate-600 rounded-full blur-3xl opacity-20" />
 
-      {/* Logo or branding mark */}
-      <motion.div
-        className="mb-8 text-3xl font-bold text-primary"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-      >
-        <div className="flex items-center gap-2">
-          <Icon icon="mdi:chat" className="text-primary" />
-          <span>th3.chat</span>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        animate={mounted ? 'visible' : 'hidden'}
-        variants={containerVariants}
-        className="w-full md:max-w-md"
-      >
-        <Card className="backdrop-blur-sm bg-background/75 border border-accent/20 shadow-lg">
-          <CardHeader className="space-y-1 pb-2">
-            <motion.div variants={itemVariants}>
-              <CardTitle className="text-2xl font-bold text-center text-foreground/90">
-                Sign Up for th3.chat
-              </CardTitle>
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <CardDescription className="text-center text-muted-foreground">
-                Create your account to get started.
-              </CardDescription>
-            </motion.div>
-          </CardHeader>
-
-          <CardContent className="space-y-4 pt-4">
-            <motion.div variants={itemVariants}>
-              <div className="space-y-2 relative">
-                <AuthForm action={handleSubmit}>
-                  {/* We can't style the form directly, but we'll style the container */}
-                  <div className="pt-4">
-                    <SubmitButton
-                      isSuccessful={isSuccessful}
-                      className="w-full relative overflow-hidden group bg-primary hover:bg-primary/90 text-white dark:bg-accent dark:hover:bg-accent/90 dark:hover:text-primary"
-                    >
-                      {isSuccessful ? (
-                        <>
-                          <Check className="size-4 mr-1" />
-                          Success!
-                        </>
-                      ) : (
-                        <>Join th3.chat</>
-                      )}
-                    </SubmitButton>
+              <CardHeader className="space-y-1 pb-2 relative z-10">
+                <motion.div variants={itemVariants}>
+                  <div className="relative">
+                    <CardTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-blue-300">
+                      Join the Future
+                    </CardTitle>
                   </div>
-                </AuthForm>
-              </div>
-            </motion.div>
-          </CardContent>
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                  <div className="relative">
+                    <CardDescription className="text-center text-blue-200/70">
+                      Create your account to get started with AI-powered chat
+                    </CardDescription>
+                  </div>
+                </motion.div>
+              </CardHeader>
 
-          <CardFooter className="flex flex-col space-y-4 pt-0">
-            <motion.div variants={itemVariants} className="text-center w-full">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-accent/30" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background/95 px-2 text-muted-foreground">
-                    Already joined?{' '}
-                    <Link
-                      href="/login"
-                      className="text-primary hover:text-primary/90 hover:underline cursor-pointer font-semibold text-md"
-                    >
-                      Login
-                    </Link>
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          </CardFooter>
-        </Card>
-      </motion.div>
+              <CardContent className="space-y-4 pt-4 relative z-10">
+                <motion.div variants={itemVariants}>
+                  <div className="space-y-2 relative">
+                    <AuthForm action={handleSubmit}>
+                      {/* Form styling handled by AuthForm component */}
+                      <div className="pt-4">
+                        <SubmitButton
+                          isSuccessful={isSuccessful}
+                          className="w-full relative overflow-hidden group bg-blue-500 hover:bg-blue-700 hover:to-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                        >
+                          {isSuccessful ? (
+                            <>
+                              <Check className="size-5 mr-2" />
+                              Success!
+                            </>
+                          ) : (
+                            <>
+                              <span className="mr-2">✨</span>
+                              Join DeDevsClub
+                            </>
+                          )}
+                        </SubmitButton>
+                      </div>
+                    </AuthForm>
+                  </div>
+                </motion.div>
+              </CardContent>
+
+              <CardFooter className="flex flex-col space-y-4 pt-0 relative z-10">
+                <motion.div
+                  variants={itemVariants}
+                  className="text-center w-full"
+                >
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-blue-500/30" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-slate-900/80 px-3 py-1 rounded-full text-blue-200/80">
+                        Already joined?{' '}
+                        <Link
+                          href="/login"
+                          className="text-slate-400 hover:text-slate-300 hover:underline font-semibold transition-colors"
+                        >
+                          Login
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        </div>
+      </GridBeam>
     </div>
   );
 }
+
+// 'use client'
+
+// export const Account: React.FC<{
+//   defaultTab?: 0 | 1
+//   firstTab: React.ReactNode
+//   secondTab: React.ReactNode
+// }> = ({ defaultTab = 0, firstTab, secondTab }) => {
+//   const [currentTab, setCurrentTab] = useState<0 | 1>(defaultTab)
+
+//   return (
+//     <div className="flex w-full max-w-[430px] flex-col gap-2">
+//       <Switch currentTab={currentTab} setTab={setCurrentTab} />
+//       <div className="overflow-hidden rounded-xl border border-neutral-200 p-2 shadow-sm dark:border-neutral-900">
+//         {currentTab === 0 && firstTab}
+//         {currentTab === 1 && secondTab}
+//       </div>
+//     </div>
+//   )
+// }
+
+// const Switch: React.FC<{
+//   setTab: Dispatch<SetStateAction<0 | 1>>
+//   currentTab: number
+// }> = ({ setTab, currentTab }) => (
+//   <div
+//     className={`relative flex w-full items-center rounded-lg bg-neutral-100 py-1 text-neutral-900 dark:bg-neutral-800 dark:text-white`}>
+//     <motion.div
+//       transition={{ type: 'keyframes', duration: 0.15, ease: 'easeInOut' }}
+//       animate={currentTab === 0 ? { x: 4 } : { x: '98%' }}
+//       initial={currentTab === 0 ? { x: 4 } : { x: '98%' }}
+//       className={`absolute h-5/6 w-1/2 rounded-md bg-white shadow-sm dark:bg-neutral-950`}
+//     />
+//     <button
+//       onClick={() => {
+//         setTab(0)
+//       }}
+//       className="z-10 h-9 w-full rounded-md text-center">
+//       Sign in
+//     </button>
+//     <button
+//       onClick={() => {
+//         setTab(1)
+//       }}
+//       className="z-10 h-9 w-full rounded-md text-center">
+//       Sign up
+//     </button>
+//   </div>
+// )

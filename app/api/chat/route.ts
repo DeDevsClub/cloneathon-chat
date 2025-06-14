@@ -47,7 +47,7 @@ const createChatSchema = z.object({
   id: z.string().uuid(),
   title: z.string().optional().default('New Chat'),
   visibility: z.enum(['public', 'private']).default('private'),
-  projectId: z.string().optional(),
+  projectId: z.string().uuid().optional().nullable(),
   selectedChatModel: z.string().optional(),
   message: z.object({
     id: z.string().optional(),
@@ -121,13 +121,22 @@ export async function POST(request: NextRequest) {
 
     const { id, title, visibility, projectId } = validationResult.data;
 
+    // Log the validated data
+    console.log('Validated chat creation data:', {
+      id,
+      userId: user.id,
+      title: title || 'New Chat',
+      visibility,
+      projectId: projectId || null,
+    });
+    
     // Create the chat
     const newChat = await createChat({
       id,
       userId: user.id,
       title: title || 'New Chat',
       visibility,
-      projectId,
+      projectId: projectId || null,
     });
 
     return NextResponse.json({ chat: newChat }, { status: 201 });

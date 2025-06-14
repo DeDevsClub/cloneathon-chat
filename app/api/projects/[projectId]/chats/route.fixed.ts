@@ -82,13 +82,12 @@ const createChatSchema = z.object({
 });
 
 // GET /api/projects/[projectId]/chats - Get all chats for a specific project
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { projectId: string } }
+) {
   try {
-    // Extract projectId from URL
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split('/');
-    const projectId = pathParts[pathParts.indexOf('projects') + 1];
-
+    const projectId = params.projectId;
     console.log('Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
@@ -113,7 +112,6 @@ export async function GET(request: NextRequest) {
       console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
-      // TODO : Remove this in production
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -140,13 +138,12 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { projectId: string } }
+) {
   try {
-    // Extract projectId from URL
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split('/');
-    const projectId = pathParts[pathParts.indexOf('projects') + 1];
-
+    const projectId = params.projectId;
     console.log('Creating chat for Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names

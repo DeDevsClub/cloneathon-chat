@@ -45,7 +45,7 @@ async function extractEmailFromCookie(
 // Schema for updating chat project association
 const updateChatProjectSchema = z.object({
   chatId: z.string().uuid(),
-  projectId: z.string().uuid(),
+  projectId: z.string().uuid().nullable(),
 });
 
 // PATCH /api/chat/project - Update a chat's project association
@@ -101,11 +101,17 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { chatId, projectId } = validationResult.data;
+    
+    // Log the validated data
+    console.log('Validated chat project update data:', {
+      chatId,
+      projectId: projectId || null,
+    });
 
     // Update the chat's project association
     const updatedChat = await updateChatProject({
       chatId,
-      projectId,
+      projectId: projectId || null,
     });
 
     return NextResponse.json({ chat: updatedChat }, { status: 200 });

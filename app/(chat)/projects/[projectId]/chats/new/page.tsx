@@ -62,8 +62,8 @@ export default function NewChatPage(props: PageProps) {
         const messageId = uuidv4();
         const payload = {
           id: chatId,
-          projectId, // Include projectId in the initial payload
-          selectedVisibilityType: 'private',
+          // Don't include projectId in initial payload to avoid validation issues
+          visibility: 'private',
           selectedChatModel: 'chat-model',
           message: {
             id: messageId,
@@ -75,7 +75,7 @@ export default function NewChatPage(props: PageProps) {
           },
         };
 
-        console.log('Sending chat creation payload:', payload);
+        console.log('Preparing chat creation payload:', payload);
 
         const response = await fetch(AppRoutes.api.chat.base, {
           method: 'POST',

@@ -24,7 +24,7 @@ export function MessageEditor({
 
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  console.log('MessageEditor');
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();

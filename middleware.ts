@@ -35,15 +35,26 @@ export async function middleware(request: NextRequest) {
     `MIDDLEWARE DEBUG - Token check for ${pathname}: ${token ? 'Token found' : 'No token'}`,
   );
 
+  // Allow all API routes to function without authentication
+  if (pathname.startsWith('/api/')) {
+    console.log(`MIDDLEWARE DEBUG - Allowing API access: ${pathname}`);
+    return NextResponse.next();
+  }
+
   if (!token) {
-    // Skip authentication redirect for project chat routes to debug the issue
-    if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
-      console.log(
-        `MIDDLEWARE DEBUG - Skipping auth redirect for project chat: ${pathname}`,
-      );
+    // Skip authentication for development/debugging
+    if (isDevelopmentEnvironment) {
+      console.log(`MIDDLEWARE DEBUG - Dev mode: skipping auth for ${pathname}`);
       return NextResponse.next();
     }
 
+    // Skip authentication redirect for project chat routes
+    if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
+      console.log(`MIDDLEWARE DEBUG - Skipping auth for project chat: ${pathname}`);
+      return NextResponse.next();
+    }
+
+    // For other routes, redirect to guest auth
     const redirectUrl = encodeURIComponent(request.url);
     console.log(`MIDDLEWARE DEBUG - Redirecting to guest auth: ${redirectUrl}`);
 

@@ -15,7 +15,7 @@ export function MessageReasoning({
   reasoning,
 }: MessageReasoningProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-
+  console.log('MessageReasoning');
   const variants = {
     collapsed: {
       height: 0,

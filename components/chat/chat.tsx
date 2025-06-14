@@ -3,10 +3,9 @@
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 import { ChatHeader } from '@/components/chat/chat-header';
-import type { Vote } from '@/lib/db/schema';
-import { fetcher, fetchWithErrorHandlers, generateUUID } from '@/lib/utils';
+import { fetchWithErrorHandlers, generateUUID } from '@/lib/utils';
 import { Artifact } from '@/components/chat/artifact';
 import { MultimodalInput } from '@/components/chat/multimodal-input';
 import { Messages } from '@/components/chat/messages';
@@ -68,7 +67,7 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
-    api: '/api/ai', // Explicitly set the API endpoint
+    api: '/api/chat', // Use the correct API endpoint
     experimental_prepareRequestBody: (body) => {
       console.log('Preparing request body with projectId:', projectId);
       console.log('Chat request body:', JSON.stringify(body, null, 2));

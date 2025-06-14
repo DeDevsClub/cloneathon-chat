@@ -257,7 +257,7 @@ export const PreviewMessage = memo(
 
 export const ThinkingMessage = () => {
   const role = 'assistant';
-
+  console.log('ThinkingMessage');
   return (
     <motion.div
       data-testid="message-assistant-loading"

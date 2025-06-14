@@ -144,6 +144,7 @@ function PureMultimodalInput({
     formData.append('file', file);
 
     try {
+      console.log('Uploading file:', file.name);
       const response = await fetch('/api/files/upload', {
         method: 'POST',
         body: formData,
@@ -169,7 +170,10 @@ function PureMultimodalInput({
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
-
+      console.log(
+        'Selected files:',
+        files.map((file) => file.name),
+      );
       setUploadQueue(files.map((file) => file.name));
 
       try {
@@ -178,7 +182,10 @@ function PureMultimodalInput({
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment) => attachment !== undefined,
         );
-
+        console.log(
+          'Successfully uploaded attachments:',
+          successfullyUploadedAttachments,
+        );
         setAttachments((currentAttachments) => [
           ...currentAttachments,
           ...successfullyUploadedAttachments,
@@ -282,7 +289,13 @@ function PureMultimodalInput({
         rows={2}
         autoFocus
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
+          if (
+            event.key === 'Enter' &&
+            !event.shiftKey &&
+            !event.nativeEvent.isComposing
+          ) {
+            event.preventDefault();
+            // Allow submission regardless of status to fix streaming issues
             submitForm();
           }
         }}

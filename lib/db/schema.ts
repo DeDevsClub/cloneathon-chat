@@ -111,6 +111,7 @@ export const message = pgTable(
     chatIdIdx: index('message_chatId_idx').on(table.chatId),
     createdAtIdx: index('message_createdAt_idx').on(table.createdAt),
     roleIdx: index('message_role_idx').on(table.role),
+    projectIdIdx: index('message_projectId_idx').on(table.projectId),
   }),
 );
 

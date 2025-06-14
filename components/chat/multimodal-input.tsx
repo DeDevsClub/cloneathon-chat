@@ -45,7 +45,7 @@ function PureMultimodalInput({
   selectedVisibilityType,
 }: {
   chatId: string;
-  projectId: string;
+  projectId: string | null;
   input: UseChatHelpers['input'];
   setInput: UseChatHelpers['setInput'];
   status: UseChatHelpers['status'];

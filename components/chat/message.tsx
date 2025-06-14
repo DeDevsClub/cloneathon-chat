@@ -8,7 +8,7 @@ import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
 import { PencilEditIcon, SparklesIcon } from '@/components/icons';
 import { Markdown } from '@/components/chat/markdown';
-import { MessageActions } from '@/components/chat/message-actions';
+// import { MessageActions } from '@/components/chat/message-actions';
 import { PreviewAttachment } from '@/components/chat/preview-attachment';
 import { Weather } from '@/components/weather';
 import equal from 'fast-deep-equal';
@@ -225,7 +225,7 @@ const PurePreviewMessage = ({
               }
             })}
 
-            {!isReadonly && (
+            {/* {!isReadonly && (
               <MessageActions
                 key={`action-${message.id}`}
                 chatId={chatId}
@@ -233,7 +233,7 @@ const PurePreviewMessage = ({
                 vote={vote}
                 isLoading={isLoading}
               />
-            )}
+            )} */}
           </div>
         </div>
       </motion.div>

@@ -104,14 +104,14 @@ async function testProjectChatAssociation() {
 
   const payload = {
     chatId: CHAT_ID,
-    projectId: PROJECT_ID,
+    projectId: PROJECT_ID || null,
   };
 
   try {
-    console.log(`Sending PATCH request to /api/chat/project...`);
+    console.log(`Sending PATCH request to /api/project...`);
     console.log(`Request payload: ${JSON.stringify(payload, null, 2)}`);
 
-    const response = await fetchAPI(`${BASE_URL}/api/chat/project`, {
+    const response = await fetchAPI(`${BASE_URL}/api/project`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     });

@@ -7,16 +7,18 @@ import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
+import { cn } from '@/lib/utils';
 
 interface MessagesProps {
   chatId: string;
   status: UseChatHelpers['status'];
-  votes: Array<Vote> | undefined;
+  votes: Array<Vote>;
   messages: Array<UIMessage>;
   setMessages: UseChatHelpers['setMessages'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   isArtifactVisible: boolean;
+  className?: string;
 }
 
 function PureMessages({
@@ -27,6 +29,7 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
+  className,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -42,7 +45,10 @@ function PureMessages({
   return (
     <div
       ref={messagesContainerRef}
-      className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 relative"
+      className={cn(
+        'flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 relative',
+        className,
+      )}
     >
       {messages.length === 0 && <Greeting />}
 

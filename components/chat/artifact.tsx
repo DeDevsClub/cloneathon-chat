@@ -71,7 +71,7 @@ function PureArtifact({
   selectedVisibilityType,
 }: {
   chatId: string;
-  projectId: string;
+  projectId: string | null;
   input: string;
   setInput: UseChatHelpers['setInput'];
   status: UseChatHelpers['status'];
@@ -329,7 +329,7 @@ function PureArtifact({
                 <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">
                   <MultimodalInput
                     chatId={chatId}
-                    projectId={projectId}
+                    projectId={projectId || null}
                     input={input}
                     setInput={setInput}
                     handleSubmit={handleSubmit}

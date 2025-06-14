@@ -31,13 +31,12 @@ export function ModelSelector({
 
   // Default to 'guest' if session or user type is undefined
   const userType = session?.user?.type || 'guest';
-  console.log({ userType });
+  // console.log({ userType });
   const { availableChatModelIds } = entitlementsByUserType[userType];
-  console.log({ availableChatModelIds });
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
   );
-  console.log({ availableChatModels });
+  // console.log({ availableChatModels });
 
   const selectedChatModel = useMemo(
     () =>
@@ -46,6 +45,8 @@ export function ModelSelector({
       ),
     [optimisticModelId, availableChatModels],
   );
+
+  // console.log({ selectedChatModel });
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>

@@ -263,7 +263,7 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const chatId = searchParams.get('chatId');
+  const chatId = searchParams.get('chatId') || '';
 
   if (!chatId) {
     return new ChatSDKError('bad_request:api').toResponse();

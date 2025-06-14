@@ -77,9 +77,9 @@ const ProjectsPage = () => {
     setIsSidebarOpen(true);
     setOpen(true);
   };
-  const toggleSidebar = useCallback(() => {
-    setIsSidebarOpen((prev) => !prev);
-  }, []);
+  // const toggleSidebar = useCallback(() => {
+  //   setIsSidebarOpen((prev) => !prev);
+  // }, []);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

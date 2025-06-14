@@ -13,14 +13,12 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 
 interface HeaderIslandProps {
-  projectId: string;
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   openSearchModal: () => void;
 }
 
 export function HeaderIsland({
-  projectId,
   isSidebarOpen,
   toggleSidebar,
   openSearchModal,
@@ -31,8 +29,7 @@ export function HeaderIsland({
     router.push('/projects');
   };
 
-  const createChat = (projectId: string) => {
-    // router.push(`/projects/${projectId}/chats/new`);
+  const createChat = () => {
     router.push(`/chats/new`);
     router.refresh();
   };
@@ -100,18 +97,10 @@ export function HeaderIsland({
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      // Make sure projectId is a valid UUID and not the literal string "id"
-                      if (projectId && projectId !== 'id') {
-                        createChat(projectId);
-                      } else {
-                        console.error(
-                          'Invalid projectId for chat creation:',
-                          projectId,
-                        );
-                      }
+                      createChat();
                     }}
                     className="size-8 hover:bg-muted"
-                    aria-label="Projects"
+                    aria-label="New Chat"
                   >
                     <Icon
                       icon="mdi:plus-circle-outline"

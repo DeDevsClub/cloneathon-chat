@@ -28,10 +28,11 @@ export default function ChatsPage(props: PageProps) {
   const chatId = unwrappedParams.chatId;
   const projectId = unwrappedParams.projectId;
   const { data: session } = useSession();
-  if (!session) {
-    console.error('No session found');
-    redirect('/login');
-  }
+
+  // if (!session) {
+  //   console.error('No session found');
+  //   redirect('/login');
+  // }
 
   // Use a default welcome message if no chat data is available yet
   const defaultMessage: UIMessage = {
@@ -44,15 +45,17 @@ export default function ChatsPage(props: PageProps) {
   };
 
   return (
-    <Chat
-      projectId={projectId}
-      chatId={chatId}
-      initialMessages={[defaultMessage as UIMessage]}
-      initialChatModel="chat-model"
-      initialVisibilityType="private"
-      isReadonly={false}
-      session={session as Session}
-      autoResume={true}
-    />
+    <div className="flex flex-cols">
+      <Chat
+        projectId={projectId}
+        chatId={chatId}
+        initialMessages={[defaultMessage as UIMessage]}
+        initialChatModel="chat-model"
+        initialVisibilityType="private"
+        isReadonly={false}
+        session={session as Session}
+        autoResume={true}
+      />
+    </div>
   );
 }

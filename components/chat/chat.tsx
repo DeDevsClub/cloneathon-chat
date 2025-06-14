@@ -32,7 +32,7 @@ export function Chat({
   session,
   autoResume,
 }: {
-  projectId: string;
+  projectId: string | null;
   chatId: string;
   initialMessages: Array<UIMessage>;
   initialChatModel: string;
@@ -48,81 +48,100 @@ export function Chat({
     initialVisibilityType,
   });
 
+  // const {
+  //   messages,
+  //   setMessages,
+  //   handleSubmit,
+  //   input,
+  //   setInput,
+  //   append,
+  //   status,
+  //   stop,
+  //   reload,
+  //   experimental_resume,
+  //   data,
+  //   error,
+  // } = useChat({
+  //   id: chatId,
+  //   initialMessages,
+  //   experimental_throttle: 100,
+  //   sendExtraMessageFields: true,
+  //   generateId: generateUUID,
+  //   fetch: fetchWithErrorHandlers,
+  //   api: '/api/chat', // Use the correct AI chat endpoint
+  //   experimental_prepareRequestBody: (body) => {
+  //     console.log('Preparing request body with projectId:', projectId);
+  //     console.log('Chat request body:', JSON.stringify(body, null, 2));
+  //     // Send the messages array directly as expected by the OpenAI API
+  //     return {
+  //       ...body, // Keep all original properties
+  //       projectId: projectId || null, // Add project ID for context
+  //       selectedChatModel: initialChatModel || 'chat-model',
+  //       selectedVisibilityType: visibilityType,
+  //     };
+  //   },
+  //   onFinish: () => {
+  //     mutate(unstable_serialize(getChatHistoryPaginationKey));
+  //   },
+  //   onError: (error) => {
+  //     console.error('Chat error:', error);
+  //     if (error instanceof ChatSDKError) {
+  //       toast({
+  //         type: 'error',
+  //         description: error.message,
+  //       });
+  //     } else {
+  //       toast({
+  //         type: 'error',
+  //         description: 'Failed to get AI response. Please try again.',
+  //       });
+  //     }
+  //   },
+  // });
+
   const {
-    messages,
-    setMessages,
-    handleSubmit,
+    error,
     input,
+    status,
+    handleInputChange,
+
+    handleSubmit,
+    messages,
+    reload,
+    stop,
+    // old
+    experimental_resume, //
+    data,
+    setMessages,
     setInput,
     append,
-    status,
-    stop,
-    reload,
-    experimental_resume,
-    data,
-    error,
   } = useChat({
-    id: chatId,
-    initialMessages,
-    experimental_throttle: 100,
-    sendExtraMessageFields: true,
-    generateId: generateUUID,
-    fetch: fetchWithErrorHandlers,
-    api: '/api/chat', // Use the correct AI chat endpoint
-    experimental_prepareRequestBody: (body) => {
-      console.log('Preparing request body with projectId:', projectId);
-      console.log('Chat request body:', JSON.stringify(body, null, 2));
-      // Send the messages array directly as expected by the OpenAI API
-      return {
-        ...body, // Keep all original properties
-        projectId, // Add project ID for context
-        selectedChatModel: initialChatModel || 'chat-model',
-        selectedVisibilityType: visibilityType,
-      };
-    },
-    onFinish: () => {
-      mutate(unstable_serialize(getChatHistoryPaginationKey));
-    },
-    onError: (error) => {
-      console.error('Chat error:', error);
-      if (error instanceof ChatSDKError) {
-        toast({
-          type: 'error',
-          description: error.message,
-        });
-      } else {
-        toast({
-          type: 'error',
-          description: 'Failed to get AI response. Please try again.',
-        });
-      }
+    onFinish(message, { usage, finishReason }) {
+      console.log('Usage', usage);
+      console.log('FinishReason', finishReason);
     },
   });
 
-  const searchParams = useSearchParams();
-  const query = searchParams.get('query');
+  // const searchParams = useSearchParams();
+  // const query = searchParams.get('query');
 
   const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
 
   useEffect(() => {
-    if (query && !hasAppendedQuery) {
-      append({
-        role: 'user',
-        content: query,
-      });
+    // if (query && !hasAppendedQuery) {
+    //   append({
+    //     role: 'user',
+    //     content: query,
+    //   });
 
-      setHasAppendedQuery(true);
-      window.history.replaceState(
-        {},
-        '',
-        `/projects/${projectId}/chats/${chatId}`,
-      );
-    }
-  }, [query, append, hasAppendedQuery, chatId, projectId]);
+    setHasAppendedQuery(true);
+    // window.history.replaceState({}, '', `/projects/${projectId}`);
+    // }
+  }, [hasAppendedQuery, status, input, messages]);
 
   // TODO enable voting
   const { data: votes } = useSWR<Array<Vote>>(
-    messages?.length >= 2 ? `/api/vote?chatId=${chatId}` : null,
+    messages?.length >= 2 ? `/api/chat/vote?chatId=${chatId}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -142,74 +161,65 @@ export function Chat({
   });
 
   return (
-    <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
-        <ChatHeader
-          chatId={chatId}
-          selectedModelId={initialChatModel}
-          selectedVisibilityType={initialVisibilityType}
-          isReadonly={isReadonly}
-          session={session}
-        />
-
-        <Messages
-          chatId={chatId}
-          status={status}
-          votes={votes}
-          messages={messages}
-          setMessages={setMessages}
-          reload={reload}
-          isReadonly={isReadonly}
-          isArtifactVisible={isArtifactVisible}
-        />
-
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-          {!isReadonly && (
-            <MultimodalInput
-              chatId={chatId}
-              projectId={projectId}
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleSubmit}
-              status={status}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={append}
-              selectedVisibilityType={visibilityType}
-            />
-          )}
-          {messages?.length <= 4 && (
-            <SuggestedActions
-              chatId={chatId}
-              projectId={projectId}
-              append={append}
-              selectedVisibilityType={visibilityType}
-            />
-          )}
-        </form>
-      </div>
-
-      <Artifact
+    <div className="flex flex-col w-full min-w-full h-dvh justify-center scrollbar-transparent">
+      {/* <ChatHeader
         chatId={chatId}
-        projectId={projectId}
-        input={input}
-        setInput={setInput}
-        handleSubmit={handleSubmit}
+        selectedModelId={initialChatModel}
+        selectedVisibilityType={initialVisibilityType}
+        isReadonly={isReadonly}
+        session={session}
+      /> */}
+
+      <Messages
+        chatId={chatId}
         status={status}
-        stop={stop}
-        attachments={attachments}
-        setAttachments={setAttachments}
-        append={append}
+        votes={votes || []}
         messages={messages}
         setMessages={setMessages}
         reload={reload}
-        votes={undefined}
         isReadonly={isReadonly}
-        selectedVisibilityType={visibilityType}
+        isArtifactVisible={isArtifactVisible}
       />
-    </>
+
+      <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">
+        {/* <div className="flex bg-background h-fit justify-center"> */}
+        {!isReadonly && (
+          <MultimodalInput
+            chatId={chatId}
+            projectId={projectId || null}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            status={status}
+            stop={stop}
+            attachments={attachments}
+            setAttachments={setAttachments}
+            messages={messages}
+            setMessages={setMessages}
+            append={append}
+            selectedVisibilityType={visibilityType}
+          />
+        )}
+
+        <Artifact
+          chatId={chatId}
+          projectId={projectId || null}
+          input={input}
+          setInput={setInput}
+          handleSubmit={handleSubmit}
+          status={status}
+          stop={stop}
+          attachments={attachments}
+          setAttachments={setAttachments}
+          append={append}
+          messages={messages}
+          setMessages={setMessages}
+          reload={reload}
+          votes={votes}
+          isReadonly={isReadonly}
+          selectedVisibilityType={visibilityType}
+        />
+      </div>
+    </div>
   );
 }

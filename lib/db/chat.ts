@@ -95,11 +95,17 @@ export async function getChatsByProjectId({
 }) {
   try {
     // Get all chats for the project
-    const chats = await db
-      .select()
-      .from(chat)
-      .where(and(eq(chat.projectId, projectId), eq(chat.userId, userId)))
-      .orderBy(desc(chat.createdAt));
+    const chats = projectId
+      ? await db
+          .select()
+          .from(chat)
+          .where(and(eq(chat.projectId, projectId), eq(chat.userId, userId)))
+          .orderBy(desc(chat.createdAt))
+      : await db
+          .select()
+          .from(chat)
+          .where(eq(chat.userId, userId))
+          .orderBy(desc(chat.createdAt));
 
     return chats;
   } catch (error) {

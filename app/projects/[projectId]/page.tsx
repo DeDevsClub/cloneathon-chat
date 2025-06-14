@@ -274,11 +274,7 @@ export default function ProjectPage(props: PageProps) {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chats in this Project</h2>
-        <Button
-          onClick={() =>
-            projectId && router.push(AppRoutes.chats.projectChat.new(projectId))
-          }
-        >
+        <Button onClick={() => projectId && router.push(AppRoutes.chats.new)}>
           <MessageSquare className="mr-2 size-4" />
           New Chat
         </Button>
@@ -292,10 +288,7 @@ export default function ProjectPage(props: PageProps) {
           </p>
           <Button
             className="mt-4"
-            onClick={() =>
-              projectId &&
-              router.push(AppRoutes.chats.projectChat.new(projectId))
-            }
+            onClick={() => projectId && router.push(AppRoutes.chats.new)}
           >
             <MessageSquare className="mr-2 size-4" />
             Create your first chat
@@ -307,10 +300,7 @@ export default function ProjectPage(props: PageProps) {
             <Card
               key={chat.id}
               onClick={() =>
-                projectId &&
-                router.push(
-                  AppRoutes.chats.projectChat.detail(projectId, chat.id),
-                )
+                projectId && router.push(AppRoutes.chats.detail(chat.id))
               }
               className="hover:shadow-md transition-shadow cursor-pointer"
             >
@@ -345,12 +335,7 @@ export default function ProjectPage(props: PageProps) {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() =>
-                    projectId &&
-                    router.push(
-                      AppRoutes.chats.projectChat.detail(projectId, chat.id),
-                    )
-                  }
+                  onClick={() => router.push(AppRoutes.chats.detail(chat.id))}
                 >
                   Open Chat
                 </Button>

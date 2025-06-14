@@ -28,24 +28,23 @@ import { Button } from '@/components/ui/button';
 
 interface AppSidebarProps {
   user: User | undefined;
-  projectId: string;
 }
 
-export function AppSidebar({ user, projectId }: AppSidebarProps) {
+export function AppSidebar({ user }: AppSidebarProps) {
   const router = useRouter();
   const { toggleSidebar, state } = useSidebar();
   const isOpen = state === 'expanded';
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  const createChat = (projectId: string) => {
+  const createChat = () => {
     // Validate projectId before navigation
-    if (projectId && projectId !== 'id') {
+    if (user?.id) {
       console.log({ user });
-      console.log(`Creating chat with project ID: ${projectId}`);
+      console.log(`Creating chat for user ID: ${user.id}`);
       router.push(`/chats/new`);
       router.refresh();
     } else {
-      console.error('Invalid projectId for chat creation:', projectId);
+      console.error('Invalid user ID for chat creation:', user?.id);
       // Fallback to projects page if no valid projectId
       router.push('/projects');
     }
@@ -55,14 +54,12 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
     <>
       <SearchModal
         isOpen={isSearchModalOpen}
-        projectId={projectId}
         onOpenChange={setIsSearchModalOpen}
       />
       <Sidebar className="group-data-[side=left]:border-r-0">
         <SidebarHeader className="flex flex-row gap-1 sm:ml-12 h-12 rounded-md justify-start items-center mt-2 max-w-full">
           <SidebarMenu>
             <HeaderIsland
-              projectId={projectId}
               isSidebarOpen={isOpen}
               toggleSidebar={toggleSidebar}
               openSearchModal={() => setIsSearchModalOpen(true)}
@@ -88,13 +85,10 @@ export function AppSidebar({ user, projectId }: AppSidebarProps) {
             className="w-full hover:bg-muted group grid place-items-center"
             onClick={() => {
               // Make sure projectId is a valid UUID and not the literal string "id"
-              if (projectId && projectId !== 'id' && user?.id) {
-                createChat(projectId);
+              if (user?.id) {
+                createChat();
               } else {
-                console.error(
-                  'Invalid projectId for chat creation:',
-                  projectId,
-                );
+                console.error('Invalid user ID for chat creation:');
                 router.push('/projects');
               }
             }}

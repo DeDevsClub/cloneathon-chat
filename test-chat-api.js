@@ -79,7 +79,7 @@ async function createProjectChat(projectId) {
   };
 
   const response = await fetchWithAuth(
-    `${BASE_URL}/api/projects/${projectId}/chats`,
+    `${BASE_URL}/api/projects/${projectId}`,
     {
       method: 'POST',
       body: JSON.stringify(payload),

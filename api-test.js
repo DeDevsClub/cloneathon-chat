@@ -7,17 +7,17 @@ const { v4: uuidv4 } = require('uuid');
 async function testChatApi() {
   // Generate test IDs
   const chatId = process.env.CHAT_ID || uuidv4();
-  const projectId = process.env.PROJECT_ID || uuidv4();
+  const projectId = process.env.PROJECT_ID || null;
   const messageId = uuidv4();
 
   console.log('Testing chat API with:');
   console.log(`Chat ID: ${chatId}`);
-  console.log(`Project ID: ${projectId}`);
+  console.log(`Project ID: ${projectId || null}`);
 
   // Create a payload that matches the expected schema
   const payload = {
     id: chatId,
-    projectId: projectId,
+    projectId: projectId || null,
     message: {
       id: messageId,
       role: 'user',
@@ -62,7 +62,7 @@ async function testChatApi() {
 
     // Print URL for manual testing in browser
     console.log('\nTest URL for browser:');
-    console.log(`http://localhost:3000/projects/${projectId}/chats/${chatId}`);
+    console.log(`http://localhost:3000/chats/${chatId}`);
 
     return status === 200;
   } catch (error) {

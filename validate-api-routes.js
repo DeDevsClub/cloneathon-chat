@@ -148,10 +148,13 @@ async function validateProjectChatAssociation() {
 
   // Test with valid payload
   console.log('2.1: Testing with valid payload...');
-  const response = await fetchAPI(`${BASE_URL}/api/chat/project`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
+  const response = await fetchAPI(
+    `${BASE_URL}/api/projects/${PROJECT_ID}/chats`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  );
 
   console.log(`Response status: ${response.status}`);
 
@@ -176,10 +179,13 @@ async function validateProjectChatAssociation() {
     projectId: PROJECT_ID,
   };
 
-  const invalidResponse = await fetchAPI(`${BASE_URL}/api/chat/project`, {
-    method: 'PATCH',
-    body: JSON.stringify(invalidPayload),
-  });
+  const invalidResponse = await fetchAPI(
+    `${BASE_URL}/api/projects/${PROJECT_ID}/chats`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(invalidPayload),
+    },
+  );
 
   console.log(`Response status: ${invalidResponse.status}`);
 

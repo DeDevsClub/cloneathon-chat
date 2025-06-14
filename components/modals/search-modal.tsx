@@ -12,14 +12,9 @@ import { Button } from '../ui/button';
 interface SearchModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  projectId: string;
 }
 
-export function SearchModal({
-  isOpen,
-  onOpenChange,
-  projectId,
-}: SearchModalProps) {
+export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConversations, setFilteredConversations] = useState<any[]>([]);
@@ -43,13 +38,10 @@ export function SearchModal({
     }
   }, [searchTerm]);
 
-  const handleSelectConversation = (
-    projectId: string,
-    conversationId: string,
-  ) => {
+  const handleSelectConversation = (conversationId: string) => {
     // const storeSelectConversation = useChatStore(state => state.selectConversation); // If you want to sync global store selection
     // storeSelectConversation(conversationId);
-    router.push(`/projects/${projectId}/chats/${conversationId}`);
+    // router.push(`/projects/${projectId}`);
     onOpenChange(false); // Close modal on selection
   };
 
@@ -64,7 +56,7 @@ export function SearchModal({
       createdAt: new Date(),
     };
     // addConversation(newConversationEntry);
-    router.push(`/projects/${projectId}/chats/${newChatId}`);
+    // router.push(`/projects/${projectId}`);
     onOpenChange(false);
   };
 
@@ -88,10 +80,7 @@ export function SearchModal({
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 if (filteredConversations.length > 0 && searchTerm) {
-                  handleSelectConversation(
-                    projectId,
-                    filteredConversations[0].id,
-                  );
+                  // handleSelectConversation(filteredConversations[0].id);
                 } else {
                   handleStartNewChat();
                 }
@@ -116,9 +105,7 @@ export function SearchModal({
               {filteredConversations.map((convo) => (
                 <li key={convo.id}>
                   <Button
-                    onClick={() =>
-                      handleSelectConversation(projectId, convo.id)
-                    }
+                    // onClick={() => handleSelectConversation(convo.id)}
                     className="flex w-full items-center gap-3 rounded-md p-2 text-left text-sm hover:bg-muted"
                   >
                     <MessageSquare

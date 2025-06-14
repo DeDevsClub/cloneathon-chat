@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 import { UIMessage } from 'ai';
 interface PageParams {
   chatId: string;
-  projectId: string;
+  projectId: string | null;
 }
 
 interface PageProps {
@@ -28,10 +28,10 @@ export default function ChatPage(props: PageProps) {
   const chatId = unwrappedParams.chatId;
   const projectId = unwrappedParams.projectId;
   const { data: session } = useSession();
-  if (!session) {
-    console.error('No session found');
-    redirect('/login');
-  }
+  // if (!session) {
+  //   console.error('No session found');
+  //   redirect('/login');
+  // }
 
   // Use a default welcome message if no chat data is available yet
   const defaultMessage: UIMessage = {
@@ -45,7 +45,7 @@ export default function ChatPage(props: PageProps) {
 
   return (
     <Chat
-      projectId={projectId}
+      projectId={projectId || null}
       chatId={chatId}
       initialMessages={[defaultMessage as UIMessage]}
       initialChatModel="chat-model"

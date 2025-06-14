@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
 
 interface PageParams {
-  projectId: string;
+  projectId?: string;
 }
 
 interface PageProps {
@@ -40,11 +40,11 @@ export default function NewChatPage(props: PageProps) {
       if (status === 'loading') return;
 
       try {
-        if (!projectId) {
-          toast.error('Project ID is required');
-          router.push(AppRoutes.projects.list);
-          return;
-        }
+        // if (!projectId) {
+        //   toast.error('Project ID is required');
+        //   router.push(AppRoutes.projects.list);
+        //   return;
+        // }
 
         if (!session) {
           toast.error('You must be logged in to create a chat');
@@ -64,14 +64,25 @@ export default function NewChatPage(props: PageProps) {
           // Don't include projectId in initial payload to avoid validation issues
           visibility: 'private',
           selectedChatModel: 'chat-model',
-          message: {
-            id: messageId,
-            content: messageContent,
-            parts: [{ text: messageContent, type: 'text' }],
-            role: 'user',
-            createdAt: new Date().toISOString(),
-            experimental_attachments: [],
-          },
+          // message: {
+          //   id: messageId,
+          //   content: messageContent,
+          //   parts: [{ text: messageContent, type: 'text' }],
+          //   role: 'user',
+          //   createdAt: new Date().toISOString(),
+          //   experimental_attachments: [],
+          // },
+          messages: [
+            {
+              id: messageId,
+              content: messageContent,
+              parts: [{ text: messageContent, type: 'text' }],
+              role: 'user',
+              createdAt: new Date().toISOString(),
+              experimental_attachments: [],
+              model: 'chat-model',
+            },
+          ],
         };
         console.log({ payload });
         console.log('Preparing chat creation payload:', payload);
@@ -83,44 +94,49 @@ export default function NewChatPage(props: PageProps) {
           },
           body: JSON.stringify(payload),
         });
-
+        console.log({ response });
         if (!response.ok) {
           throw new Error('Failed to create chat');
         }
 
-        // Now update the chat with the project ID
-        const projectUpdateResponse = await fetch(AppRoutes.api.chat.project, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chatId,
-            projectId,
-          }),
-        });
-
-        if (!projectUpdateResponse.ok) {
-          throw new Error(
-            `Failed to associate chat with project: ${projectUpdateResponse.status} ${projectUpdateResponse.statusText}`,
+        // Now update the chat with the project ID (conditional)
+        if (projectId) {
+          console.log('Updating chat with project ID: %s', projectId);
+          const projectUpdateResponse = await fetch(
+            AppRoutes.api.chat.project,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                chatId,
+                projectId,
+              }),
+            },
           );
-        }
 
+          if (!projectUpdateResponse.ok) {
+            throw new Error(
+              `Failed to associate chat with project: ${projectUpdateResponse.status} ${projectUpdateResponse.statusText}`,
+            );
+          }
+        }
         // Redirect to the new chat
-        router.push(AppRoutes.chats.projectChat.detail(projectId, chatId));
+        router.push(AppRoutes.chats.detail(chatId));
       } catch (error: unknown) {
         console.error('Error creating chat:', error);
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';
         toast.error(`Failed to create chat: ${errorMessage}`);
-        router.push(AppRoutes.projects.detail(projectId));
+        router.push(AppRoutes.chats.list());
       } finally {
         setCreating(false);
       }
     }
 
     createNewChat();
-  }, [projectId, router, session, status]);
+  }, [router, session, status]);
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">

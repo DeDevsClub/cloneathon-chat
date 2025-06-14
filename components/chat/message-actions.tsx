@@ -4,7 +4,7 @@ import { useCopyToClipboard } from 'usehooks-ts';
 
 import type { Vote } from '@/lib/db/schema';
 
-import { CopyIcon } from '@/components/icons';
+import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -66,7 +66,7 @@ export function PureMessageActions({
         </Tooltip>
 
         {/* TODO: Add upvote and downvote functionality */}
-        {/* <Tooltip>
+        <Tooltip>
           <TooltipTrigger asChild>
             <Button
               data-testid="message-upvote"
@@ -119,11 +119,11 @@ export function PureMessageActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Upvote Response</TooltipContent>
-        </Tooltip> */}
+        </Tooltip>
 
         {/* TODO: Implement downvoting */}
 
-        {/* <Tooltip>
+        <Tooltip>
           <TooltipTrigger asChild>
             <Button
               data-testid="message-downvote"
@@ -176,7 +176,7 @@ export function PureMessageActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Downvote Response</TooltipContent>
-        </Tooltip> */}
+        </Tooltip>
       </div>
     </TooltipProvider>
   );

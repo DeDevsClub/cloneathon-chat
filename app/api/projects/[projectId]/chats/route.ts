@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       title: title || 'New Chat',
       visibility,
-      projectId,
+      projectId: projectId || null,
     });
 
     return NextResponse.json({ chat: newChat }, { status: 201 });

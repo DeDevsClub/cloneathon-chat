@@ -10,15 +10,10 @@ interface SuggestedActionsProps {
   chatId: string;
   append: UseChatHelpers['append'];
   selectedVisibilityType: VisibilityType;
-  projectId?: string;
+  projectId?: string | null;
 }
 
-function PureSuggestedActions({
-  chatId,
-  append,
-  selectedVisibilityType,
-  projectId,
-}: SuggestedActionsProps) {
+function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
       title: 'What are the advantages',
@@ -59,9 +54,7 @@ function PureSuggestedActions({
           <Button
             variant="ghost"
             onClick={async () => {
-              const chatUrl = projectId
-                ? `/projects/${projectId}/chats/${chatId}`
-                : `/chat/${chatId}`;
+              const chatUrl = `/chats/${chatId}`;
               window.history.replaceState({}, '', chatUrl);
 
               append({
@@ -85,11 +78,8 @@ function PureSuggestedActions({
 export const SuggestedActions = memo(
   PureSuggestedActions,
   (prevProps, nextProps) => {
+    // console.log({ prevProps, nextProps });
     if (prevProps.chatId !== nextProps.chatId) return false;
-    if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
-      return false;
-    if (prevProps.projectId !== nextProps.projectId) return false;
-
     return true;
   },
 );

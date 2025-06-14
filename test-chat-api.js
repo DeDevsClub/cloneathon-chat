@@ -148,7 +148,7 @@ async function runTest() {
     console.log(`Chat ID: ${chatId}`);
     console.log(`Message sent successfully: ${messageSuccess}`);
     console.log('\nChat URL (copy and paste into browser):');
-    console.log(`${BASE_URL}/projects/${project.id}/chats/${chatId}`);
+    console.log(`${BASE_URL}/chats/${chatId}`);
 
     console.log('\nTest completed successfully!');
   } catch (error) {

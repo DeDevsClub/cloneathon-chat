@@ -17,7 +17,7 @@ test.describe('Chat activity', () => {
     expect(assistantMessage.content).toContain("It's just green duh!");
   });
 
-  test('Redirect to /projects/:projectId/chats/:chatId after submitting message', async () => {
+  test('Redirect to /chats/:chatId after submitting message', async () => {
     await chatPage.sendUserMessage('Why is grass green?');
     await chatPage.isGenerationComplete();
 

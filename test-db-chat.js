@@ -133,7 +133,7 @@ async function runTest() {
     // Success!
     console.log('\nTest completed successfully!');
     console.log(
-      `\nTo view the test chat in the app, use this URL:\nhttp://localhost:3000/projects/${TEST_PROJECT_ID}/chats/${TEST_CHAT_ID}\n\nIMPORTANT: Make sure you are logged in to the application first!\nIf you are still being redirected, try these steps:
+      `\nTo view the test chat in the app, use this URL:\nhttp://localhost:3000/chats/${TEST_CHAT_ID}\n\nIMPORTANT: Make sure you are logged in to the application first!\nIf you are still being redirected, try these steps:
       \n1. Open the browser to http://localhost:3000 first
       \n2. Ensure you are logged in (you should see projects list)
       \n3. Then copy and paste the test URL after logging in\n

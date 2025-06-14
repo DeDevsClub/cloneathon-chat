@@ -48,4 +48,4 @@ curl -X POST "http://localhost:3000/api/chat" \
 
 echo ""
 echo "----------------------------------------"
-echo "Test URL (if successful): http://localhost:3000/projects/$PROJECT_ID/chats/$CHAT_ID"
+echo "Test URL (if successful): http://localhost:3000/chats/$CHAT_ID"

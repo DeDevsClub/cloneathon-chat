@@ -1,7 +1,6 @@
 import {
   AppRoutes,
   navigateToProjectChat,
-  navigateToNewProjectChat,
   getChatHistoryEndpoint,
   getChatMessagesEndpoint,
 } from './routes';
@@ -24,11 +23,6 @@ console.log(`New project: ${AppRoutes.projects.new}`);
 console.log('\n--- Testing chat routes ---');
 console.log(`Chats list: ${AppRoutes.chats.list()}`);
 console.log(`Chat detail: ${AppRoutes.chats.detail(TEST_CHAT_ID)}`);
-console.log(`Project chat list: ${AppRoutes.chats.projectChat.list()}`);
-console.log(
-  `Project chat detail: ${AppRoutes.chats.projectChat.detail(TEST_CHAT_ID)}`,
-);
-console.log(`New project chat: ${AppRoutes.chats.projectChat.new()}`);
 
 // Test API routes
 console.log('\n--- Testing API routes ---');
@@ -48,19 +42,10 @@ console.log(
 // Test newly added API routes
 console.log('\n--- Testing new API routes ---');
 console.log(`Chat Project update: ${AppRoutes.api.chatProject.update}`);
-console.log(`Chat Visibility update: ${AppRoutes.api.chatVisibility.update}`);
-console.log(`Chat Model update: ${AppRoutes.api.chatModel.update}`);
-console.log(`Chat Vote update: ${AppRoutes.api.chatVote.update}`);
-console.log(`Chat History update: ${AppRoutes.api.chatHistory.update}`);
-console.log(`Chat Message update: ${AppRoutes.api.chatMessage.update}`);
-console.log(`Artifact update: ${AppRoutes.api.artifact.update}`);
-console.log(`AI chat: ${AppRoutes.api.ai.chat}`);
-console.log(`Vote update: ${AppRoutes.api.vote.update}`);
 
 // Test helper functions
 console.log('\n--- Testing helper functions ---');
 console.log(`navigateToProjectChat: ${navigateToProjectChat(TEST_CHAT_ID)}`);
-console.log(`navigateToNewProjectChat: ${navigateToNewProjectChat()}`);
 console.log(`getChatHistoryEndpoint: ${getChatHistoryEndpoint(TEST_CHAT_ID)}`);
 console.log(
   `getChatMessagesEndpoint: ${getChatMessagesEndpoint(TEST_CHAT_ID)}`,
@@ -79,11 +64,5 @@ const actualHistoryEndpoint = getChatHistoryEndpoint(TEST_CHAT_ID);
 console.log(`Expected history endpoint: ${expectedHistoryEndpoint}`);
 console.log(`Actual history endpoint: ${actualHistoryEndpoint}`);
 console.log(`Match: ${expectedHistoryEndpoint === actualHistoryEndpoint}`);
-
-const expectedNewChatUrl = `/chats/new`;
-const actualNewChatUrl = navigateToNewProjectChat();
-console.log(`Expected new chat URL: ${expectedNewChatUrl}`);
-console.log(`Actual new chat URL: ${actualNewChatUrl}`);
-console.log(`Match: ${expectedNewChatUrl === actualNewChatUrl}`);
 
 console.log('\n=== Routes testing complete ===');

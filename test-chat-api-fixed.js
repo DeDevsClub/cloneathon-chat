@@ -172,9 +172,7 @@ async function runTests() {
     }
 
     console.log('\nTest URLs for manual testing:');
-    console.log(
-      `Chat URL: ${BASE_URL}/projects/${PROJECT_ID}/chats/${CHAT_ID}`,
-    );
+    console.log(`Chat URL: ${BASE_URL}/chats/${CHAT_ID}`);
     console.log(`API endpoint: ${BASE_URL}/api/chat`);
 
     console.log('\nTests completed!');

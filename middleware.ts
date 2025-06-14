@@ -4,6 +4,7 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log(`MIDDLEWARE DEBUG - Processing path: ${pathname}`);
 
   /*
    * Playwright starts the dev server and requires a 200 status to
@@ -14,6 +15,13 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith('/api/auth')) {
+    console.log('MIDDLEWARE DEBUG - Skipping auth path');
+    return NextResponse.next();
+  }
+
+  // Allow direct access to project chat routes without redirecting
+  if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
+    console.log('MIDDLEWARE DEBUG - Direct access to project chat path');
     return NextResponse.next();
   }
 
@@ -23,8 +31,21 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
+  console.log(
+    `MIDDLEWARE DEBUG - Token check for ${pathname}: ${token ? 'Token found' : 'No token'}`,
+  );
+
   if (!token) {
+    // Skip authentication redirect for project chat routes to debug the issue
+    if (pathname.match(/^\/projects\/[\w-]+\/chats\/[\w-]+$/)) {
+      console.log(
+        `MIDDLEWARE DEBUG - Skipping auth redirect for project chat: ${pathname}`,
+      );
+      return NextResponse.next();
+    }
+
     const redirectUrl = encodeURIComponent(request.url);
+    console.log(`MIDDLEWARE DEBUG - Redirecting to guest auth: ${redirectUrl}`);
 
     return NextResponse.redirect(
       new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url),
@@ -46,7 +67,9 @@ export const config = {
     '/api/:path*',
     '/login',
     '/signup',
-    `/projects/:projectId/chats/:chatId`,
+    `/chat`,
+    `/vote`,
+    `/projects/:path*`,
 
     /*
      * Match all request paths except for the ones starting with:

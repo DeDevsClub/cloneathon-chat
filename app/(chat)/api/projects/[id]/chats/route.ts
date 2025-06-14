@@ -43,16 +43,14 @@ async function extractEmailFromCookie(
   }
 }
 
-// Using the proper NextJS App Router typing for route parameters
-type RouteParams = { params: { id: string } }
-
 export async function GET(
   request: NextRequest,
-  context: RouteParams,
+  context: { params: { id: string } },
 ) {
   try {
-    // Extract project ID from context params
-    const projectId = context.params.id;
+    // Extract project ID from params - properly awaited
+    const params = context.params;
+    const projectId = params.id;
 
     console.error(
       `DEBUG - GET project/${projectId}/chats - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,

@@ -56,7 +56,8 @@
         "noUselessSwitchCase": "off", // Turned off due to developer preferences
         "noUselessThisAlias": "off", // Turned off due to developer preferences
         "noBannedTypes": "off",
-        "noUselessTernary": "off"
+        "noUselessTernary": "off",
+        "useOptionalChain": "off"
       },
       "correctness": {
         "noUnusedImports": "warn", // Not in recommended ruleset, turning on manually

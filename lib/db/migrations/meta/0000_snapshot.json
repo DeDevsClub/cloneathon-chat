@@ -1,5 +1,5 @@
 {
-  "id": "8b5d3cab-4840-4ffd-9671-2a9411a07f21",
+  "id": "27a7ce2b-f951-4dea-b791-05f5aedab397",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -326,6 +326,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "projectId": {
+          "name": "projectId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "role": {
           "name": "role",
           "type": "varchar(20)",
@@ -423,6 +429,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Message_projectId_Project_id_fk": {
+          "name": "Message_projectId_Project_id_fk",
+          "tableFrom": "Message",
+          "tableTo": "Project",
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

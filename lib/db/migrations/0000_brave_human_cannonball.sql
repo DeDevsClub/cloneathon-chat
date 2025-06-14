@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS "Document" (
 CREATE TABLE IF NOT EXISTS "Message" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"chatId" uuid NOT NULL,
+	"projectId" uuid,
 	"role" varchar(20) NOT NULL,
 	"parts" jsonb NOT NULL,
 	"attachments" jsonb NOT NULL,
@@ -114,6 +115,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "Message" ADD CONSTRAINT "Message_chatId_Chat_id_fk" FOREIGN KEY ("chatId") REFERENCES "public"."Chat"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "Message" ADD CONSTRAINT "Message_projectId_Project_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."Project"("id") ON DELETE set null ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

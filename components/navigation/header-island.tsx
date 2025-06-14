@@ -103,7 +103,10 @@ export function HeaderIsland({
                       if (projectId && projectId !== 'id') {
                         createChat(projectId);
                       } else {
-                        console.error('Invalid projectId for chat creation:', projectId);
+                        console.error(
+                          'Invalid projectId for chat creation:',
+                          projectId,
+                        );
                       }
                     }}
                     className="size-8 hover:bg-muted"
@@ -133,11 +136,11 @@ export function HeaderIsland({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleProjectsClick()}
-                className="size-8 hover:bg-muted"
+                className="size-8 text-foreground hover:bg-muted"
                 aria-label="Projects"
               >
                 <Icon
-                  icon="line-md:folder-settings-twotone"
+                  icon="solar:folder-bold-duotone"
                   className="text-muted-foreground"
                   width={18}
                   height={18}
@@ -159,14 +162,14 @@ export function HeaderIsland({
               >
                 {theme === 'dark' ? (
                   <Icon
-                    icon="line-md:sunny-outline-twotone"
+                    icon="icon-park-twotone:sun"
                     className="text-muted-foreground"
                     width={18}
                     height={18}
                   />
                 ) : (
                   <Icon
-                    icon="line-md:moon-twotone-loop"
+                    icon="icon-park-twotone:moon"
                     className="text-muted-foreground"
                     width={18}
                     height={18}

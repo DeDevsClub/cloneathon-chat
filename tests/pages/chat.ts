@@ -82,13 +82,13 @@ export class ChatPage {
         process.cwd(),
         'public',
         'images',
-        'mouth of the seine, monet.jpg',
+        'opengraph-image.png',
       );
       const imageBuffer = fs.readFileSync(filePath);
 
       await fileChooser.setFiles({
-        name: 'mouth of the seine, monet.jpg',
-        mimeType: 'image/jpeg',
+        name: 'opengraph-image.png',
+        mimeType: 'image/png',
         buffer: imageBuffer,
       });
     });

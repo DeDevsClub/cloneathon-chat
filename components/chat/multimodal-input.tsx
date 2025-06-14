@@ -282,6 +282,7 @@ function PureMultimodalInput({
         rows={2}
         autoFocus
         onKeyDown={(event) => {
+          console.log({ event });
           if (
             event.key === 'Enter' &&
             !event.shiftKey &&
@@ -290,6 +291,7 @@ function PureMultimodalInput({
             event.preventDefault();
             console.log({ status });
             if (status !== 'ready') {
+              // console.log({ error: status });
               toast.error('Please wait for the model to finish its response!');
             } else {
               submitForm();

@@ -25,19 +25,42 @@ export async function fetchWithErrorHandlers(
 ) {
   try {
     const response = await fetch(input, init);
-
+    
+    // For streaming responses, we need to return the response directly
+    // Check if this is a streaming response (text/plain or text/event-stream)
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('text/plain') || contentType?.includes('text/event-stream')) {
+      if (!response.ok) {
+        console.error('Error in streaming response:', response.status, response.statusText);
+        throw new ChatSDKError('bad_request:api', `HTTP error ${response.status}`);
+      }
+      return response;
+    }
+    
+    // For non-streaming responses, we can check the response body
     if (!response.ok) {
-      const { code, cause } = await response.json();
-      throw new ChatSDKError(code as ErrorCode, cause);
+      console.error('Error response:', response.status, response.statusText);
+      try {
+        const errorData = await response.json();
+        console.error('Error data:', errorData);
+        const code = errorData.code || 'bad_request:api';
+        throw new ChatSDKError(code, errorData.cause || errorData.message || 'Unknown error');
+      } catch (jsonError) {
+        // If we can't parse the error as JSON, just throw a generic error
+        throw new ChatSDKError('bad_request:api', `HTTP error ${response.status}`);
+      }
     }
 
     return response;
-  } catch (error: unknown) {
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      throw new ChatSDKError('offline:chat');
+  } catch (error) {
+    console.error('Fetch error:', error);
+    if (error instanceof ChatSDKError) {
+      throw error;
     }
 
-    throw error;
+    // Convert unknown error to string for the error message
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new ChatSDKError('bad_request:api', errorMessage);
   }
 }
 

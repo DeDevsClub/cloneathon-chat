@@ -99,9 +99,9 @@ export function SidebarUserNav({ user }: { user: User }) {
                   if (isGuest) {
                     toast({
                       type: 'error',
-                      description: 'You must be logged in to sign out',
-                      // router.push('/login');
+                      description: 'You must be logged in.',
                     });
+                    router.push('/login');
                   } else {
                     signOut({
                       redirectTo: '/',
@@ -109,7 +109,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   }
                 }}
               >
-                {isGuest ? 'Login to your account' : 'Sign out'}
+                {isGuest ? 'Login' : 'Sign out'}
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>

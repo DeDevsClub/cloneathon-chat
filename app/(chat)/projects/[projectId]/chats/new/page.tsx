@@ -74,7 +74,7 @@ export default function NewChatPage(props: PageProps) {
             experimental_attachments: [],
           },
         };
-
+        console.log({ payload });
         console.log('Preparing chat creation payload:', payload);
 
         const response = await fetch(AppRoutes.api.chat.base, {

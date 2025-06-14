@@ -60,6 +60,7 @@ export function Chat({
     reload,
     experimental_resume,
     data,
+    error,
   } = useChat({
     id: chatId,
     initialMessages,
@@ -67,12 +68,14 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
+    api: '/api/ai', // Explicitly set the API endpoint
     experimental_prepareRequestBody: (body) => {
       console.log('Preparing request body with projectId:', projectId);
+      console.log('Chat request body:', JSON.stringify(body, null, 2));
+      // Send the messages array directly as expected by the OpenAI API
       return {
-        id: chatId,
-        projectId, // Ensure projectId is included in every request
-        message: body.messages.at(-1),
+        ...body, // Keep all original properties
+        projectId, // Add project ID for context
         selectedChatModel: initialChatModel || 'chat-model',
         selectedVisibilityType: visibilityType,
       };
@@ -81,10 +84,16 @@ export function Chat({
       mutate(unstable_serialize(getChatHistoryPaginationKey));
     },
     onError: (error) => {
+      console.error('Chat error:', error);
       if (error instanceof ChatSDKError) {
         toast({
           type: 'error',
           description: error.message,
+        });
+      } else {
+        toast({
+          type: 'error',
+          description: 'Failed to get AI response. Please try again.',
         });
       }
     },
@@ -112,10 +121,11 @@ export function Chat({
     }
   }, [query, append, hasAppendedQuery, chatId, projectId]);
 
-  const { data: votes } = useSWR<Array<Vote>>(
-    messages.length >= 2 ? `/api/vote?chatId=${chatId}` : null,
-    fetcher,
-  );
+  // TODO enable voting
+  // const { data: votes } = useSWR<Array<Vote>>(
+  //   messages.length >= 2 ? `/api/vote?chatId=${chatId}` : null,
+  //   fetcher,
+  // );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
@@ -142,7 +152,7 @@ export function Chat({
         <Messages
           chatId={chatId}
           status={status}
-          votes={votes}
+          votes={undefined}
           messages={messages}
           setMessages={setMessages}
           reload={reload}
@@ -193,7 +203,7 @@ export function Chat({
         messages={messages}
         setMessages={setMessages}
         reload={reload}
-        votes={votes}
+        votes={undefined}
         isReadonly={isReadonly}
         selectedVisibilityType={visibilityType}
       />

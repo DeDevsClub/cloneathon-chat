@@ -60,9 +60,9 @@ export default function PromptInput02({ quickPrompts }: PromptInput02Props) {
   const handleSubmit = () => {
     if (message.trim() === '') return;
     // Handle message submission logic here
-    console.log('Message submitted:', message);
-    console.log('Search toggle state:', searchToggle ? 'Enabled' : 'Disabled');
-    console.log('Reason toggle state:', reasonToggle ? 'Enabled' : 'Disabled');
+    // console.log('Message submitted:', message);
+    // console.log('Search toggle state:', searchToggle ? 'Enabled' : 'Disabled');
+    // console.log('Reason toggle state:', reasonToggle ? 'Enabled' : 'Disabled');
     setMessage('');
   };
 

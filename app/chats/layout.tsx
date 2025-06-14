@@ -15,7 +15,7 @@ export default async function Layout({
 }) {
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
-  console.log({ session });
+  // console.log({ session });
 
   return (
     <AnimatedGridBackgroundSection className="flex flex-col w-full max-w-screen h-dvh justify-center">

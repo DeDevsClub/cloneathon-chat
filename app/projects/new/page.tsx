@@ -75,7 +75,7 @@ const NewProjectPage = () => {
       }
 
       const { project } = await response.json();
-      console.log({ project });
+      // console.log({ project });
       toast.success('Project created successfully');
       router.push(`/projects/${project.id}`);
     } catch (error: any) {

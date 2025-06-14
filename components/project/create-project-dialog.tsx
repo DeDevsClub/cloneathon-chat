@@ -69,8 +69,8 @@ export function CreateProjectDialog({
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
-    console.log({ user: session?.user });
-    console.log('Available cookies:', document.cookie);
+    // console.log({ user: session?.user });
+    // console.log('Available cookies:', document.cookie);
     const isGuest = session?.user?.type === 'guest';
     try {
       const response = await fetch('/api/projects', {
@@ -83,7 +83,7 @@ export function CreateProjectDialog({
 
       if (!response.ok) {
         const error = await response.json();
-        console.log({ error });
+        // console.log({ error });
         if (isGuest) {
           toast.error('Authentication Required', {
             description:
@@ -104,7 +104,7 @@ export function CreateProjectDialog({
       onProjectCreated(project);
       router.refresh();
     } catch (error) {
-      console.log({ user: session?.user });
+      // console.log({ user: session?.user });
       console.error('Error creating project:', error);
       toast.error('Project Creation Failed', {
         description:

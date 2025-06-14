@@ -84,7 +84,7 @@ const createChatSchema = z.object({
 // GET /api/projects/[projectId]/chats - Get all chats for a specific project
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: { projectId: string } },
 ) {
   try {
     const projectId = params.projectId;
@@ -109,7 +109,7 @@ export async function GET(
     }
 
     if (!email) {
-      console.log('No session found');
+      // console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -140,11 +140,11 @@ export async function GET(
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
 export async function POST(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: { projectId: string } },
 ) {
   try {
     const projectId = params.projectId;
-    console.log('Creating chat for Project ID:', projectId);
+    // console.log('Creating chat for Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -161,7 +161,7 @@ export async function POST(
       if (request.cookies.has(cookieName)) {
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.log(`Found valid email in cookie ${cookieName}: ${email}`);
+          // console.log(`Found valid email in cookie ${cookieName}: ${email}`);
           break;
         }
       }

@@ -84,8 +84,8 @@ export default function NewChatPage(props: PageProps) {
             },
           ],
         };
-        console.log({ payload });
-        console.log('Preparing chat creation payload:', payload);
+        // console.log({ payload });
+        // console.log('Preparing chat creation payload:', payload);
 
         const response = await fetch(AppRoutes.api.chat.base, {
           method: 'POST',
@@ -94,14 +94,14 @@ export default function NewChatPage(props: PageProps) {
           },
           body: JSON.stringify(payload),
         });
-        console.log({ response });
+        // console.log({ response });
         if (!response.ok) {
           throw new Error('Failed to create chat');
         }
 
         // Now update the chat with the project ID (conditional)
         if (projectId) {
-          console.log('Updating chat with project ID: %s', projectId);
+          // console.log('Updating chat with project ID: %s', projectId);
           const projectUpdateResponse = await fetch(
             AppRoutes.api.chat.project,
             {

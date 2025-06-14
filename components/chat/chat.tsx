@@ -117,8 +117,8 @@ export function Chat({
     append,
   } = useChat({
     onFinish(message, { usage, finishReason }) {
-      console.log('Usage', usage);
-      console.log('FinishReason', finishReason);
+      // console.log('Usage', usage);
+      // console.log('FinishReason', finishReason);
     },
   });
 

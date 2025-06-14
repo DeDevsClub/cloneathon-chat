@@ -170,10 +170,10 @@ function PureMultimodalInput({
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
-      console.log(
-        'Selected files:',
-        files.map((file) => file.name),
-      );
+      // console.log(
+      //   'Selected files:',
+      //   files.map((file) => file.name),
+      // );
       setUploadQueue(files.map((file) => file.name));
 
       try {
@@ -182,10 +182,10 @@ function PureMultimodalInput({
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment) => attachment !== undefined,
         );
-        console.log(
-          'Successfully uploaded attachments:',
-          successfullyUploadedAttachments,
-        );
+        // console.log(
+        //   'Successfully uploaded attachments:',
+        //   successfullyUploadedAttachments,
+        // );
         setAttachments((currentAttachments) => [
           ...currentAttachments,
           ...successfullyUploadedAttachments,

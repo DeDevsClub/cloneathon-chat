@@ -29,12 +29,12 @@ export function PureMessageActions({
 }) {
   const { mutate } = useSWRConfig();
   const [_, copyToClipboard] = useCopyToClipboard();
-  console.log('MessageActions');
+  // console.log('MessageActions');
   if (isLoading) return null;
   if (message.role === 'user') return null;
-  console.log('MessageActions', message);
-  console.log('MessageActions', vote);
-  console.log('MessageActions', isLoading);
+  // console.log('MessageActions', message);
+  // console.log('MessageActions', vote);
+  // console.log('MessageActions', isLoading);
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex flex-row gap-2">

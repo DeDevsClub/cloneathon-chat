@@ -39,8 +39,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
   const createChat = () => {
     // Validate projectId before navigation
     if (user?.id) {
-      console.log({ user });
-      console.log(`Creating chat for user ID: ${user.id}`);
+      // console.log({ user });
+      // console.log(`Creating chat for user ID: ${user.id}`);
       router.push(`/chats/new`);
       router.refresh();
     } else {

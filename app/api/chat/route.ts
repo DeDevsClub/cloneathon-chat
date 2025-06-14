@@ -49,9 +49,9 @@ function getStreamContext() {
       });
     } catch (error: any) {
       if (error.message.includes('REDIS_URL')) {
-        console.log(
-          ' > Resumable streams are disabled due to missing REDIS_URL',
-        );
+        // console.log(
+        //   ' > Resumable streams are disabled due to missing REDIS_URL',
+        // );
       } else {
         console.error(error);
       }
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
   const { messages, id } = await req.json();
 
-  console.log('chat id', id); // can be used for persisting the chat
+  // console.log('chat id', id); // can be used for persisting the chat
 
   // Call the language model
   const result = streamText({
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     },
   });
 
-  console.log('result', result);
+  // console.log('result', result);
 
   // Respond with the stream
   return result.toDataStreamResponse();

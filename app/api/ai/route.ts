@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     // Parse the request body
     const body = await req.json();
-    console.log('📝 Request body:', body);
+    // console.log('📝 Request body:', body);
     function getModel(model: string) {
       if (model === 'chat-model') {
         return 'gpt-4o';
@@ -24,11 +24,11 @@ export async function POST(req: NextRequest) {
     const messages = body.messages || [];
     const model = getModel(body.selectedChatModel || body.model || 'gpt-4o');
 
-    console.log('📝 Extracted data:', {
-      messageCount: messages.length,
-      model: model,
-      lastMessage: messages.length > 0 ? messages[messages.length - 1] : null,
-    });
+    // console.log('📝 Extracted data:', {
+    //   messageCount: messages.length,
+    //   model: model,
+    //   lastMessage: messages.length > 0 ? messages[messages.length - 1] : null,
+    // });
 
     // Check if we have messages
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    console.log('📣 Creating chat completion with model:', model);
+    // console.log('📣 Creating chat completion with model:', model);
 
     // Format messages for OpenAI API
     const formattedMessages = messages.map((msg) => ({
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       content: msg.content,
     }));
 
-    console.log('📣 Formatted messages for OpenAI:', formattedMessages);
+    // console.log('📣 Formatted messages for OpenAI:', formattedMessages);
 
     // Create a streaming chat completion
     const response = await openai.chat.completions.create({
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Create a streaming response
-    console.log('✅ Streaming response started');
+    // console.log('✅ Streaming response started');
 
     // Create a streaming response using the format expected by Vercel AI SDK
     return new Response(
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
   //     );
   // }
 }
-console.log('🔄 AI API Request received');
+// console.log('🔄 AI API Request received');
 
 // import { NextRequest, NextResponse } from 'next/server';
 // import OpenAI from 'openai';

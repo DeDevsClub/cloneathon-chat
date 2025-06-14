@@ -80,7 +80,7 @@ export default function ProjectPage(props: PageProps) {
 
       // Fetch project data
       const projectResponse = await fetch(`/api/projects/${currentPid}`);
-      console.log('Project fetch status:', projectResponse.status);
+      // console.log('Project fetch status:', projectResponse.status);
 
       if (!projectResponse.ok) {
         if (projectResponse.status === 401) {
@@ -91,13 +91,13 @@ export default function ProjectPage(props: PageProps) {
       }
 
       const projectData = await projectResponse.json();
-      console.log('Project data received:', projectData);
+      // console.log('Project data received:', projectData);
       const projectDetails = projectData.project;
       setProject(projectDetails);
 
       // Fetch project chats
       const chatsResponse = await fetch(`/api/projects/${currentPid}/chats`);
-      console.log('Chats fetch status:', chatsResponse.status);
+      // console.log('Chats fetch status:', chatsResponse.status);
 
       if (!chatsResponse.ok) {
         if (chatsResponse.status === 401) {
@@ -108,18 +108,18 @@ export default function ProjectPage(props: PageProps) {
       }
 
       const chatsData = await chatsResponse.json();
-      console.log('Fetched chats data:', chatsData);
+      // console.log('Fetched chats data:', chatsData);
 
       // Make sure chats is always an array
       const projectChats = Array.isArray(chatsData.chats)
         ? chatsData.chats
         : [];
-      console.log('Project chats to display:', projectChats);
+      // console.log('Project chats to display:', projectChats);
 
       if (projectChats.length > 0) {
-        console.log('First chat details:', projectChats[0]);
+        // console.log('First chat details:', projectChats[0]);
       } else {
-        console.log('No chats found for this project');
+        // console.log('No chats found for this project');
       }
 
       setChats(projectChats);
@@ -165,7 +165,7 @@ export default function ProjectPage(props: PageProps) {
       setProjectId(projectId);
       fetchProjectDetails();
     }
-    console.log('Project ID:', projectId);
+    // console.log('Project ID:', projectId);
     // Only depend on specific dependencies to avoid unnecessary rerenders
   }, [projectId, router]);
 
@@ -199,7 +199,7 @@ export default function ProjectPage(props: PageProps) {
       const debugResponse = await fetch(`/api/debug?projectId=${projectId}`);
       const debugData = await debugResponse.json();
       const chatIds = debugData.chatIds;
-      console.log('Debug data:', debugData);
+      // console.log('Debug data:', debugData);
       toast.success('Debug data logged to console');
     } catch (error) {
       console.error('Debug error:', error);

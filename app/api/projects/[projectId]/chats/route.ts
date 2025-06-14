@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     const pathParts = url.pathname.split('/');
     const projectId = pathParts[pathParts.indexOf('projects') + 1];
 
-    console.log('Project ID:', projectId);
+    // console.log('Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!email) {
-      console.log('No session found');
+      // console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
       // TODO : Remove this in production
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     const pathParts = url.pathname.split('/');
     const projectId = pathParts[pathParts.indexOf('projects') + 1];
 
-    console.log('Creating chat for Project ID:', projectId);
+    // console.log('Creating chat for Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       if (request.cookies.has(cookieName)) {
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.log(`Found valid email in cookie ${cookieName}: ${email}`);
+          // console.log(`Found valid email in cookie ${cookieName}: ${email}`);
           break;
         }
       }

@@ -167,7 +167,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (!email) {
-      console.log('No session found');
+      // console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
       // TODO : Remove this in production
@@ -234,7 +234,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (!email) {
-      console.log('No session found');
+      // console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
       // TODO : Remove this in production

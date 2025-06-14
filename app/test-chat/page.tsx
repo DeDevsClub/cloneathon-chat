@@ -14,8 +14,8 @@ export default function TestChat() {
     stop,
   } = useChat({
     onFinish(message, { usage, finishReason }) {
-      console.log('Usage', usage);
-      console.log('FinishReason', finishReason);
+      // console.log('Usage', usage);
+      // console.log('FinishReason', finishReason);
     },
   });
 

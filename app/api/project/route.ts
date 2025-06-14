@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getToken } from 'next-auth/jwt';
-import { updateChatProject } from '@/lib/db/chat';
+// import { updateChatProject } from '@/lib/db/chat';
 import { getUser } from '@/lib/db/queries';
 import { updateProject } from '@/lib/db';
 
@@ -29,7 +29,7 @@ async function extractEmailFromCookie(
 
         return (token?.email as string) || null;
       } catch (jwtError) {
-        console.error(`Failed to decode JWT token: ${jwtError}`);
+        // console.error(`Failed to decode JWT token: ${jwtError}`);
         return null;
       }
     } else {
@@ -38,7 +38,7 @@ async function extractEmailFromCookie(
       return data.email;
     }
   } catch (error) {
-    console.error(`Error extracting email from ${cookieName}:`, error);
+    // console.error(`Error extracting email from ${cookieName}:`, error);
     return null;
   }
 }
@@ -52,7 +52,7 @@ const updateChatProjectSchema = z.object({
 // PATCH /api/project - Update a project
 export async function PATCH(request: NextRequest) {
   try {
-    console.log('PATCH /api/project - Updating project');
+    // console.log('PATCH /api/project - Updating project');
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -67,10 +67,10 @@ export async function PATCH(request: NextRequest) {
 
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
-        console.log(`Trying cookie: ${cookieName}`);
+        // console.log(`Trying cookie: ${cookieName}`);
         email = await extractEmailFromCookie(request, cookieName);
         if (email) {
-          console.log(`Found valid email in cookie ${cookieName}: ${email}`);
+          // console.log(`Found valid email in cookie ${cookieName}: ${email}`);
           break;
         }
       }
@@ -89,12 +89,12 @@ export async function PATCH(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    console.log('Request body:', JSON.stringify(body));
+    // console.log('Request body:', JSON.stringify(body));
 
     const validationResult = updateChatProjectSchema.safeParse(body);
 
     if (!validationResult.success) {
-      console.error('Validation error:', validationResult.error);
+      // console.error('Validation error:', validationResult.error);
       return NextResponse.json(
         { error: validationResult.error.errors },
         { status: 400 },
@@ -104,9 +104,9 @@ export async function PATCH(request: NextRequest) {
     const { projectId } = validationResult.data;
 
     // Log the validated data
-    console.log('Validated chat project update data:', {
-      projectId,
-    });
+    // console.log('Validated chat project update data:', {
+    //   projectId,
+    // });
 
     // Update the chat's project association
     const updatedProject = await updateProject({

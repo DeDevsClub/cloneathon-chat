@@ -112,7 +112,7 @@ export async function submitUserMessage(content: string) {
     },
     onFinish: (event) => {
       // your own logic, e.g. for saving the chat history or recording usage
-      console.log(`[onFinish]: ${JSON.stringify(event, null, 2)}`);
+      // console.log(`[onFinish]: ${JSON.stringify(event, null, 2)}`);
     },
   });
 

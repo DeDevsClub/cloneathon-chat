@@ -31,7 +31,7 @@ const ProjectsPage = () => {
       const response = await fetch('/api/projects');
 
       if (!response.ok) {
-        console.log('Project fetch status:', response.status);
+        // console.log('Project fetch status:', response.status);
         throw new Error(`Failed to fetch projects: ${response.status}`);
       }
 

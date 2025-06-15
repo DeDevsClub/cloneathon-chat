@@ -25,6 +25,8 @@ import {
 } from '@/components/icons';
 import { memo } from 'react';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
+import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
 
 const PureChatItem = ({
   chat,
@@ -50,64 +52,35 @@ const PureChatItem = ({
         </Link>
       </SidebarMenuButton>
 
-      <DropdownMenu modal={true}>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuAction
-            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mr-0.5"
-            showOnHover={!isActive}
-          >
-            <MoreHorizontalIcon />
-            <span className="sr-only">More</span>
-          </SidebarMenuAction>
-        </DropdownMenuTrigger>
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute top-0 right-0 z-10 size-8 m-2 bg-transparent hover:bg-red-500"
+        onClick={() => onDelete(chat.id)}
+      >
+        <TrashIcon />
+      </Button>
 
-        <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="cursor-pointer">
-              <ShareIcon />
-              <span>Share</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem
-                  className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setVisibilityType('private');
-                  }}
-                >
-                  <div className="flex flex-row gap-2 items-center">
-                    <LockIcon size={12} />
-                    <span>Private</span>
-                  </div>
-                  {visibilityType === 'private' ? (
-                    <CheckCircleFillIcon />
-                  ) : null}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setVisibilityType('public');
-                  }}
-                >
-                  <div className="flex flex-row gap-2 items-center">
-                    <GlobeIcon />
-                    <span>Public</span>
-                  </div>
-                  {visibilityType === 'public' ? <CheckCircleFillIcon /> : null}
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-
-          <DropdownMenuItem
-            className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive dark:text-red-500"
-            onSelect={() => onDelete(chat.id)}
-          >
-            <TrashIcon />
-            <span>Delete</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant="outline"
+        size="icon"
+        className={`absolute top-0 right-8 z-10 size-8 m-2 bg-transparent ${
+          visibilityType === 'private'
+            ? 'hover:bg-red-500'
+            : 'hover:bg-gray-500'
+        }`}
+        onClick={() => {
+          setVisibilityType(
+            visibilityType === 'private' ? 'public' : 'private',
+          );
+        }}
+      >
+        {visibilityType === 'private' ? (
+          <LockIcon size={12} />
+        ) : (
+          <GlobeIcon size={12} />
+        )}
+      </Button>
     </SidebarMenuItem>
   );
 };

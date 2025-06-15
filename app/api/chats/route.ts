@@ -208,13 +208,15 @@ export async function POST(req: Request) {
       async onFinish(result: {
         text: string;
         toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
+        toolResults?: Array<{ toolCallId: string; toolName: string; result: any }>;
         reasoning?: string;
       }) {
         try {
-          const { text, toolCalls, reasoning } = result;
+          const { text, toolCalls, toolResults, reasoning } = result;
           console.log('onFinish called with:', { 
             hasText: !!text, 
             hasToolCalls: !!toolCalls, 
+            hasToolResults: !!toolResults,
             hasReasoning: !!reasoning,
             reasoningLength: reasoning?.length,
             reasoning: reasoning ? `${reasoning.substring(0, 200)}...` : undefined // First 200 chars

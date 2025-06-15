@@ -21,7 +21,9 @@ import {
 import { MessageEditor } from '@/components/chat/message-editor';
 import { DocumentPreview } from '@/components/chat/document-preview';
 import { MessageReasoning } from '@/components/chat/message-reasoning';
+import { SearchResults } from '@/components/search/search-results';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import { Globe } from 'lucide-react';
 
 const PurePreviewMessage = ({
   chatId,
@@ -184,6 +186,16 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'webSearch' ? (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                            <Globe size={16} />
+                            <span className="font-medium">Searching the web...</span>
+                          </div>
+                          <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                            Query: "{args.query}"
+                          </p>
+                        </div>
                       ) : null}
                     </div>
                   );
@@ -213,6 +225,10 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'search' ? (
+                        <SearchResults data={result} />
+                      ) : toolName === 'webSearch' ? (
+                        <SearchResults data={result} />
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
                       )}

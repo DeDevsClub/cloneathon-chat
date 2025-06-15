@@ -1,9 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2 } from 'lucide-react'; // MoreHorizontal
+import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chat } from '@/lib/db/schema';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
 interface ChatMenuProps {
   chat: Chat;
   open: boolean;
@@ -21,12 +19,8 @@ interface ChatMenuProps {
 export const ChatMenu = ({ chat, open, onOpenChange }: ChatMenuProps) => {
   const router = useRouter();
 
-  //   const handleEdit = () => {
-  //     router.push(`/chats/${chat.id}/edit`);
-  //     onOpenChange(false);
-  //   };
-
   const handleDelete = async () => {
+    console.log(chat.id);
     try {
       const response = await fetch(`/api/chats/${chat.id}`, {
         method: 'DELETE',
@@ -42,8 +36,6 @@ export const ChatMenu = ({ chat, open, onOpenChange }: ChatMenuProps) => {
     } catch (error) {
       toast.error('Failed to delete chat');
       console.error('Error deleting chat:', error);
-    } finally {
-      onOpenChange(false);
     }
   };
 
@@ -53,10 +45,6 @@ export const ChatMenu = ({ chat, open, onOpenChange }: ChatMenuProps) => {
         <span className="sr-only">Open chat menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {/* <DropdownMenuItem onClick={handleEdit}>
-          <FolderEdit className="mr-2 size-4" />
-          Edit
-        </DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-destructive focus:bg-destructive focus:text-destructive-foreground"

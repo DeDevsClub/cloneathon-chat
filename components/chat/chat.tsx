@@ -141,9 +141,9 @@ export function Chat({
       });
 
       setHasAppendedQuery(true);
-      // window.history.replaceState({}, '', `/projects/${projectId}`);
+      window.history.replaceState({}, '', `/chats/${chatId}`);
     }
-  }, [hasAppendedQuery, status, input, messages, projectId]);
+  }, [hasAppendedQuery, status, input, messages, chatId]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isArtifactVisible = useArtifactSelector(

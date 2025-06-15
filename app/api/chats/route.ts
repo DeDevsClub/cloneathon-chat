@@ -38,18 +38,23 @@ import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
 import { openai } from '@ai-sdk/openai';
 import z from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
-  const { messages, id } = await req.json();
+  const { messages } = await req.json();
+  // const chat = id ?? uuidv4();
+  const session = await auth();
 
-  console.log('chat id', id); // can be used for persisting the chat
+  if (!session?.user) {
+    return new ChatSDKError('unauthorized:chat').toResponse();
+  }
 
   // Call the language model
   const result = streamText({
-    model: openai('gpt-4o'),
+    model: openai('gpt-4.1'),
     messages,
     async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
       // implement your own logic here, e.g. for storing messages
@@ -229,27 +234,27 @@ export async function POST(req: Request) {
 //   return new Response(stream, { status: 200 });
 // }
 
-// export async function DELETE(request: Request) {
-//   const { searchParams } = new URL(request.url);
-//   const id = searchParams.get('id');
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
 
-//   if (!id) {
-//     return new ChatSDKError('bad_request:api').toResponse();
-//   }
+  if (!id) {
+    return new ChatSDKError('bad_request:api').toResponse();
+  }
 
-//   const session = await auth();
+  const session = await auth();
 
-//   if (!session?.user) {
-//     return new ChatSDKError('unauthorized:chat').toResponse();
-//   }
+  if (!session?.user) {
+    return new ChatSDKError('unauthorized:chat').toResponse();
+  }
 
-//   const chat = await getChatById({ id });
+  const chat = await getChatById({ id });
 
-//   if (chat.userId !== session.user.id) {
-//     return new ChatSDKError('forbidden:chat').toResponse();
-//   }
+  if (chat.userId !== session.user.id) {
+    return new ChatSDKError('forbidden:chat').toResponse();
+  }
 
-//   const deletedChat = await deleteChatById({ id });
+  const deletedChat = await deleteChatById({ id });
 
-//   return Response.json(deletedChat, { status: 200 });
-// }
+  return Response.json(deletedChat, { status: 200 });
+}

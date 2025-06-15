@@ -1,56 +1,45 @@
-import OpenAI from 'openai';
-import {
-  AssistantResponse,
-  // smoothStream,
-  streamText,
-  // UIMessage,
-} from 'ai';
+import { CoreMessage, streamText } from 'ai';
 import { auth } from '@/app/(auth)/auth';
-import { type RequestHints, systemPrompt } from '@/lib/ai/prompts';
 import {
-  // createStreamId,
   deleteChatById,
   getChatById,
   getMessagesByChatId,
   getStreamIdsByChatId,
-  // getMessageCountByUserId,
-  // getMessagesByChatId,
-  // getStreamIdsByChatId,
-  // saveChat,
-  // saveMessages,
+  saveChat,
+  saveMessages,
 } from '@/lib/db/queries';
-// import { generateUUID, getTrailingMessageId } from '@/lib/utils';
-// import { generateTitleFromUserMessage } from '@/app/actions';
-// import { createDocument } from '@/lib/ai/tools/create-document';
-// import { updateDocument } from '@/lib/ai/tools/update-document';
-// import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-// import { getWeather } from '@/lib/ai/tools/get-weather';
-// import { isProductionEnvironment } from '@/lib/constants';
-// import { myProvider } from '@/lib/ai/providers';
-// import { entitlementsByUserType } from '@/lib/ai/entitlements';
-// import { postRequestBodySchema, type PostRequestBody } from '../ai/chat/schema'; // Adjusted import path
-// import { geolocation } from '@vercel/functions';
 import {
   createResumableStreamContext,
   type ResumableStreamContext,
 } from 'resumable-stream';
 import { after } from 'next/server';
-import type { Chat } from '@/lib/db/schema';
 import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
 import { openai } from '@ai-sdk/openai';
-import z from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { createDataStream } from 'ai';
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
+import { Chat } from '@/lib/db';
+import z from 'zod';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
-  const { messages, id, system } = await req.json();
+  const {
+    messages,
+    id,
+    system,
+    project,
+    systemPrompt,
+    title,
+    visibility,
+    model,
+    textContent,
+  } = await req.json();
 
-  const chat = id ?? uuidv4();
+  const chatId = id ?? uuidv4();
+  const projectId = project?.id ?? uuidv4();
   const session = await auth();
   const user = session?.user;
 
@@ -63,7 +52,7 @@ export async function POST(req: Request) {
     model: openai('gpt-4-turbo'),
     toolCallStreaming: true,
     messages,
-    system: system ?? DEFAULT_SYSTEM_PROMPT,
+    system: systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
     tools: {
       // server-side tool with execute function:
       getWeatherInformation: {
@@ -91,12 +80,53 @@ export async function POST(req: Request) {
         }),
       },
     },
-    async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
+    async onFinish({
+      text,
+      toolCalls,
+      toolResults,
+      usage,
+      finishReason,
+      response,
+      reasoning,
+      reasoningDetails,
+    }) {
       // implement your own logic here, e.g. for storing messages
       // or recording token usage
+      await saveChat({
+        id: chatId,
+        userId: user.id,
+        visibility: visibility,
+        projectId: projectId,
+        systemPrompt: systemPrompt,
+        model: model,
+        title: title,
+      });
     },
   });
 
+  const initialDbMessages = (messages as CoreMessage[]).map((m) => ({
+    id: (m as any).id?.toString() || uuidv4(),
+    chatId: uuidv4(),
+    projectId: uuidv4(),
+    role: m.role,
+    attachments: ((m as any).attachments as any[]) || [],
+    contentType: 'application/vnd.ai.content.v1+json',
+    createdAt: new Date(),
+    parts: [],
+    textContent: '',
+  }));
+
+  if (initialDbMessages.length > 0) {
+    await saveMessages({ messages: initialDbMessages });
+  }
+
+  // return Response.json(
+  //   { newChatId },
+  //   {
+  //     status: 201,
+  //     headers: { 'X-Chat-Id': newChatId },
+  //   },
+  // );
   // Respond with the stream
   return result.toDataStreamResponse();
 }

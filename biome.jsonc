@@ -56,7 +56,8 @@
         "noUselessSwitchCase": "off", // Turned off due to developer preferences
         "noUselessThisAlias": "off", // Turned off due to developer preferences
         "noBannedTypes": "off",
-        "noUselessTernary": "off"
+        "noUselessTernary": "off",
+        "useOptionalChain": "off"
       },
       "correctness": {
         "noUnusedImports": "warn", // Not in recommended ruleset, turning on manually
@@ -76,7 +77,8 @@
         "useExponentiationOperator": "off", // Obscure and arguably not easily readable
         "noUnusedTemplateLiteral": "off", // Stylistic opinion
         "noUselessElse": "off", // Stylistic opinion
-        "useImportType": "off"
+        "useImportType": "off",
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
         "noExplicitAny": "off", // We trust Vercelians to use any only when necessary

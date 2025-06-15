@@ -9,8 +9,18 @@ const nextConfig: NextConfig = {
       {
         hostname: 'avatar.vercel.sh',
       },
+      {
+        hostname: 'docs.dedevs.club',
+      },
     ],
   },
+  redirects: async () => [
+    {
+      source: '/',
+      destination: '/chats',
+      permanent: true,
+    },
+  ],
 };
 
 export default nextConfig;

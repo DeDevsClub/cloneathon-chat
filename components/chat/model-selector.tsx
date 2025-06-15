@@ -2,7 +2,7 @@
 
 import { startTransition, useMemo, useOptimistic, useState } from 'react';
 
-import { saveChatModelAsCookie } from '@/app/(chat)/actions';
+import { saveChatModelAsCookie } from '@/app/chats/actions';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,25 +16,30 @@ import { cn } from '@/lib/utils';
 import { CheckCircleFillIcon, ChevronDownIcon } from '../icons';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import type { Session } from 'next-auth';
+// import { useLocalStorage } from 'usehooks-ts';
 
 export function ModelSelector({
   session,
   selectedModelId,
   className,
+  // onModelChange,
 }: {
   session: Session;
   selectedModelId: string;
+  // onModelChange?: (modelId: string) => void;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
 
-  const userType = session.user.type;
+  // Default to 'guest' if session or user type is undefined
+  const userType = session?.user?.type || 'guest';
+  // console.log({ userType });
   const { availableChatModelIds } = entitlementsByUserType[userType];
-
   const availableChatModels = chatModels.filter((chatModel) =>
     availableChatModelIds.includes(chatModel.id),
   );
+  // console.log({ availableChatModels });
 
   const selectedChatModel = useMemo(
     () =>
@@ -43,6 +48,8 @@ export function ModelSelector({
       ),
     [optimisticModelId, availableChatModels],
   );
+
+  // console.log({ selectedChatModel });
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>

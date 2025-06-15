@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat API Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    textarea {
+      height: 100px;
+      padding: 10px;
+      font-family: inherit;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover {
+      background-color: #0060df;
+    }
+    .output-section {
+      border: 1px solid #eaeaea;
+      padding: 15px;
+      border-radius: 4px;
+      min-height: 200px;
+      white-space: pre-wrap;
+    }
+    .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .user {
+      background-color: #f0f0f0;
+    }
+    .assistant {
+      background-color: #e6f7ff;
+    }
+    .system {
+      background-color: #fff8e6;
+      font-style: italic;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+    .endpoint-input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat API Test</h1>
+  
+  <div class="container">
+    <div class="input-section">
+      <div class="controls">
+        <input type="text" id="endpoint" class="endpoint-input" value="/api/chats" placeholder="API Endpoint Base">
+        <input type="text" id="chatId" class="endpoint-input" placeholder="Chat ID (optional, will be generated)">
+        <button id="clear-btn">Clear Output</button>  
+      </div>
+      <textarea id="message-input" placeholder="Type your message here..."></textarea>
+      <button id="send-btn">Send Message</button>
+    </div>
+    
+    <div class="output-section" id="output">
+      <div class="message system">System: Chat session started. Send a message to begin.</div>
+    </div>
+  </div>
+
+  <script>
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const output = document.getElementById('output');
+    const endpointInput = document.getElementById('endpoint');
+    const chatIdInput = document.getElementById('chatId'); // Added chatId input reference
+    
+    let messages = [];
+
+    function generateUUID() { // Public Domain/MIT
+        var d = new Date().getTime();//Timestamp
+        var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16;//random number between 0 and 16
+            if(d > 0){//Use timestamp until depleted
+                r = (d + r)%16 | 0;
+                d = Math.floor(d/16);
+            } else {//Use microseconds since page-load if supported
+                r = (d2 + r)%16 | 0;
+                d2 = Math.floor(d2/16);
+            }
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const userMessage = messageInput.value.trim();
+      if (!userMessage) return;
+      
+      // Add user message to UI
+      const userDiv = document.createElement('div');
+      userDiv.className = 'message user';
+      userDiv.textContent = `You: ${userMessage}`;
+      output.appendChild(userDiv);
+      
+      // Add to messages array
+      messages.push({
+        role: 'user',
+        content: userMessage
+      });
+      
+      // Clear input
+      messageInput.value = '';
+      
+      // Create loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'message assistant';
+      loadingDiv.textContent = 'Assistant: ';
+      const loadingSpan = document.createElement('span');
+      loadingSpan.textContent = 'Thinking...';
+      loadingDiv.appendChild(loadingSpan);
+      output.appendChild(loadingDiv);
+      
+      try {
+        const baseEndpoint = endpointInput.value.trim() || '/api/chats';
+        let currentChatId = chatIdInput.value.trim();
+        if (!currentChatId) {
+            currentChatId = generateUUID();
+            chatIdInput.value = currentChatId; // Populate the input field if generated
+        }
+        
+        const fullEndpoint = `${baseEndpoint.replace(/\/$/, '')}/${currentChatId}`; // Construct full endpoint
+        console.log('Sending POST to:', fullEndpoint);
+
+        // Send request to API
+        const response = await fetch(fullEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages,
+            stream: true
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Process the stream
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantMessage = '';
+        
+        // Remove loading indicator
+        loadingDiv.removeChild(loadingSpan);
+        
+        // Create response container
+        const responseSpan = document.createElement('span');
+        loadingDiv.appendChild(responseSpan);
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          console.log('Raw chunk:', chunk);
+          
+          // Process the chunk
+          const lines = chunk.split('\n\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.substring(6);
+              if (data === '[DONE]') {
+                console.log('Stream complete');
+                continue;
+              }
+              
+              try {
+                const parsed = JSON.parse(data);
+                console.log('Parsed chunk:', parsed);
+                
+                if (parsed.content) {
+                  assistantMessage += parsed.content;
+                  responseSpan.textContent = assistantMessage;
+                }
+              } catch (e) {
+                console.error('Error parsing chunk:', e);
+              }
+            }
+          }
+        }
+        
+        // Add assistant message to messages array
+        messages.push({
+          role: 'assistant',
+          content: assistantMessage
+        });
+        
+      } catch (error) {
+        console.error('Error:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'message error';
+        errorDiv.textContent = `Error: ${error.message}`;
+        output.appendChild(errorDiv);
+      }
+    });
+    
+    clearBtn.addEventListener('click', () => {
+      output.innerHTML = '<div class="message system">System: Chat session cleared.</div>';
+      messages = [];
+    });
+    
+    // Allow sending with Enter key
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>

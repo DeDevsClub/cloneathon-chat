@@ -17,7 +17,7 @@ test.describe('Chat activity', () => {
     expect(assistantMessage.content).toContain("It's just green duh!");
   });
 
-  test('Redirect to /chat/:id after submitting message', async () => {
+  test('Redirect to /chats/:chatId after submitting message', async () => {
     await chatPage.sendUserMessage('Why is grass green?');
     await chatPage.isGenerationComplete();
 
@@ -107,36 +107,6 @@ test.describe('Chat activity', () => {
     expect(assistantMessage.content).toBe(
       'The current temperature in San Francisco is 17°C.',
     );
-  });
-
-  test('Upvote message', async () => {
-    await chatPage.sendUserMessage('Why is the sky blue?');
-    await chatPage.isGenerationComplete();
-
-    const assistantMessage = await chatPage.getRecentAssistantMessage();
-    await assistantMessage.upvote();
-    await chatPage.isVoteComplete();
-  });
-
-  test('Downvote message', async () => {
-    await chatPage.sendUserMessage('Why is the sky blue?');
-    await chatPage.isGenerationComplete();
-
-    const assistantMessage = await chatPage.getRecentAssistantMessage();
-    await assistantMessage.downvote();
-    await chatPage.isVoteComplete();
-  });
-
-  test('Update vote', async () => {
-    await chatPage.sendUserMessage('Why is the sky blue?');
-    await chatPage.isGenerationComplete();
-
-    const assistantMessage = await chatPage.getRecentAssistantMessage();
-    await assistantMessage.upvote();
-    await chatPage.isVoteComplete();
-
-    await assistantMessage.downvote();
-    await chatPage.isVoteComplete();
   });
 
   test('Create message from url query', async ({ page }) => {

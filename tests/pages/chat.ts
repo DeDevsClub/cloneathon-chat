@@ -27,7 +27,7 @@ export class ChatPage {
   }
 
   async createNewChat() {
-    await this.page.goto('/');
+    await this.page.goto('/chats/new');
   }
 
   public getCurrentURL(): string {
@@ -42,15 +42,7 @@ export class ChatPage {
 
   async isGenerationComplete() {
     const response = await this.page.waitForResponse((response) =>
-      response.url().includes('/api/chat'),
-    );
-
-    await response.finished();
-  }
-
-  async isVoteComplete() {
-    const response = await this.page.waitForResponse((response) =>
-      response.url().includes('/api/vote'),
+      response.url().includes('/api/chats'),
     );
 
     await response.finished();
@@ -82,13 +74,13 @@ export class ChatPage {
         process.cwd(),
         'public',
         'images',
-        'mouth of the seine, monet.jpg',
+        'opengraph-image.png',
       );
       const imageBuffer = fs.readFileSync(filePath);
 
       await fileChooser.setFiles({
-        name: 'mouth of the seine, monet.jpg',
-        mimeType: 'image/jpeg',
+        name: 'opengraph-image.png',
+        mimeType: 'image/png',
         buffer: imageBuffer,
       });
     });
@@ -163,12 +155,6 @@ export class ChatPage {
         await lastMessageElement
           .getByTestId('message-reasoning-toggle')
           .click();
-      },
-      async upvote() {
-        await lastMessageElement.getByTestId('message-upvote').click();
-      },
-      async downvote() {
-        await lastMessageElement.getByTestId('message-downvote').click();
       },
     };
   }

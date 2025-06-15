@@ -65,22 +65,25 @@ export default function Page() {
 
   useEffect(() => {
     if (state.status === 'user_exists') {
-      toast({ type: 'error', description: 'Account already exists!' });
+      toast({ type: 'error', description: 'Account already exists' });
+      router.push('/login');
     } else if (state.status === 'failed') {
-      toast({ type: 'error', description: 'Failed to create account!' });
+      toast({ type: 'error', description: 'Failed to create account' });
     } else if (state.status === 'invalid_data') {
       toast({
         type: 'error',
-        description: 'Failed validating your submission!',
+        description: 'Failed validating your submission',
       });
     } else if (state.status === 'success') {
-      toast({ type: 'success', description: 'Account created successfully!' });
-
+      toast({ type: 'success', description: 'Account created successfully' });
       setIsSuccessful(true);
       updateSession();
-      router.refresh();
+      // Redirect to home page after successful account creation
+      setTimeout(() => {
+        router.push('/chats');
+      }, 500); // Short delay to allow the success message to be seen
     }
-  }, [state]);
+  }, [state, updateSession, router]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
@@ -88,18 +91,18 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-[100vh] w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -top-48 -right-48 size-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div
-          className="absolute -bottom-48 -left-48 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-48 -left-48 size-96 bg-accent/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '8s' }}
         />
       </div>
 
       {/* Logo or branding mark */}
-      <motion.div
+      {/* <motion.div
         className="mb-8 text-3xl font-bold text-primary"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -109,7 +112,7 @@ export default function Page() {
           <Icon icon="mdi:chat" className="text-primary" />
           <span>th3.chat</span>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       <motion.div
         initial="hidden"
@@ -121,12 +124,21 @@ export default function Page() {
           <CardHeader className="space-y-1 pb-2">
             <motion.div variants={itemVariants}>
               <CardTitle className="text-2xl font-bold text-center text-foreground/90">
-                Join our community
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                >
+                  <div className="flex items-center justify-center font-bold gap-4 w-full bg-gray-950/90 backdrop-blur-sm rounded-md  text-white">
+                    <Icon icon="mdi:chat" className="text-white size-6" />
+                    Join th3.chat
+                  </div>
+                </motion.div>
               </CardTitle>
             </motion.div>
             <motion.div variants={itemVariants}>
-              <CardDescription className="text-center text-muted-foreground">
-                Create your account to get started
+              <CardDescription className="text-center text-foreground w-full font-semibold">
+                Create your account to get started.
               </CardDescription>
             </motion.div>
           </CardHeader>
@@ -143,7 +155,7 @@ export default function Page() {
                     >
                       {isSuccessful ? (
                         <>
-                          <Check className="h-4 w-4 mr-1" />
+                          <Check className="size-4 mr-1" />
                           Success!
                         </>
                       ) : (
@@ -164,12 +176,12 @@ export default function Page() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/95 px-2 text-muted-foreground">
-                    Already a member?{' '}
+                    Already joined?{' '}
                     <Link
                       href="/login"
-                      className="text-primary hover:text-primary/90 hover:underline"
+                      className="hover:underline cursor-pointer font-semibold text-md"
                     >
-                      Login here
+                      Login
                     </Link>
                   </span>
                 </div>

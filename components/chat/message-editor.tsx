@@ -4,7 +4,7 @@ import { Message } from 'ai'; // ChatRequestOptions
 import { Button } from '@/components/ui/button';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
-import { deleteTrailingMessages } from '@/app/(chat)/actions';
+import { deleteTrailingMessages } from '@/app/chats/actions';
 import { UseChatHelpers } from '@ai-sdk/react';
 
 export type MessageEditorProps = {
@@ -24,7 +24,7 @@ export function MessageEditor({
 
   const [draftContent, setDraftContent] = useState<string>(message.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  // console.log('MessageEditor');
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();

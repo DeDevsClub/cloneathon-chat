@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 
@@ -29,6 +28,7 @@ const ChatsPage = () => {
   };
 
   const fetchChats = async () => {
+    console.log('Fetching chats...');
     try {
       setLoading(true);
       const response = await fetch('/api/chats/history', {
@@ -42,7 +42,8 @@ const ChatsPage = () => {
       }
 
       const data = await response.json();
-      setChats(data.chats || []);
+      console.log({ data });
+      setChats(data?.chats || []);
     } catch (error) {
       console.error('Error fetching chats:', error);
       toast.error('Failed to load chats');
@@ -102,7 +103,7 @@ const ChatsPage = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="container py-4 sm:py-0 max-w-5xl mx-auto overflow-hidden">
+    <div className="container w-fit max-w-[calc(100vw-1rem)] py-4 sm:py-0 mx-auto overflow-hidden">
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <Icon
@@ -117,7 +118,8 @@ const ChatsPage = () => {
           ) : (
             <div
               className={cn(
-                'flex flex-col gap-6 m-12 md:m-16 border-2 h-fit w-full rounded-lg items-center',
+                'flex flex-col gap-6 w-dvw h-dvh m-8 justify-start items-start sm:m-12 md:m-16',
+                // 'flex flex-col gap-6 m-12 md:m-16 border-2 h-fit w-full rounded-lg items-center',
                 chats.length > 20 ? 'overflow-y-hidden' : '',
               )}
             >
@@ -145,7 +147,7 @@ const ChatsPage = () => {
 
 const Hero = () => {
   return (
-    <div className="flex flex-col w-screen max-w-screen-lg h-full max-h-full justify-center items-center overflow-hidden">
+    <div className="flex flex-col w-full max-w-screen-lg h-screen max-h-full justify-center items-center overflow-hidden">
       <Greeting />
       <Link href="/chats/new" className="welcome-button">
         Chat with AI Agents

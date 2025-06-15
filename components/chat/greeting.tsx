@@ -55,7 +55,7 @@ export const Greeting = () => {
   return (
     <div
       key="overview"
-      className="relative h-[calc(100vh-4rem)] overflow-hidden sm:mx-0 px-4 size-full sm:w-screen sm:h-dvh flex flex-col justify-center mx-auto"
+      className="flex w-vw h-dvh max-h-full max-w-screen flex-col justify-center items-center overflow-hidden"
     >
       {/* Synthwave grid background */}
       <div className="absolute inset-0 z-0 opacity-10 dark:opacity-20 overflow-hidden">
@@ -64,15 +64,15 @@ export const Greeting = () => {
           className="size-full sm:w-screen"
           style={{
             backgroundImage: `linear-gradient(0deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(139, 92, 246, .3) 25%, rgba(139, 92, 246, .3) 26%, transparent 27%, transparent 74%, rgba(139, 92, 246, .3) 75%, rgba(139, 92, 246, .3) 76%, transparent 77%, transparent)`,
-            backgroundSize: '50px 50px',
+            backgroundSize: '64px 64px',
           }}
         />
       </div>
 
       {/* Glow elements */}
-      <div className="absolute -bottom-40 -left-40 size-80 bg-purple-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob" />
-      <div className="absolute -bottom-40 -right-40 size-80 bg-pink-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-2000" />
-      <div className="absolute top-40 left-20 size-80 bg-blue-600 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-4000" />
+      <div className="absolute -bottom-0 -left-0 size-80 bg-purple-600 rounded-full mix-blend-multiply blur-3xl opacity-10 animate-blob" />
+      <div className="absolute -bottom-0 -right-0 size-80 bg-pink-600 rounded-full mix-blend-multiply blur-3xl opacity-10 animate-blob animation-delay-1000" />
+      <div className="absolute top-0 left-0 size-80 bg-blue-600 rounded-full mix-blend-multiply blur-3xl opacity-10 animate-blob animation-delay-2000" />
 
       <div className="relative z-10 mx-auto">
         <motion.div

@@ -79,22 +79,6 @@ export async function middleware(request: NextRequest) {
       // const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
       // return NextResponse.redirect(loginUrl);
     }
-  } else {
-    // Token exists, handle authenticated user logic
-    // Note: token is guaranteed to be non-null here
-    const isGuest = guestRegex.test(token.email ?? ''); // Can use token.email directly
-
-    // If an authenticated non-guest user tries to access /login or /signup, redirect to home
-    if (!isGuest && ['/login', '/signup'].includes(pathname)) {
-      console.log(
-        'Authenticated non-guest user on login/signup page, redirecting to home.',
-      );
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-
-    // For all other cases where a token exists and it's not a special case above
-    // console.log('Authenticated access for token:', token, 'to path:', pathname);
-    return NextResponse.next();
   }
 }
 

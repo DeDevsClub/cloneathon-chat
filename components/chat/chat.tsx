@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr'; // useSWR removed as unused
 import { fetchWithErrorHandlers, generateUUID } from '@/lib/utils'; // fetcher removed as unused
 import { Artifact, type UIArtifact } from '@/components/chat/artifact'; // Added UIArtifact import
-import { MultimodalInput } from '@/components/chat/multimodal-input';
 import { Messages } from '@/components/chat/messages';
 import type { VisibilityType } from '@/components/visibility-selector'; // Restored VisibilityType import
 import { useArtifactSelector } from '@/hooks/use-artifact'; // Restored useArtifactSelector and corrected path
@@ -16,6 +15,7 @@ import type { Session } from 'next-auth';
 import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
+import { MultimodalInput } from '@/components/chat/multimodal-input';
 
 export function Chat({
   chatId,
@@ -127,7 +127,7 @@ export function Chat({
       />
 
       <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">
-        {/* <div className="flex bg-background h-fit justify-center"> */}
+        {/* <div className="flex flex-col w-[calc(100vw-1rem)] px-2 py-1 max-w-full items-center justify-center dark:bg-slate-950/50 bg-background"> */}
         {!isReadonly && (
           <MultimodalInput
             chatId={chatId}

@@ -64,25 +64,34 @@ export default function NewChatPage(props: PageProps) {
         // Create initial chat with default title
         const messageContent = 'Hello! This is a new chat.';
 
-        const messageId = uuidv4();
+        const messageId = uuidv4(); // `msg-${uuidv4()}`;
+        const message = {
+          id: messageId,
+          content: messageContent,
+          parts: [
+            {
+              text: messageContent,
+              type: 'text',
+            },
+          ],
+          role: 'user',
+          createdAt: new Date().toISOString(),
+          experimental_attachments: [],
+          model: 'chat-model', // Ensure model is part of the message if needed by backend
+          projectId: projectId || null,
+          contentType: 'application/vnd.ai.content.v1+json',
+          textContent: messageContent,
+        };
         const payload = {
           id: chatId,
           system: systemPrompt,
           // Don't include projectId in initial payload to avoid validation issues
           visibility: 'private',
           selectedChatModel: 'chat-model',
-          messages: [
-            {
-              id: messageId,
-              content: messageContent,
-              parts: [{ text: messageContent, type: 'text' }],
-              role: 'user',
-              createdAt: new Date().toISOString(),
-              experimental_attachments: [],
-              model: 'chat-model', // Ensure model is part of the message if needed by backend
-              projectId: projectId || null,
-            },
-          ],
+          messages: [message],
+          projectId: projectId || null,
+          // contentType: 'application/vnd.ai.content.v1+json',
+          // textContent: messageContent,
         };
         console.log({ payload });
         // console.log('Preparing chat creation payload:', payload);
@@ -108,6 +117,7 @@ export default function NewChatPage(props: PageProps) {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
+                // Authorization: `Bearer ${session?.user?.email}`,
               },
               body: JSON.stringify({
                 chatId,

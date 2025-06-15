@@ -35,7 +35,6 @@ import { generateUUID } from '../utils';
 import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
-import { DEFAULT_SYSTEM_PROMPT } from '../constants';
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -104,27 +103,35 @@ export async function saveChat({
   projectId,
   systemPrompt,
   model,
+  contentType,
+  textContent,
 }: {
   id: string;
   userId: string;
-  title: string;
   visibility: VisibilityType;
-  projectId?: string | null;
-  systemPrompt?: string | null;
-  model?: string | null;
+  title: string;
+  projectId: string | null;
+  systemPrompt: string;
+  model: string;
+  contentType: string;
+  textContent: string;
 }) {
   try {
     return await db.insert(chat).values({
-      id,
+      id: id || generateUUID(),
+      // chatId: id || generateUUID(),
       createdAt: new Date(),
-      userId,
-      title,
-      visibility,
-      projectId,
-      systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
-      model: model || 'chat-model',
+      userId: userId,
+      title: title,
+      visibility: visibility,
+      projectId: projectId,
+      systemPrompt: systemPrompt,
+      model: model,
+      // contentType: contentType || 'application/vnd.ai.content.v1+json',
+      // textContent: textContent || '',
     });
   } catch (error) {
+    console.error('Error saving chat:', error);
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }
@@ -289,7 +296,12 @@ export async function saveMessages({
   try {
     return await db.insert(message).values(messages);
   } catch (error) {
-    throw new ChatSDKError('bad_request:database', 'Failed to save messages');
+    console.error('Failed to save messages. Original error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new ChatSDKError(
+      'bad_request:database',
+      `Failed to save messages: ${errorMessage}`,
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-import { CoreMessage, streamText } from 'ai';
+import { CoreMessage, Message, streamText } from 'ai';
 import { auth } from '@/app/(auth)/auth';
 import {
   deleteChatById,
@@ -15,12 +15,17 @@ import {
 import { after } from 'next/server';
 import { differenceInSeconds } from 'date-fns';
 import { ChatSDKError } from '@/lib/errors';
-import { openai } from '@ai-sdk/openai';
+
+// Define a more specific type for the parts we are constructing
+// type ConstructedMessagePart =
+//   | { type: 'text'; text: string }
+//   | { type: 'tool-call'; toolCallId: string; toolName: string; args: any };
 import { v4 as uuidv4 } from 'uuid';
 import { createDataStream } from 'ai';
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
 import { Chat } from '@/lib/db';
 import z from 'zod';
+import { openai } from '@ai-sdk/openai';
 
 export const maxDuration = 60;
 
@@ -36,10 +41,11 @@ export async function POST(req: Request) {
     visibility,
     model,
     textContent,
+    toolCallStreaming,
   } = await req.json();
 
   const chatId = id ?? uuidv4();
-  const projectId = project?.id ?? uuidv4();
+  const prompt = systemPrompt || DEFAULT_SYSTEM_PROMPT;
   const session = await auth();
   const user = session?.user;
 
@@ -48,10 +54,62 @@ export async function POST(req: Request) {
   }
 
   // Call the language model
+  // Determine projectId for the chat. Allow it to be null if not provided.
+  const chatProjectId = project?.id || null;
+
+  // Save chat metadata first
+  saveChat({
+    id: chatId,
+    userId: user.id,
+    title: title || messages[0]?.content?.substring(0, 100) || 'New Chat',
+    visibility: visibility || 'private',
+    projectId: chatProjectId || null,
+    systemPrompt: prompt,
+    model: model || 'chat-model', // Default model if not provided
+    contentType: 'application/vnd.ai.content.v1+json',
+    textContent: textContent || '',
+  });
+
+  const initialDbMessages = (messages as Message[]).map((m) => ({
+    id: (m as any).id?.toString() || uuidv4(),
+    chatId: chatId,
+    projectId: chatProjectId || null,
+    role: m.role,
+    attachments: ((m as any).attachments as any[]) || [],
+    contentType: 'application/vnd.ai.content.v1+json',
+    createdAt: new Date(),
+    parts: [],
+    textContent: '',
+  }));
+
+  if (initialDbMessages.length > 0) {
+    saveMessages({ messages: initialDbMessages });
+  }
+  // Prepare and save initial user messages
+  // const initialDbMessages = (messages as Message[]).map((m) => ({
+  //   id: (m as any).id?.toString() || uuidv4(),
+  //   chatId: chatId, // Use the determined chatId for all messages
+  //   projectId: chatProjectId, // Use the determined projectId for all messages
+  //   role: m.role || 'user',
+  //   // TODO: Implement proper parts and textContent extraction from m.content
+  //   parts: m.content ? [{ type: 'text', text: m.content as string }] : [],
+  //   textContent: typeof m.content === 'string' ? m.content : '',
+  //   attachments: ((m as any).attachments as any[]) || [],
+  //   contentType: 'application/vnd.ai.content.v1+json',
+  //   createdAt: new Date(),
+  // }));
+
+  // if (initialDbMessages.length > 0) {
+  //   saveMessages({
+  //     messages: initialDbMessages,
+  //   });
+  // }
+
+  // Call the language model after initial chat and messages are saved
   const result = streamText({
-    model: openai('gpt-4-turbo'),
-    toolCallStreaming: true,
-    messages,
+    model: openai('gpt-4o'),
+    toolCallStreaming: toolCallStreaming || false,
+    messages: messages,
     system: systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
     tools: {
       // server-side tool with execute function:
@@ -80,53 +138,70 @@ export async function POST(req: Request) {
         }),
       },
     },
-    async onFinish({
-      text,
-      toolCalls,
-      toolResults,
-      usage,
-      finishReason,
-      response,
-      reasoning,
-      reasoningDetails,
+    async onFinish(result: {
+      text: string;
+      toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
     }) {
-      // implement your own logic here, e.g. for storing messages
-      // or recording token usage
-      await saveChat({
-        id: chatId,
-        userId: user.id,
-        visibility: visibility,
-        projectId: projectId,
-        systemPrompt: systemPrompt,
-        model: model,
-        title: title,
-      });
+      const { text, toolCalls } = result;
+      const assistantMessageParts: {
+        type: 'tool-call';
+        toolCallId: string;
+        toolName: string;
+        args: any;
+      }[] = [];
+      // const assistantMessageParts: ConstructedMessagePart[] = [];
+      let assistantTextContent = '';
+
+      if (text) {
+        assistantTextContent = text;
+      }
+
+      if (Array.isArray(toolCalls)) {
+        toolCalls.forEach((tc) => {
+          assistantMessageParts.push({
+            type: 'tool-call',
+            toolCallId: tc.toolCallId,
+            toolName: tc.toolName,
+            args: tc.args,
+          });
+        });
+      }
+
+      if (assistantMessageParts.length > 0) {
+        const assistantMessageToSave = {
+          id: uuidv4(),
+          chatId: chatId,
+          projectId: chatProjectId,
+          role: 'assistant' as const,
+          parts: assistantMessageParts,
+          textContent: assistantTextContent,
+          attachments: [], // Defaulting to empty as streamText onFinish doesn't directly provide attachments
+          contentType: 'application/vnd.ai.content.v1+json',
+          createdAt: new Date(),
+        };
+        saveMessages({ messages: [assistantMessageToSave] });
+      }
+      // Chat metadata is saved before streamText. Updates (e.g., AI-generated title) could happen here if needed.
     },
   });
 
-  const initialDbMessages = (messages as CoreMessage[]).map((m) => ({
-    id: (m as any).id?.toString() || uuidv4(),
-    chatId: uuidv4(),
-    projectId: uuidv4(),
-    role: m.role,
-    attachments: ((m as any).attachments as any[]) || [],
+  // implement your own logic here, e.g. for storing messages
+  // or recording token usage
+
+  // implement your own logic here, e.g. for storing messages
+  // or recording token usage
+  saveChat({
+    id: chatId,
+    userId: user.id,
+    visibility: visibility,
+    projectId: chatProjectId || null,
+    systemPrompt: systemPrompt,
+    model: model,
+    title: title,
     contentType: 'application/vnd.ai.content.v1+json',
-    createdAt: new Date(),
-    parts: [],
-    textContent: '',
-  }));
+    textContent: textContent,
+  });
 
-  if (initialDbMessages.length > 0) {
-    await saveMessages({ messages: initialDbMessages });
-  }
-
-  // return Response.json(
-  //   { newChatId },
-  //   {
-  //     status: 201,
-  //     headers: { 'X-Chat-Id': newChatId },
-  //   },
-  // );
   // Respond with the stream
   return result.toDataStreamResponse();
 }

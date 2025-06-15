@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 
 import { AppSidebar } from '@/components/navigation/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { auth } from '../(auth)/auth';
+import { auth } from '@/app/(auth)/auth';
 import Script from 'next/script';
 import { SessionProvider } from 'next-auth/react';
 
@@ -18,6 +18,7 @@ export default async function Layout({
   // console.log({ session });
 
   return (
+    // <div className="flex flex-col w-fit max-w-[calc(100vw-1rem)] h-dvh justify-between overflow-hidden">
     <SessionProvider session={session}>
       <Script
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
@@ -28,5 +29,6 @@ export default async function Layout({
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </SessionProvider>
+    // </div>
   );
 }

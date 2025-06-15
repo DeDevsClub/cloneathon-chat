@@ -94,24 +94,24 @@ export const {
       credentials: {},
       async authorize() {
         const [guestUser] = await createGuestUser();
-        
+
         // Create initial chat for guest users
         const initialChat = {
           id: `chat-${Date.now()}`,
           messages: [
             {
               id: `msg-${Date.now()}`,
-              content: 'Welcome to DeDevs Chat! How can I assist you today?',
+              content: 'Welcome to th3 Chat, how may I assist you today?',
               role: 'assistant' as const,
               createdAt: new Date(),
             },
           ],
         };
-        
-        return { 
-          ...guestUser, 
+
+        return {
+          ...guestUser,
           type: 'guest',
-          chat: initialChat
+          chat: initialChat,
         };
       },
     }),
@@ -121,7 +121,7 @@ export const {
       if (user) {
         token.id = user.id as string;
         token.type = user.type;
-        
+
         // Initialize chat with a welcome message
         if (!token.chat) {
           const chatId = `chat-${Date.now()}`;
@@ -145,7 +145,7 @@ export const {
       if (session.user) {
         session.user.id = token.id;
         session.user.type = token.type;
-        
+
         // Include chat in session
         if (token.chat) {
           session.chat = token.chat;

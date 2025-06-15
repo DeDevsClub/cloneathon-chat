@@ -27,6 +27,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
+import { ModelSelector } from './model-selector';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+// import { saveChatModelAsCookie } from '@/app/chats/actions';
 
 function PureMultimodalInput({
   chatId,
@@ -43,6 +47,7 @@ function PureMultimodalInput({
   handleSubmit,
   className,
   selectedVisibilityType,
+  // selectedModelId,
 }: {
   chatId: string;
   projectId: string | null;
@@ -58,6 +63,7 @@ function PureMultimodalInput({
   handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
   selectedVisibilityType: VisibilityType;
+  // selectedModelId: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -107,10 +113,13 @@ function PureMultimodalInput({
     setInput(event.target.value);
     adjustHeight();
   };
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
-
+  const { data: session } = useSession();
+  if (!session) {
+    console.error('No session found');
+    redirect('/login');
+  }
   const submitForm = useCallback(() => {
     handleSubmit(undefined, {
       experimental_attachments: attachments,
@@ -159,6 +168,11 @@ function PureMultimodalInput({
       toast.error('Failed to upload file, please try again!');
     }
   };
+
+  // const handleModelChange = (modelId: string) => {
+  //   console.log('Model changed to:', modelId);
+  //   saveChatModelAsCookie(modelId);
+  // };
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -272,7 +286,7 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Enter your message here..."
         value={input}
         onChange={handleInput}
         className={cx(
@@ -294,7 +308,11 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+      <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-tr-lg">
+        {/* TODO: Add model selector */}
+        {/* {messages.length >= 0 && (
+          <ModelSelector session={session} selectedModelId={selectedModelId} />
+        )} */}
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
@@ -321,7 +339,6 @@ export const MultimodalInput = memo(
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
-
     return true;
   },
 );

@@ -66,6 +66,7 @@ export default function Page() {
   useEffect(() => {
     if (state.status === 'user_exists') {
       toast({ type: 'error', description: 'Account already exists' });
+      router.push('/login');
     } else if (state.status === 'failed') {
       toast({ type: 'error', description: 'Failed to create account' });
     } else if (state.status === 'invalid_data') {
@@ -75,13 +76,12 @@ export default function Page() {
       });
     } else if (state.status === 'success') {
       toast({ type: 'success', description: 'Account created successfully' });
-
       setIsSuccessful(true);
       updateSession();
       // Redirect to home page after successful account creation
       setTimeout(() => {
-        router.push('/');
-      }, 1000); // Short delay to allow the success message to be seen
+        router.push('/chats');
+      }, 500); // Short delay to allow the success message to be seen
     }
   }, [state, updateSession, router]);
 

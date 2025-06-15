@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
+import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
 
 interface PageParams {
   projectId?: string;
@@ -26,16 +27,15 @@ type ErrorMessage = {
  * It generates a UUID for the chat, creates the chat record in the database,
  * and redirects to the new chat page.
  */
-const PAGE_SIZE = 20;
 
 export default function NewChatPage(props: PageProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [creating, setCreating] = useState(true);
 
-  // Properly unwrap params using React.use()
-  const unwrappedParams = use(props.params);
-  const projectId = unwrappedParams.projectId;
+  // props.params is a Promise, unwrap it with React.use()
+  const params = use(props.params);
+  const projectId = params.projectId;
 
   useEffect(() => {
     async function createNewChat() {
@@ -121,7 +121,7 @@ export default function NewChatPage(props: PageProps) {
         // Redirect to the new chat
         router.push(AppRoutes.chats.detail(chatId));
         // Revalidate the first page of chat history to update the sidebar
-        mutate(`/api/chats/history?limit=${PAGE_SIZE}`);
+        mutate(`/api/chats/history?limit=${PAGE_SIZE}&offset=0`);
       } catch (error: unknown) {
         console.error('Error creating chat:', error);
         const errorMessage =

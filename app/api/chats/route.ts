@@ -12,8 +12,8 @@ import {
   deleteChatById,
   getChatById,
   // getMessageCountByUserId,
-  getMessagesByChatId,
-  getStreamIdsByChatId,
+  // getMessagesByChatId,
+  // getStreamIdsByChatId,
   // saveChat,
   // saveMessages,
 } from '@/lib/db/queries';
@@ -44,22 +44,24 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
-  const { messages } = await req.json();
-  // const chat = id ?? uuidv4();
+  const { messages, id, system } = await req.json();
+  const chat = id ?? uuidv4();
   const session = await auth();
-
-  if (!session?.user) {
+  const user = session?.user;
+  console.log({ system });
+  if (!user) {
     return new ChatSDKError('unauthorized:chat').toResponse();
   }
 
   // Call the language model
   const result = streamText({
-    model: openai('gpt-4.1'),
+    model: openai('gpt-4o'),
     messages,
     async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
       // implement your own logic here, e.g. for storing messages
       // or recording token usage
     },
+    system,
   });
 
   // Respond with the stream

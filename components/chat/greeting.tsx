@@ -1,20 +1,56 @@
+import { AppRoutes } from '@/lib/routes';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
+interface Greeting {
+  main: string;
+  sub: string;
+  status: string;
+}
 export const Greeting = () => {
+  const [greeting, setGreeting] = useState<Greeting | null>(null);
+  const [loading, setLoading] = useState(true);
   // Random synthwave phrases for dynamic greetings
-  const greetings = [
-    { main: 'WELCOME TO THE FUTURE', sub: 'Your AI companion awaits...' },
-    {
-      main: 'NEURAL LINK ESTABLISHED',
-      sub: "Let's create something extraordinary!",
-    },
-    { main: 'SYSTEM ONLINE', sub: 'Ready to hack the impossible?' },
-    { main: 'SYNTHWAVE ACTIVATED', sub: 'Your digital journey begins now' },
-    { main: 'ENTER THE GRID', sub: 'How can we revolutionize today?' },
-  ];
 
-  // Select a random greeting
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  useEffect(() => {
+    function getSystemPrompt() {
+      const greetings = [
+        {
+          main: 'WELCOME TO THE FUTURE',
+          sub: 'Your AI companion awaits...',
+          status: 'Future-AI interface initialized.',
+        },
+        {
+          main: 'NEURAL LINK ESTABLISHED',
+          sub: "Let's create something extraordinary!",
+          status: 'Cognitive connection synced.',
+        },
+        {
+          main: 'SYSTEM ONLINE',
+          sub: 'Ready to hack the impossible?',
+          status: 'Core systems fully operational.',
+        },
+        {
+          main: 'SYNTHWAVE ACTIVATED',
+          sub: 'Your digital journey begins now',
+          status: 'Digital soundscape engaged.',
+        },
+        {
+          main: 'ENTER THE GRID',
+          sub: 'How can we revolutionize today?',
+          status: 'Cyber-reality portal open.',
+        },
+      ];
+      // Select a random greeting
+      const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+      setGreeting({
+        main: greeting.main,
+        sub: greeting.sub,
+        status: greeting.status,
+      });
+    }
+    getSystemPrompt();
+  }, []);
 
   return (
     <div
@@ -47,7 +83,7 @@ export const Greeting = () => {
           className="text-5xl md:text-6xl font-bold tracking-tighter mb-4"
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-gradient">
-            {greeting.main}
+            {greeting?.main}
           </span>
         </motion.div>
 
@@ -58,7 +94,7 @@ export const Greeting = () => {
           transition={{ type: 'spring', stiffness: 50, delay: 0.6 }}
           className="text-2xl md:text-3xl my-6 text-zinc-400 dark:text-zinc-300"
         >
-          {greeting.sub}
+          {greeting?.sub}
         </motion.div>
 
         <motion.div
@@ -70,7 +106,7 @@ export const Greeting = () => {
         >
           <div className="size-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-sm text-zinc-500 dark:text-zinc-400 animate-pulse">
-            AI systems ready for interaction
+            {greeting?.status}
           </span>
         </motion.div>
       </div>

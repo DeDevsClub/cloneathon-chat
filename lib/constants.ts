@@ -31,3 +31,5 @@ Focus on making these improvements:
 Your response must be valid JSON.`;
 
 export const ORIGINAL_TEXT = 'Original text';
+
+export const DEFAULT_SYSTEM_PROMPT = `You are a helpful AI assistant. Your goal is to provide accurate, clear, and concise responses to the user's queries. If you don't know the answer to a question, it's better to state that you don't know rather than providing potentially incorrect information. Be polite and respectful in all your interactions.`;

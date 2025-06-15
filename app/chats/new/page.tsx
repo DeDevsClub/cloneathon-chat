@@ -9,9 +9,11 @@ import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
 import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
+import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
 
 interface PageParams {
   projectId?: string;
+  systemPrompt?: string;
 }
 
 interface PageProps {
@@ -36,7 +38,8 @@ export default function NewChatPage(props: PageProps) {
   // props.params is a Promise, unwrap it with React.use()
   const params = use(props.params);
   const projectId = params.projectId;
-
+  const systemPrompt = params.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+  console.log({ systemPrompt });
   useEffect(() => {
     async function createNewChat() {
       // Wait for session to load
@@ -64,6 +67,7 @@ export default function NewChatPage(props: PageProps) {
         const messageId = uuidv4();
         const payload = {
           id: chatId,
+          system: systemPrompt,
           // Don't include projectId in initial payload to avoid validation issues
           visibility: 'private',
           selectedChatModel: 'chat-model',
@@ -80,7 +84,7 @@ export default function NewChatPage(props: PageProps) {
             },
           ],
         };
-        // console.log({ payload });
+        console.log({ payload });
         // console.log('Preparing chat creation payload:', payload);
 
         const response = await fetch(AppRoutes.api.chats.base, {

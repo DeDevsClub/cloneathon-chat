@@ -36,13 +36,13 @@ export function MobileHeader({
       <div className="flex items-center justify-between p-2 ">
         {/* Left section */}
         <div className="flex items-center gap-1 bg-transparent/10 w-fit backdrop-blur-xs border-b border-border rounded-lg p-1">
-          <SidebarTrigger className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted hover:text-white" />
+          <SidebarTrigger className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted dark:text-white hover:text-white" />
           {showBackButton && (
             <Button
               variant="ghost"
               size="icon"
               onClick={handleBack}
-              className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted hover:text-white"
+              className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted dark:text-white hover:text-white"
               aria-label="Back"
             >
               <ArrowLeft className="size-7" />
@@ -52,7 +52,7 @@ export function MobileHeader({
             variant="ghost"
             size="icon"
             onClick={handleNewChat}
-            className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted hover:text-white"
+            className="size-7 hover:scale-110 transition-all bg-violet-800/80 hover:bg-violet-600/80 text-muted dark:text-white hover:text-white"
             aria-label="New Chat"
           >
             <Plus className="size-7" />

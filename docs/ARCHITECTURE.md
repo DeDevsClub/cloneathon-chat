@@ -4,15 +4,15 @@
 
 Cloneathon-chat is a modern real-time chat application that integrates AI capabilities for enhanced conversation experiences. The application allows users to engage in conversations with AI models, manage documents, and collaborate in a multi-modal environment. Key features include:
 
-- User authentication and account management
-- Chats associated with projects (project context primarily managed at the data layer and implicitly in UI flows rather than strict URL nesting)
-- Real-time chat with AI assistants
-- Document creation, editing, and management
-- Multi-modal interactions supporting text, code, and images
-- Suggestion system for content improvement
-- Chat history and conversation management
-- Public and private visibility settings for chats
-- Guided onboarding with automatic tutorial project creation
+- User authentication (NextAuth.js) and account management, including guest user functionality.
+- Chats associated with projects, providing organizational context.
+- Real-time chat with AI assistants, with model and system prompt persistence per chat.
+- Document creation, editing, and management (foundational).
+- Multi-modal interactions supporting text, and potentially images/code attachments.
+- Suggestion system for content improvement (foundational).
+- Chat history and conversation management.
+- Public and private visibility settings for chats.
+- Streamlined onboarding and user interface, with a focus on core chat functionality.
 
 The application serves as a platform for interactive AI-assisted communication, document collaboration, and knowledge management in a chat-centric interface. It leverages modern web technologies to provide a responsive, accessible, and feature-rich user experience.
 
@@ -24,27 +24,28 @@ The application follows a modern, layered architecture based on Next.js App Rout
 
 The application uses a **layered architecture** with clear separation of concerns:
 
-1. **Presentation Layer**: React components and Next.js pages
-2. **Application Layer**: Route handlers, server actions, and client-side logic
-3. **Domain Layer**: Core business logic and data models
-4. **Data Access Layer**: Database operations via Drizzle ORM
-5. **Infrastructure Layer**: External services and AI integrations
+1.  **Presentation Layer**: React components (client and server) and Next.js pages, styled with Tailwind CSS and Shadcn UI.
+2.  **Application Layer**: Next.js API Route Handlers (e.g., for chat), Server Actions, and client-side logic (e.g., `useChat` hook).
+3.  **Domain Layer**: Core business logic encapsulated in services/actions and data models/types.
+4.  **Data Access Layer**: Database operations via Drizzle ORM, with queries defined in `lib/db/queries.ts`.
+5.  **Infrastructure Layer**: External services (e.g., OpenAI via AI SDK) and authentication (NextAuth.js).
 
 The application also incorporates aspects of:
 
-- **Component-Based Architecture**: UI is built from reusable, composable components
-- **API-First Design**: Backend functionality is exposed through well-defined API endpoints
-- **Feature-Based Organization**: Code is organized by feature rather than technical function
-- **Hierarchical Data Structure**: Projects can group chats. Messages are linked to chats and can also be linked directly to projects (e.g., via `messages.projectId`).
+- **Component-Based Architecture**: UI is built from reusable, composable React components.
+- **API-Driven Design**: Backend functionality is exposed through API endpoints (e.g., `/api/chats`).
+- **Feature-Based Organization**: Code is often organized by feature (e.g., `chats`, `projects`, `auth`).
 
 ### Key Architectural Decisions
 
-1. **Next.js App Router**: For modern routing, server components, and improved SEO.
-2. **Server Actions**: For secure server-side mutations directly from client components.
-3. **PostgreSQL with Drizzle ORM**: For type-safe database access and schema management.
-4. **Session-Based Authentication**: For secure authentication and session management without external dependencies.
-5. **AI SDK Integration**: Simplified integration for AI model interactions, primarily using `@ai-sdk/openai` directly in the main chat API endpoint. The API focuses on streaming text, with more complex AI logic (like custom tools or detailed persistence steps) potentially handled elsewhere or refactored.
-6. **Project-Contextualized Chats**: While direct URL nesting of chats under projects (`/projects/:projectId/chats/:chatId`) has been de-emphasized in favor of simpler chat routes (`/chats/:chatId`), projects still provide a way to organize and contextualize chats at the data and application logic level.
+1.  **Next.js App Router**: For modern routing, server components, client components, and API route handlers.
+2.  **Server Actions & API Routes**: Server Actions for some mutations, and API Routes (like `/api/chats`) for core functionalities like chat streaming and history.
+3.  **PostgreSQL with Drizzle ORM**: For type-safe database access and schema management (`lib/db/schema.ts`).
+4.  **NextAuth.js**: For robust authentication, session management, and provider integration.
+5.  **AI SDK Integration**: Direct and simplified integration for AI model interactions using the `ai` SDK (`streamText`, `CoreMessage`, `useChat` hook), primarily with OpenAI models.
+6.  **Simplified Chat API**: The `POST /api/chats` route handles both new chat creation and streaming messages for existing chats, with streamlined persistence logic.
+7.  **Middleware for Authorization**: `middleware.ts` handles route protection, guest user redirection, and authorization checks based on user email for specific admin/test routes.
+8.  **Client-Side State Management**: Primarily React Context and component state, with `useChat` for managing chat interaction state.
 
 ## Components
 
@@ -52,220 +53,186 @@ The application is organized into several core components and modules:
 
 ### Frontend Components
 
-1. **Authentication Components** (`app/(auth)/*`)
+1.  **Authentication Components** (`app/(auth)/*`, `components/auth/*`)
+    - Login and signup pages.
+    - UI elements for user sessions (e.g., user button).
+    - Integration with NextAuth.js for client-side session management.
 
-   - Login and signup pages with form validation
-   - Session management and protected routes
-   - OAuth provider integration
+2.  **Chat Interface** (`components/chat/*`, `app/chats/[chatId]/page.tsx`, `app/chats/new/page.tsx`)
+    - Core chat UI using `useChat` hook for message streaming and input handling.
+    - Display of messages, including markdown rendering (`ChatMessage`).
+    - Multi-modal input capabilities (`MultimodalInput`).
+    - Chat list and item components (`ChatItem`, `ChatList`).
+    - Persistence of `systemPrompt` and `model` per chat, configurable by the user.
 
-2. **Chat Interface** (`components/chat.tsx` and related components)
+3.  **Project Management** (`app/projects/*`, `components/project/*`)
+    - Project creation dialog and page (`CreateProjectDialog`, `app/projects/new/page.tsx`) with guest user handling.
+    - Listing and management of projects (foundational).
+    - Chats are associated with projects at the data layer.
 
-   - Message display and conversation threading
-   - Input handling and response streaming (utilizing a simplified `useChat` hook setup)
-   - Message actions (editing, deletion, reactions) - some actions like voting are being re-enabled.
+4.  **UI Components** (`components/ui/*`)
+    - Reusable UI elements (buttons, cards, inputs, dialogs, etc.) from Shadcn UI.
+    - Layout components and styling utilities (`Tailwind CSS`).
+    - Responsive design elements.
+    - Toast notifications via `sonner`.
 
-3. **Document Management** (`components/document*.tsx`)
+5.  **Navigation and Structure** (`components/navigation/*`, `app/layout.tsx`)
+    - Application sidebar (`AppSidebar`) for navigating chats and projects.
+    - Header components (`HeaderIsland`).
+    - Main application layout providing consistent structure.
 
-   - Document creation and editing interfaces
-   - Different editorTypes (text, code, image)
-   - Version control and collaboration features
-
-4. **UI Components** (`components/ui/*`)
-
-   - Reusable UI elements (buttons, cards, inputs)
-   - Layout components and styling utilities
-   - Responsive design elements
-
-5. **Navigation and Structure** (`components/navigation/app-sidebar.tsx`, `components/navigation/header-island.tsx`, etc.)
-
-   - Application navigation and routing (simplified chat routes, e.g., `/chats/:chatId`)
-   - Project and chat organization in sidebar (sidebar components updated to reflect de-emphasis of `projectId` prop in some areas)
-   - History management and sidebar components
-   - User preferences and settings
-
-6. **Project Management** (`app/projects/*`, `components/projects/*`)
-   - Project listing and creation interfaces
-   - Project editing and management
-   - Placeholder for individual project page (`app/projects/[projectId]/page.tsx`)
-   - Chats are associated with projects, viewable within project contexts.
+6.  **Testing & Utility Pages** (`app/tests/*`)
+    - Pages for testing specific functionalities, like displaying user chats by ID (`app/tests/ids/page.tsx`) with improved UI.
 
 ### Backend Modules
 
-1. **Authentication System** (`lib/auth/*`)
+1.  **Authentication System** (`lib/auth/*`, `app/api/auth/[...nextauth]/route.ts`, `middleware.ts`)
+    - NextAuth.js configuration for authentication providers.
+    - Session management and token validation (`getToken`).
+    - Middleware (`middleware.ts`) for route protection, enforcing authorization rules (e.g., `AUTHORIZED_EMAILS`), and handling guest user redirects.
 
-   - User authentication logic
-   - Session management and token handling
-   - Password encryption and security
+2.  **Database Layer** (`lib/db/*`)
+    - Drizzle ORM schema definitions (`schema.ts`) for tables like `users`, `chats`, `messages`, `projects`. Includes `systemPrompt`, `model`, `lastActivityAt` in `chatsTable`.
+    - Database query functions (`queries.ts`) for CRUD operations and complex lookups.
+    - Migrations managed by Drizzle Kit.
 
-2. **Database Layer** (`lib/db/*`)
+3.  **AI Integration & Chat API** (`lib/ai/*`, `app/api/chats/route.ts`)
+    - Main chat API at `app/api/chats/route.ts`:
+        - `POST` handler: Manages new chat creation (saves chat metadata and initial messages, returns `newChatId`) and streams AI responses for existing chats using `streamText` from the `ai` SDK with OpenAI.
+        - `GET` handler: Retrieves chat history or resumes streams using `resumable-stream` context.
+        - `DELETE` handler: Deletes chats.
+    - Helper functions for formatting message parts for DB (`formatPartsForDB`) and deriving text content (`deriveTextContent`).
+    - `DEFAULT_SYSTEM_PROMPT` and selected model are used for AI interactions.
+    - AI tools (like `getWeatherInformation`) are defined but their integration into the main chat flow is basic.
 
-   - Schema definitions (e.g., `messagesTable` includes `projectIdIdx`) and migrations
-   - Query functions and data access patterns
-   - Relationship management between entities
-   - Automatic default project creation for new users
-
-3. **AI Integration** (`lib/ai/*`, `lib/ai/actions.tsx`, `app/api/chats/route.ts`)
-
-   - The primary chat API endpoint (`POST /api/chats`) has been significantly simplified. It now directly uses `@ai-sdk/openai` and `streamText` for generating AI responses, focusing on core text streaming.
-   - UI-related AI actions may be handled in files like `lib/ai/actions.tsx`.
-   - More complex AI logic (e.g., custom tool usage, detailed prompt engineering, robust message persistence, rate limiting, advanced telemetry) that was previously part of the main API route is currently streamlined or commented out. These features are planned to be refactored or re-introduced, possibly through dedicated server actions, separate API endpoints, or other modular approaches.
-
-4. **Artifact Management** (`lib/artifacts/*`)
-
-   - Document and file handling
-   - Storage integration and retrieval
-   - Metadata management for various artifact types
-
-5. **API Routes** (`app/api/*`)
-   - RESTful endpoints for data access (e.g., `/api/chats/history`, `/api/chats/:chatId` for messages, simplified from previous nested structures).
-   - Webhook handlers and external integrations
-   - Authentication middleware for protected routes
+4.  **Server Actions** (`app/chats/actions.ts`, `app/projects/actions.ts`, etc.)
+    - Functions for server-side logic callable from client components, e.g., `saveChatModelAsCookie`, `getChatsForUser`.
 
 ## Workflow
 
-The application follows several key workflows that define the user experience:
-
 ### Authentication Flow
 
-1. User accesses the application and is directed to login/signup if not authenticated
-2. Credentials are validated and a session is established
-3. Next.js middleware protects routes from unauthorized access
-4. Session state is maintained via cookies
-5. New users automatically receive a default project with tutorial content
-
-### Project and Chat Organization Flow
-
-1. User accesses the projects page to view all projects.
-2. User selects an existing project or creates a new one.
-3. Chats are primarily accessed via a general chat list (`/chats`) or by navigating to a specific chat (`/chats/:chatId`).
-4. While `projectId` is associated with chats and messages at the data level, direct URL nesting for project-specific chats is de-emphasized. Project context might be passed through state or API request bodies when creating/interacting with chats.
+1.  User accesses the application.
+2.  `middleware.ts` checks the route and authentication status:
+    - Unauthenticated users are redirected from protected routes to `/login` or `/api/auth/guest`.
+    - Authenticated users without specific authorization (e.g., not in `AUTHORIZED_EMAILS`) are redirected from admin/test routes.
+    - Guest users attempting actions like project creation are prompted to log in.
+3.  User authenticates via NextAuth.js (e.g., GitHub OAuth, credentials).
+4.  Session is established, and user data (including type like 'guest') is available via `useSession` or `auth()`.
 
 ### Chat Interaction Flow
 
-1. User selects an existing chat or creates a new one.
-2. User inputs a message or query.
-3. The message, along with history, is sent to the `POST /api/chats` endpoint.
-4. The simplified API endpoint uses `@ai-sdk/openai` and `streamText` to get a response from the AI model.
-5. Responses are streamed back in real-time to the client.
-6. Database persistence of user and assistant messages, which was previously handled in the `onFinish` callback of `streamText` within the API route, may now be handled by client-side logic after receiving the full response, or through separate API calls/server actions (this part is less clear from the current `POST /api/chats` implementation).
-7. Chat history is updated and accessible for future reference.
+1.  User navigates to `/chats` to see their chat list or starts a new chat (e.g., `/chats/new`).
+2.  For a new chat, initial parameters like `systemPrompt` and `model` can be set.
+3.  User types a message in `MultimodalInput`.
+4.  The `useChat` hook sends the message history (and other relevant data like `id` for existing chats, or `selectedChatModel`, `system` for new ones) to `POST /api/chats`.
+5.  **If new chat**: API creates a `chats` record, saves initial messages, returns `newChatId`. The client then typically navigates to `/chats/[newChatId]`.
+6.  **If existing chat**: API uses `streamText` with the AI model (OpenAI) and message history.
+7.  AI response is streamed back to the client via `useChat` and displayed in `ChatMessage` components.
+8.  The `onFinish` callback in `POST /api/chats` (or client-side logic post-stream) handles saving the assistant's message to the database and updating `lastActivityAt`.
 
-### Document Management Flow
+### Project Creation Flow
 
-1. User creates or opens a document (text, code, or image)
-2. Document is rendered with the appropriate editor
-3. Changes are saved automatically or manually
-4. Documents are linked to users and can be shared
-5. Suggestions can be added, reviewed, and resolved
+1.  User navigates to `/projects/new` or uses `CreateProjectDialog`.
+2.  User fills in project details.
+3.  On submission, a request is made to `POST /api/projects`.
+4.  API validates data, creates a project record in the database.
+5.  Client is notified (e.g., toast) and redirected to the new project page or project list.
+6.  Guest users are blocked and prompted to log in.
 
 ### Data Flow
 
-1. **Client to Server**:
+1.  **Client (React Components) -> Server (API Routes / Server Actions)**:
+    - User interactions trigger API calls (e.g., `fetch` in `useChat` to `/api/chats`) or Server Actions.
+    - Data is sent as JSON payloads or form data.
 
-   - Form submissions and user interactions (e.g., sending a chat message).
-   - Real-time updates via fetch requests (e.g., to `/api/chats`) or server actions.
-   - File uploads and document changes.
+2.  **Server (API / Actions) -> Database (Drizzle ORM)**:
+    - API handlers and Server Actions use query functions from `lib/db/queries.ts`.
+    - Drizzle ORM translates these calls into SQL queries for PostgreSQL.
+    - Data is persisted or retrieved.
 
-2. **Server to Database**:
+3.  **Server (API / Actions) -> AI Services (OpenAI via AI SDK)**:
+    - `app/api/chats/route.ts` sends messages, system prompts, and model choices to OpenAI using `streamText`.
+    - AI responses are streamed back to the server.
 
-   - CRUD operations via Drizzle ORM.
-   - Transaction management for complex operations.
-   - Data validation and sanitization.
-   - (Note: Direct DB operations in the main `POST /api/chats` for message saving are currently commented out/simplified).
-
-3. **Server to AI Services**:
-
-   - Messages are sent to AI services (e.g., OpenAI via `@ai-sdk/openai`).
-   - The current `POST /api/chats` sends messages directly without the elaborate prompt engineering or tool usage seen in previous versions.
-   - Stream handling for real-time responses.
-
-4. **Server to Client**:
-   - Initial page data via SSR/SSG.
-   - Real-time updates via streaming responses from `/api/chats`.
-   - State synchronization and notifications.
+4.  **Server (API / Actions) -> Client (React Components)**:
+    - API routes return JSON data or streams (e.g., AI chat responses).
+    - Server Actions return results to client components.
+    - Next.js handles SSR/RSC for initial page loads.
 
 ## Dependencies
 
-The application relies on a carefully selected set of dependencies to provide its functionality. Note that some dependencies may have evolved or been replaced since this document was last updated:
+### Core Framework & UI
 
-### Core Framework
+- **Next.js**: Full-stack React framework (App Router).
+- **React**: UI library.
+- **TypeScript**: Type safety.
+- **Tailwind CSS**: Utility-first CSS.
+- **Shadcn UI / Radix UI**: Accessible component primitives.
+- **Framer Motion**: Animations.
+- **Lucide React / @iconify/react**: Icons.
+- **Sonner**: Toast notifications.
 
-- **Next.js**: Full-stack React framework with server-side rendering, API routes, and the App Router
-- **React**: UI library for component-based interface development
-- **TypeScript**: For type-safe development and improved developer experience
+### State Management & Data Fetching
 
-### Database and ORM
-
-- **Postgres.js**: Low-level PostgreSQL client for Node.js
-- **Drizzle ORM**: Type-safe ORM for structured database access
-- **Drizzle Kit**: Tools for database migrations and schema management
+- **React Context / `useState` / `useEffect`**: Client-side state.
+- **AI SDK (`useChat`)**: Manages chat interaction state and data fetching for chat.
+- **SWR / React Query**: (Potentially used for other data fetching needs, or direct `fetch`).
 
 ### Authentication
 
-- **NextAuth.js (or custom session cookies)**: For authentication and session management.
-- **bcrypt-ts**: For secure password hashing and verification (if using credential-based auth).
+- **NextAuth.js**: Authentication and session management.
 
-### AI and Machine Learning
+### Database & ORM
 
-- **AI SDK (`@ai-sdk/react`, `@ai-sdk/openai`)**: Core library for AI integration, including React hooks and utilities. Direct usage of provider-specific packages like `@ai-sdk/openai`.
-- **XAI**: Explainable AI utilities for transparency (usage may vary based on current AI integration complexity).
-- Resumable Stream: Its direct usage in the main chat API (`POST /api/chats`) has been removed/commented out, simplifying the streaming logic at that endpoint.
+- **Postgres.js**: PostgreSQL client.
+- **Drizzle ORM & Drizzle Kit**: Type-safe ORM and migrations.
 
-### UI and Styling
+### AI & Machine Learning
 
-- **Tailwind CSS**: Utility-first CSS framework for styling
-- **Shadcn UI / Radix UI**: For accessible component primitives and pre-built components.
-- **Framer Motion**: Animation library for interactive UI elements
-- **Lucide React**: Icon library for visual elements
-- **Sonner**: Toast notification system
-
-### Content and Editors
-
-- **CodeMirror**: Code editor with syntax highlighting
-- **ProseMirror**: Rich text editing framework
-- **React Markdown**: Markdown rendering library
-- **React Data Grid**: For spreadsheet-like data display
-
-### Development Tools
-
-- **Biome / ESLint / Prettier**: Linting, formatting, and quality tools.
-- **Playwright**: End-to-end testing framework
-- **SWR / React Query**: React hooks for data fetching and caching
+- **AI SDK (`ai`, `@ai-sdk/openai`, `@ai-sdk/react`)**: Core libraries for AI model interaction, streaming, and UI integration.
+- **Resumable Stream (`resumable-stream`)**: For managing resumable streaming context in `GET /api/chats`.
 
 ### Utilities
 
-- **Zod**: Schema validation library
-- **date-fns**: Date manipulation utilities
-- **nanoid / `crypto.randomUUID`**: Unique ID generation
-- **ts-safe**: Type-safe error handling
-- **usehooks-ts**: Collection of useful React hooks
+- **Zod**: Schema validation.
+- **date-fns**: Date manipulation.
+- **uuid**: Unique ID generation.
+- **clsx / `cn` utility**: Conditional class names.
 
-These dependencies work together to create a cohesive, modern web application that delivers a smooth user experience while maintaining high code quality and developer productivity.
+### Development & Testing
+
+- **Biome**: Linting, formatting.
+- **Playwright**: End-to-end testing (setup present).
 
 ## Future Enhancements
 
 The Cloneathon-chat application is continuously evolving. Key areas planned for future development and enhancement include:
 
-1.  **Robust AI Feature Re-integration**:
+1.  **Advanced AI Features**:
+    - **Robust Tool Usage**: Fully integrate and expand AI tools beyond basic examples, with proper schema and execution logic.
+    - **Fine-tuned Prompt Engineering**: Develop more sophisticated and context-aware prompt strategies.
+    - **Enhanced Message Persistence**: Ensure all aspects of AI interaction (tool calls, rich content) are reliably saved.
 
-    - **Message Persistence**: Implementing a durable and efficient system for saving all AI-generated responses and user messages, likely decoupled from the primary streaming API endpoint.
-    - **Advanced AI Tooling**: Re-introducing and expanding custom AI tools (e.g., document creation, web search, specific data lookups) in a modular and scalable way.
-    - **Sophisticated Prompt Engineering**: Developing more advanced prompt strategies for nuanced AI interactions.
+2.  **Collaboration & Sharing**:
+    - Implement real-time collaboration features for documents and chats.
+    - Refine sharing mechanisms and permissions for projects and chats.
 
-2.  **Enhanced Chat Features**:
+3.  **Multi-Modal Capabilities**:
+    - Improve handling of image uploads and display within chats.
+    - Explore support for other media types.
 
-    - **Full Voting and Message Actions**: Completing the re-enablement and potential enhancement of features like message voting, editing, and other interactive elements.
-    - **Improved Project Context Management**: Further refining how project context is passed and utilized within UI flows and AI interactions, even with simplified URL structures.
+4.  **Scalability & Performance**:
+    - Optimize database queries, especially for large datasets (many chats/messages).
+    - Improve real-time communication efficiency.
+    - Performance tuning for frontend rendering, especially for long chat histories.
 
-3.  **Scalability and Performance**:
+5.  **Testing & CI/CD**:
+    - Increase unit, integration, and E2E test coverage.
+    - Mature CI/CD pipelines for automated builds, tests, and deployments.
 
-    - Optimizing database queries and real-time communication channels.
-    - Exploring options for scaling AI service interactions.
+6.  **User Experience Refinements**:
+    - Continue to iterate on UI/UX based on user feedback.
+    - Enhance onboarding and in-app guidance.
 
-4.  **Expanded Testing and CI/CD**:
-
-    - Increasing test coverage for new features and architectural changes.
-    - Strengthening CI/CD pipelines for automated testing and deployment.
-
-5.  **Developer Experience**:
-    - Continuously improving internal documentation, component libraries, and development workflows.
+This document provides a snapshot of the current architecture and is subject to change as the project evolves.

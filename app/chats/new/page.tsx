@@ -1,8 +1,8 @@
 'use client';
 
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { mutate } from 'swr';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -11,15 +11,6 @@ import { AppRoutes } from '@/lib/routes';
 import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
 import { MobileHeader } from '@/components/chat/mobile-header';
-
-interface PageParams {
-  projectId?: string;
-  systemPrompt?: string;
-}
-
-interface PageProps {
-  params: Promise<PageParams>;
-}
 
 type ErrorMessage = {
   message: string;
@@ -31,28 +22,22 @@ type ErrorMessage = {
  * and redirects to the new chat page.
  */
 
-export default function NewChatPage(props: PageProps) {
+export default function NewChatPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [creating, setCreating] = useState(true);
 
-  // props.params is a Promise, unwrap it with React.use()
-  const params = use(props.params);
-  const projectId = params.projectId;
-  const systemPrompt = params.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
-  // console.log({ systemPrompt });
+  // Get projectId from search parameters
+  const projectId = searchParams.get('projectId');
+  const systemPrompt = DEFAULT_SYSTEM_PROMPT;
+
   useEffect(() => {
     async function createNewChat() {
       // Wait for session to load
       if (status === 'loading') return;
 
       try {
-        // if (!projectId) {
-        //   toast.error('Project ID is required');
-        //   router.push(AppRoutes.projects.list);
-        //   return;
-        // }
-
         if (!session) {
           toast.error('You must be logged in to create a chat');
           router.push('/login');
@@ -62,10 +47,7 @@ export default function NewChatPage(props: PageProps) {
         // Generate a UUID for the new chat
         const chatId = uuidv4();
 
-        // Create initial chat with default title
-        const systemPrompt = DEFAULT_SYSTEM_PROMPT;
-
-        const messageId = uuidv4(); // `msg-${uuidv4()}`;
+        const messageId = uuidv4();
         const messageContent = 'Hello';
         const message = {
           id: messageId,
@@ -79,24 +61,24 @@ export default function NewChatPage(props: PageProps) {
           role: 'user',
           createdAt: new Date().toISOString(),
           experimental_attachments: [],
-          model: 'chat-model', // Ensure model is part of the message if needed by backend
+          model: 'chat-model',
           projectId: projectId || null,
           contentType: 'application/vnd.ai.content.v1+json',
           textContent: messageContent,
         };
+
         const payload = {
           id: chatId,
           system: systemPrompt,
-          // Don't include projectId in initial payload to avoid validation issues
           visibility: 'private',
           selectedChatModel: 'chat-model',
           messages: [message],
-          projectId: projectId || null,
+          project: projectId ? { id: projectId } : null,
           contentType: 'application/vnd.ai.content.v1+json',
           textContent: messageContent,
         };
-        console.log({ payload });
-        console.log('Preparing chat creation payload:', payload);
+
+        console.log('Creating chat with payload:', payload);
 
         const response = await fetch(AppRoutes.api.chats.base, {
           method: 'POST',
@@ -105,35 +87,11 @@ export default function NewChatPage(props: PageProps) {
           },
           body: JSON.stringify(payload),
         });
-        console.log({ response });
+
         if (!response.ok) {
           throw new Error('Failed to create chat');
         }
 
-        // Now update the chat with the project ID (conditional)
-        if (projectId) {
-          // console.log('Updating chat with project ID: %s', projectId);
-          const projectUpdateResponse = await fetch(
-            `${AppRoutes.api.chats.base}/${chatId}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                // Authorization: `Bearer ${session?.user?.email}`,
-              },
-              body: JSON.stringify({
-                chatId,
-                projectId,
-              }),
-            },
-          );
-
-          if (!projectUpdateResponse.ok) {
-            throw new Error(
-              `Failed to associate chat with project: ${projectUpdateResponse.status} ${projectUpdateResponse.statusText}`,
-            );
-          }
-        }
         // Redirect to the new chat
         router.push(AppRoutes.chats.detail(chatId));
         // Revalidate the first page of chat history to update the sidebar
@@ -150,7 +108,7 @@ export default function NewChatPage(props: PageProps) {
     }
 
     createNewChat();
-  }, [router, session, status, projectId]);
+  }, [router, session, status, projectId, systemPrompt]);
 
   return (
     <>
@@ -159,6 +117,11 @@ export default function NewChatPage(props: PageProps) {
         <div className="flex flex-col items-center justify-center gap-4">
           <Loader2 className="size-8 animate-spin text-primary" />
           <p className="text-lg text-muted-foreground">Creating a new chat...</p>
+          {projectId && (
+            <p className="text-sm text-muted-foreground">
+              Creating chat in project...
+            </p>
+          )}
         </div>
       </div>
     </>

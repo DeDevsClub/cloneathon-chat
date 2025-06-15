@@ -274,7 +274,12 @@ export default function ProjectPage(props: PageProps) {
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Chats in this Project</h2>
-        <Button onClick={() => projectId && router.push(AppRoutes.chats.new)}>
+        <Button
+          onClick={() =>
+            projectId &&
+            router.push(`${AppRoutes.chats.new}?projectId=${projectId}`)
+          }
+        >
           <MessageSquare className="mr-2 size-4" />
           New Chat
         </Button>
@@ -288,7 +293,10 @@ export default function ProjectPage(props: PageProps) {
           </p>
           <Button
             className="mt-4"
-            onClick={() => projectId && router.push(AppRoutes.chats.new)}
+            onClick={() =>
+              projectId &&
+              router.push(`${AppRoutes.chats.new}?projectId=${projectId}`)
+            }
           >
             <MessageSquare className="mr-2 size-4" />
             Create your first chat

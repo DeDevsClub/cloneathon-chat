@@ -35,6 +35,7 @@ import { generateUUID } from '../utils';
 import { generateHashedPassword } from './utils';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ChatSDKError } from '../errors';
+import { DEFAULT_SYSTEM_PROMPT } from '../constants';
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -101,12 +102,16 @@ export async function saveChat({
   title,
   visibility,
   projectId,
+  systemPrompt,
+  model,
 }: {
   id: string;
   userId: string;
   title: string;
   visibility: VisibilityType;
   projectId?: string | null;
+  systemPrompt?: string | null;
+  model?: string | null;
 }) {
   try {
     return await db.insert(chat).values({
@@ -116,6 +121,8 @@ export async function saveChat({
       title,
       visibility,
       projectId,
+      systemPrompt: systemPrompt || DEFAULT_SYSTEM_PROMPT,
+      model: model || 'chat-model',
     });
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
@@ -263,6 +270,9 @@ export async function getChatsByUserId({
 }
 
 export async function getChatById({ id }: { id: string }) {
+  if (!id) {
+    throw new ChatSDKError('bad_request:database', 'Chat ID is required');
+  }
   try {
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
     return selectedChat;

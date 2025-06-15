@@ -57,7 +57,7 @@ export default async function ChatList() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="mb-6 text-3xl font-semibold tracking-tight">My Chats</h1>
+      <h1 className="mb-6 text-3xl font-semibold tracking-tight">Chats</h1>
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>

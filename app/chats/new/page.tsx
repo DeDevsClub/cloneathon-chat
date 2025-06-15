@@ -39,7 +39,7 @@ export default function NewChatPage(props: PageProps) {
   const params = use(props.params);
   const projectId = params.projectId;
   const systemPrompt = params.systemPrompt ?? DEFAULT_SYSTEM_PROMPT;
-  console.log({ systemPrompt });
+  // console.log({ systemPrompt });
   useEffect(() => {
     async function createNewChat() {
       // Wait for session to load

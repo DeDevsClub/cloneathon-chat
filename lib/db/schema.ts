@@ -1,16 +1,17 @@
 import type { InferSelectModel } from 'drizzle-orm';
 import { relations } from 'drizzle-orm';
 import {
-  pgTable,
-  varchar,
-  timestamp,
-  jsonb,
-  uuid,
-  text,
-  primaryKey,
   boolean,
   index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
+import { DEFAULT_SYSTEM_PROMPT } from '../constants';
 
 /**
  * User Table - Stores user authentication information
@@ -76,6 +77,8 @@ export const chat = pgTable(
       onDelete: 'set null',
     }),
     lastActivityAt: timestamp('lastActivityAt').defaultNow().notNull(),
+    systemPrompt: text('systemPrompt').notNull().default(DEFAULT_SYSTEM_PROMPT),
+    model: varchar('model', { length: 100 }).notNull().default('chat-model'),
   },
   (table) => ({
     userIdIdx: index('chat_userId_idx').on(table.userId),

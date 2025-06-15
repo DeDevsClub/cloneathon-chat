@@ -5,10 +5,11 @@ import {
   createStreamableValue,
   getMutableAIState as $getMutableAIState,
   streamUI,
+  StreamableValue,
+  useStreamableValue,
 } from 'ai/rsc';
 import { z } from 'zod';
 
-import { StreamableValue, useStreamableValue } from 'ai/rsc';
 import React from 'react';
 
 export function BotMessage({ textStream }: { textStream: StreamableValue }) {

@@ -8,6 +8,7 @@ import {
   getMessageById,
   getMessagesByChatId,
   updateChatVisiblityById,
+  getChatsByUserId,
 } from '@/lib/db/queries';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { myProvider } from '@/lib/ai/providers';
@@ -37,10 +38,10 @@ export async function generateTitleFromUserMessage({
 
 export async function deleteTrailingMessages({ id }: { id: string }) {
   const [message] = await getMessageById({ id });
-
+  if (!message) return;
   await deleteMessagesByChatIdAfterTimestamp({
-    chatId: message.chatId,
-    timestamp: message.createdAt,
+    chatId: message?.chatId,
+    timestamp: message?.createdAt,
   });
 }
 
@@ -70,6 +71,21 @@ export async function getMessagesForChat({ chatId }: { chatId: string }) {
     return messages;
   } catch (error) {
     console.error('Error fetching messages for chat:', error);
+    return null;
+  }
+}
+
+export async function getChatsForUser({ userId }: { userId: string }) {
+  try {
+    const messages = await getChatsByUserId({
+      id: userId,
+      limit: 20,
+      startingAfter: null,
+      endingBefore: null,
+    });
+    return messages;
+  } catch (error) {
+    console.error('Error fetching chats for user:', error);
     return null;
   }
 }

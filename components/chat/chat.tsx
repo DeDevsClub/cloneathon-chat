@@ -43,57 +43,6 @@ export function Chat({
     initialVisibilityType,
   });
 
-  // const {
-  //   messages,
-  //   setMessages,
-  //   handleSubmit,
-  //   input,
-  //   setInput,
-  //   append,
-  //   status,
-  //   stop,
-  //   reload,
-  //   experimental_resume,
-  //   data,
-  //   error,
-  // } = useChat({
-  //   id: chatId,
-  //   initialMessages,
-  //   experimental_throttle: 100,
-  //   sendExtraMessageFields: true,
-  //   generateId: generateUUID,
-  //   fetch: fetchWithErrorHandlers,
-  //   api: '/api/chats', // Use the correct AI chat endpoint
-  //   experimental_prepareRequestBody: (body) => {
-  //     console.log('Preparing request body with projectId:', projectId);
-  //     console.log('Chat request body:', JSON.stringify(body, null, 2));
-  //     // Send the messages array directly as expected by the OpenAI API
-  //     return {
-  //       ...body, // Keep all original properties
-  //       projectId: projectId || null, // Add project ID for context
-  //       selectedChatModel: initialChatModel || 'chat-model',
-  //       selectedVisibilityType: visibilityType,
-  //     };
-  //   },
-  //   onFinish: () => {
-  //     mutate(unstable_serialize(getChatHistoryPaginationKey));
-  //   },
-  //   onError: (error) => {
-  //     console.error('Chat error:', error);
-  //     if (error instanceof ChatSDKError) {
-  //       toast({
-  //         type: 'error',
-  //         description: error.message,
-  //       });
-  //     } else {
-  //       toast({
-  //         type: 'error',
-  //         description: 'Failed to get AI response. Please try again.',
-  //       });
-  //     }
-  //   },
-  // });
-
   const {
     error,
     input,

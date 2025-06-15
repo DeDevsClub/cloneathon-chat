@@ -8,6 +8,13 @@
       "when": 1749869200386,
       "tag": "0000_brave_human_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1749975180000,
+      "tag": "0001_legal_multiple_man",
+      "breakpoints": true
     }
   ]
 }

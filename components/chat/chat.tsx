@@ -69,12 +69,12 @@ export function Chat({
 
     onFinish(message, { usage, finishReason }) {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
-      // console.log('Usage', usage);
-      // console.log('FinishReason', finishReason);
+      console.log('Usage', usage);
+      console.log('FinishReason', finishReason);
     },
     experimental_prepareRequestBody: (body) => {
-      // console.log('Preparing request body with projectId:', projectId);
-      // console.log('Chat request body:', JSON.stringify(body, null, 2));
+      console.log('Preparing request body with projectId:', projectId);
+      console.log('Chat request body:', JSON.stringify(body, null, 2));
       // Send the messages array directly as expected by the OpenAI API
       return {
         ...body, // Keep all original properties

@@ -132,6 +132,12 @@ export async function saveChat({
     });
   } catch (error) {
     console.error('Error saving chat:', error);
+    
+    // Check if this is a duplicate key error (chat already exists)
+    if (error instanceof Error && error.message.includes('duplicate key')) {
+      throw new ChatSDKError('bad_request:chat', 'Chat with this ID already exists');
+    }
+    
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }

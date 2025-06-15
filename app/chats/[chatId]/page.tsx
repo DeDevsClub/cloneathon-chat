@@ -1,34 +1,80 @@
 'use client';
 
-import { use } from 'react';
-import { Chat } from '@/components/chat/chat';
+import { use, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { Session } from 'next-auth';
 import { redirect } from 'next/navigation';
-interface PageParams {
-  chatId: string;
-  projectId: string | null;
-}
+import type { Session } from 'next-auth';
+import { Chat } from '@/components/chat/chat';
+import type { UIMessage } from 'ai';
+import { getMessagesForChat } from '@/app/chats/actions';
 
-interface PageProps {
-  params: Promise<PageParams>;
-}
+type PageProps = {
+  params: Promise<{
+    chatId: string;
+    projectId?: string;
+  }>;
+};
 
 export default function ChatPage(props: PageProps) {
   const unwrappedParams = use(props.params);
   const chatId = unwrappedParams.chatId;
   const projectId = unwrappedParams.projectId;
   const { data: session } = useSession();
+  const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+
   if (!session) {
     console.error('No session found');
     redirect('/login');
   }
 
+  useEffect(() => {
+    async function loadMessages() {
+      try {
+        setLoading(true);
+        const messages = await getMessagesForChat({ chatId });
+        console.log({ messages });
+        if (messages) {
+          // Convert database messages to UI messages format
+          const uiMessages: UIMessage[] = messages.map((msg) => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant' | 'system',
+            content: msg.textContent || '',
+            parts: Array.isArray(msg.parts) ? msg.parts : [],
+            createdAt: msg.createdAt,
+          }));
+          console.log({ uiMessages });
+          setInitialMessages(uiMessages);
+        }
+      } catch (error) {
+        console.error('Failed to load messages:', error);
+        // Continue with empty messages if loading fails
+        setInitialMessages([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMessages();
+  }, [chatId]);
+
+  // Show loading state while fetching messages
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-lg text-muted-foreground">Loading chat...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Chat
-      projectId={projectId}
+      projectId={projectId || null}
       chatId={chatId}
-      initialMessages={[]}
+      initialMessages={initialMessages}
       initialChatModel="chat-model"
       initialVisibilityType="private"
       isReadonly={false}

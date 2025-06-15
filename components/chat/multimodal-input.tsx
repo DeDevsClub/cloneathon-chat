@@ -31,6 +31,7 @@ import { ModelSelector } from './model-selector';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { saveChatModelAsCookie } from '@/app/chats/actions';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 function PureMultimodalInput({
   chatId,
@@ -67,6 +68,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (textareaRef.current) {

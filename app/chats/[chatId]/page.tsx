@@ -8,6 +8,7 @@ import { Chat } from '@/components/chat/chat';
 import type { UIMessage } from 'ai';
 import { getMessagesForChat } from '@/app/chats/actions';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import { MobileHeader } from '@/components/chat/mobile-header';
 
 type PageProps = {
   params: Promise<{
@@ -65,7 +66,9 @@ export default function ChatPage(props: PageProps) {
     const getModelFromCookies = () => {
       if (typeof document !== 'undefined') {
         const cookies = document.cookie.split(';');
-        const modelCookie = cookies.find(cookie => cookie.trim().startsWith('chat-model='));
+        const modelCookie = cookies.find((cookie) =>
+          cookie.trim().startsWith('chat-model='),
+        );
         if (modelCookie) {
           const model = modelCookie.split('=')[1];
           setSelectedModel(model || DEFAULT_CHAT_MODEL);
@@ -88,15 +91,20 @@ export default function ChatPage(props: PageProps) {
   }
 
   return (
-    <Chat
-      projectId={projectId || null}
-      chatId={chatId}
-      initialMessages={initialMessages}
-      initialChatModel={selectedModel}
-      initialVisibilityType="private"
-      isReadonly={false}
-      session={session as Session}
-      autoResume={true}
-    />
+    <>
+      <MobileHeader chatId={chatId} />
+      <div className="pt-4 md:pt-0">
+        <Chat
+          projectId={projectId || null}
+          chatId={chatId}
+          initialMessages={initialMessages}
+          initialChatModel={selectedModel}
+          initialVisibilityType="private"
+          isReadonly={false}
+          session={session as Session}
+          autoResume={true}
+        />
+      </div>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
 import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
+import { MobileHeader } from '@/components/chat/mobile-header';
 
 interface PageParams {
   projectId?: string;
@@ -152,11 +153,14 @@ export default function NewChatPage(props: PageProps) {
   }, [router, session, status, projectId]);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center">
-      <div className="flex flex-col items-center justify-center gap-4">
-        <Loader2 className="size-8 animate-spin text-primary" />
-        <p className="text-lg text-muted-foreground">Creating a new chat...</p>
+    <>
+      <MobileHeader showBackButton={false} />
+      <div className="flex min-h-[60vh] flex-col items-center justify-center pt-16 md:pt-0">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <Loader2 className="size-8 animate-spin text-primary" />
+          <p className="text-lg text-muted-foreground">Creating a new chat...</p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

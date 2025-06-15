@@ -193,7 +193,7 @@ const PurePreviewMessage = ({
                             <span className="font-medium">Searching the web...</span>
                           </div>
                           <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
-                            Query: "{args.query}"
+                            `Query: ${args.query}`
                           </p>
                         </div>
                       ) : null}

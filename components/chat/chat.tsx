@@ -41,6 +41,12 @@ export function Chat({
   // Track current model
   const [currentModel, setCurrentModel] = useState(initialChatModel);
 
+  // Handle model change
+  const handleModelChange = (modelId: string) => {
+    console.log('Chat component: Model changed to:', modelId);
+    setCurrentModel(modelId);
+  };
+
   const { visibilityType } = useChatVisibility({
     chatId,
     initialVisibilityType,
@@ -77,12 +83,13 @@ export function Chat({
     },
     experimental_prepareRequestBody: (body) => {
       console.log('Preparing request body with projectId:', projectId);
+      console.log('Using model:', currentModel);
       console.log('Chat request body:', JSON.stringify(body, null, 2));
       // Send the messages array directly as expected by the OpenAI API
       return {
         ...body, // Keep all original properties
         projectId: projectId || null, // Add project ID for context
-        selectedChatModel: initialChatModel || 'chat-model',
+        selectedChatModel: currentModel || 'chat-model',
         selectedVisibilityType: visibilityType,
       };
     },
@@ -147,6 +154,7 @@ export function Chat({
             append={append}
             selectedVisibilityType={visibilityType || 'private'}
             selectedModelId={currentModel}
+            onModelChange={handleModelChange}
           />
         )}
 

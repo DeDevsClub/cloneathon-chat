@@ -49,6 +49,7 @@ function PureMultimodalInput({
   className,
   selectedVisibilityType,
   selectedModelId,
+  onModelChange,
 }: {
   chatId: string;
   projectId: string | null;
@@ -65,6 +66,7 @@ function PureMultimodalInput({
   className?: string;
   selectedVisibilityType: VisibilityType;
   selectedModelId: string;
+  onModelChange?: (modelId: string) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -174,6 +176,7 @@ function PureMultimodalInput({
   const handleModelChange = (modelId: string) => {
     console.log('Model changed to:', modelId);
     saveChatModelAsCookie(modelId);
+    onModelChange?.(modelId);
   };
 
   const handleFileChange = useCallback(
@@ -345,6 +348,7 @@ export const MultimodalInput = memo(
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
     if (prevProps.selectedModelId !== nextProps.selectedModelId) return false;
+    if (prevProps.onModelChange !== nextProps.onModelChange) return false;
     return true;
   },
 );

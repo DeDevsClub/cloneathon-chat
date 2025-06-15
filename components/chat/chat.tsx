@@ -41,10 +41,19 @@ export function Chat({
   // Track current model
   const [currentModel, setCurrentModel] = useState(initialChatModel);
 
+  // Track tools enabled state
+  const [toolsEnabled, setToolsEnabled] = useState(false);
+
   // Handle model change
   const handleModelChange = (modelId: string) => {
     console.log('Chat component: Model changed to:', modelId);
     setCurrentModel(modelId);
+  };
+
+  // Handle tools toggle
+  const handleToolsToggle = (enabled: boolean) => {
+    console.log('Chat component: Tools enabled:', enabled);
+    setToolsEnabled(enabled);
   };
 
   const { visibilityType } = useChatVisibility({
@@ -84,6 +93,7 @@ export function Chat({
     experimental_prepareRequestBody: (body) => {
       console.log('Preparing request body with projectId:', projectId);
       console.log('Using model:', currentModel);
+      console.log('Tools enabled:', toolsEnabled);
       console.log('Chat request body:', JSON.stringify(body, null, 2));
       // Send the messages array directly as expected by the OpenAI API
       return {
@@ -91,6 +101,7 @@ export function Chat({
         projectId: projectId || null, // Add project ID for context
         selectedChatModel: currentModel || 'chat-model',
         selectedVisibilityType: visibilityType,
+        toolsEnabled: toolsEnabled,
       };
     },
   });
@@ -155,6 +166,8 @@ export function Chat({
             selectedVisibilityType={visibilityType || 'private'}
             selectedModelId={currentModel}
             onModelChange={handleModelChange}
+            toolsEnabled={toolsEnabled}
+            onToolsToggle={handleToolsToggle}
           />
         )}
 

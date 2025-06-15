@@ -6,11 +6,11 @@ import {
   saveChat,
   saveMessages,
 } from '@/lib/db/queries';
-import { z } from 'zod';
 import { ChatSDKError } from '@/lib/errors';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
+import { getEnabledTools } from '@/lib/tools';
 
 export const maxDuration = 60;
 
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       model,
       textContent,
       toolCallStreaming,
+      toolsEnabled,
     } = await req.json();
 
     // Validate required fields
@@ -203,40 +204,7 @@ export async function POST(req: Request) {
       toolCallStreaming: toolCallStreaming || false,
       messages: messages,
       system: prompt,
-      tools: {
-        // server-side tool with execute function:
-        getWeatherInformation: {
-          description: 'show a generic weather widget',
-          parameters: z.object({
-            city: z.string().describe('the city to get the weather for'),
-          }),
-          execute: async ({ city }: { city: string }) => {
-            const weatherData = {
-              city,
-              temperature: Math.round(Math.random() * 35),
-              condition: ['sunny', 'cloudy', 'rainy', 'snowy', 'windy'][
-                Math.floor(Math.random() * 5)
-              ],
-              humidity: Math.round(Math.random() * 100),
-              windSpeed: Math.round(Math.random() * 20),
-            };
-            return weatherData;
-          },
-        },
-        // client-side tool that starts a stream and returns a result:
-        showWeatherInformation: {
-          description: 'display weather information in the UI',
-          parameters: z.object({
-            city: z.string(),
-            weatherData: z.object({
-              temperature: z.number(),
-              condition: z.string(),
-              humidity: z.number(),
-              windSpeed: z.number(),
-            }),
-          }),
-        },
-      },
+      tools: getEnabledTools(toolsEnabled),
       async onFinish(result: {
         text: string;
         toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;

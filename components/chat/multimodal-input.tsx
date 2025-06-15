@@ -24,7 +24,7 @@ import { SuggestedActions } from '@/components/chat/suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Globe } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ModelSelector } from './model-selector';
@@ -50,6 +50,8 @@ function PureMultimodalInput({
   selectedVisibilityType,
   selectedModelId,
   onModelChange,
+  toolsEnabled = false,
+  onToolsToggle,
 }: {
   chatId: string;
   projectId: string | null;
@@ -67,6 +69,8 @@ function PureMultimodalInput({
   selectedVisibilityType: VisibilityType;
   selectedModelId: string;
   onModelChange?: (modelId: string) => void;
+  toolsEnabled?: boolean;
+  onToolsToggle?: (enabled: boolean) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -291,7 +295,11 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Enter your message here..."
+        placeholder={
+          toolsEnabled
+            ? "Enter your message here... (Web search enabled 🌐)"
+            : "Enter your message here..."
+        }
         value={input}
         onChange={handleInput}
         className={cx(
@@ -321,6 +329,20 @@ function PureMultimodalInput({
             onModelChange={handleModelChange}
           />
         )}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`p-1.5 h-8 w-8 transition-colors ${
+            toolsEnabled
+              ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          }`}
+          onClick={() => onToolsToggle?.(!toolsEnabled)}
+          disabled={status === 'submitted'}
+          title={toolsEnabled ? 'Disable web search' : 'Enable web search'}
+        >
+          <Globe size={16} />
+        </Button>
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
@@ -349,6 +371,8 @@ export const MultimodalInput = memo(
       return false;
     if (prevProps.selectedModelId !== nextProps.selectedModelId) return false;
     if (prevProps.onModelChange !== nextProps.onModelChange) return false;
+    if (prevProps.toolsEnabled !== nextProps.toolsEnabled) return false;
+    if (prevProps.onToolsToggle !== nextProps.onToolsToggle) return false;
     return true;
   },
 );

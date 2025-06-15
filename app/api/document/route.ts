@@ -88,7 +88,7 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const timestamp = searchParams.get('timestamp');
-
+  console.log({ id, timestamp });
   if (!id) {
     return new ChatSDKError(
       'bad_request:api',

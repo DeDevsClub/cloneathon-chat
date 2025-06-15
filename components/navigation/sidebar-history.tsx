@@ -120,7 +120,8 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     : false;
 
   const handleDelete = async () => {
-    const deletePromise = fetch(`/api/chats?id=${deleteId}`, {
+    console.log('Attempting to delete chat with ID:', deleteId);
+    const deletePromise = fetch(`/api/chats?chatId=${deleteId}`, {
       method: 'DELETE',
     });
 

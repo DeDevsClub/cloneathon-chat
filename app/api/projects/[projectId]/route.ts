@@ -215,6 +215,7 @@ export async function DELETE(request: NextRequest) {
   const pathParts = url.pathname.split('/');
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
   try {
+    console.log('Deleting project:', projectId);
     // Try extracting email from different possible session cookie names
     let email = null;
 

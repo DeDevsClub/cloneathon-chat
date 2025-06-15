@@ -17,7 +17,7 @@ export const chatModels: Array<ChatModel> = [
   {
     id: 'chat-model-reasoning',
     name: 'Reasoning',
-    description: 'Uses advanced reasoning',
-    model: 'o3-mini',
+    description: 'Uses Groq Llama for advanced reasoning',
+    model: 'llama-3.1-70b-versatile',
   },
 ];

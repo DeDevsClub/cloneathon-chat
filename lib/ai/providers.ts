@@ -4,6 +4,7 @@ import {
   wrapLanguageModel,
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import { isTestEnvironment } from '../constants';
 import { artifactModel, reasoningModel } from './models.test';
 
@@ -20,7 +21,7 @@ export const myProvider = isTestEnvironment
       languageModels: {
         'chat-model': openai.chat('gpt-4o'),
         'chat-model-reasoning': wrapLanguageModel({
-          model: openai.chat('o3-mini'),
+          model: groq('llama-3.1-70b-versatile'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
         'title-model': openai.chat('gpt-4o'),

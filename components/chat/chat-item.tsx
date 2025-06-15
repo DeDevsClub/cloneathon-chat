@@ -27,6 +27,7 @@ interface ChatItemProps {
   active?: boolean;
   showMenu?: boolean;
   onChatSelected?: (chat: Chat) => void;
+  className?: string;
 }
 
 export const ChatItem = ({
@@ -34,6 +35,7 @@ export const ChatItem = ({
   active = false,
   showMenu = true,
   onChatSelected,
+  className,
 }: ChatItemProps) => {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -85,6 +87,7 @@ export const ChatItem = ({
       className={cn(
         'group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted/50',
         active && 'bg-muted font-medium',
+        className,
       )}
     >
       <Button

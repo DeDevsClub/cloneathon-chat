@@ -67,6 +67,14 @@ export function CreateProjectDialog({
     },
   });
 
+  /**
+   * Handles the submission of the project creation form.
+   * - Sends a POST request to the server to create a new project with the given form values.
+   * - Displays a success toast and refreshes the router on successful project creation.
+   * - Handles errors by displaying appropriate error messages and redirecting guests to the login page if necessary.
+   *
+   * @param {FormValues} values - The form values to be submitted for project creation.
+   */
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true);
     // console.log({ user: session?.user });
@@ -82,7 +90,6 @@ export function CreateProjectDialog({
       });
 
       if (!response.ok) {
-        const error = await response.json();
         // console.log({ error });
         if (isGuest) {
           toast.error('Authentication Required', {
@@ -97,6 +104,7 @@ export function CreateProjectDialog({
           setTimeout(() => router.push('/login'), 2000);
           return;
         }
+        const error = await response.json();
         throw new Error(error.message || 'Failed to create project');
       }
 

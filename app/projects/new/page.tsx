@@ -26,6 +26,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useSession } from 'next-auth/react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -46,6 +47,8 @@ type FormValues = z.infer<typeof formSchema>;
 const NewProjectPage = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: session } = useSession();
+  const isGuest = session?.user?.type === 'guest';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -71,6 +74,21 @@ const NewProjectPage = () => {
 
       if (!response.ok) {
         const error = await response.json();
+        const isGuest = session?.user?.type === 'guest';
+
+        if (isGuest) {
+          toast.error('Authentication Required', {
+            description:
+              'Please sign in with your account to create and manage projects.',
+            action: {
+              label: 'Sign In',
+              onClick: () => router.push('/login'),
+            },
+            duration: 5000,
+          });
+          setTimeout(() => router.push('/login'), 2000);
+          return;
+        }
         throw new Error(error.message || 'Failed to create project');
       }
 
@@ -80,7 +98,13 @@ const NewProjectPage = () => {
       router.push(`/projects/${project.id}`);
     } catch (error: any) {
       console.error('Error creating project:', error);
-      toast.error(error.message || 'Failed to create project');
+      const isGuest = session?.user?.type === 'guest';
+      console.log({ isGuest });
+      if (!isGuest) {
+        toast.error(error.message || 'Failed to create project');
+      } else {
+        toast.error('You must be logged in to create a project');
+      }
     } finally {
       setIsSubmitting(false);
     }

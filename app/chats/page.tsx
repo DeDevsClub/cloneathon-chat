@@ -1,29 +1,43 @@
 'use client';
-
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 
 import { ChatItem } from '@/components/chat/chat-item';
 import { CreateChatDialog } from '@/components/chat/create-chat-dialogue';
+import { useSession } from 'next-auth/react';
+import { cn } from '@/lib/utils';
+import { Greeting } from '@/components/chat/greeting';
 
 const ChatsPage = () => {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<any[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState(false);
-
+  const { data: session } = useSession();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  const handleChatCreated = (chat: any) => {
+    // Refresh the project list after a new project is created
+    fetchChats();
+    setOpen(false);
+    toast.success('Chat created successfully');
+  };
 
   const fetchChats = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/chats/history');
+      const response = await fetch('/api/chats/history', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.user?.email}`,
+        },
+      });
       if (!response.ok) {
-        // console.log('Project fetch status:', response.status);
         throw new Error(`Failed to fetch chats: ${response.status}`);
       }
 
@@ -37,16 +51,15 @@ const ChatsPage = () => {
     }
   };
 
+  // return;
   useEffect(() => {
-    fetchChats();
-  }, []);
-
-  const handleChatCreated = (chat: any) => {
-    // Refresh the project list after a new project is created
-    fetchChats();
-    setOpen(false);
-    toast.success('Chat created successfully');
-  };
+    if (!session) {
+      console.log('No session found');
+      setLoading(false);
+    } else {
+      fetchChats();
+    }
+  }, [session]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -89,35 +102,34 @@ const ChatsPage = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="container py-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Chats</h1>
-        <Button onClick={() => setOpen(true)}>
-          <Plus className="size-4 mr-2" />
-          New Chat
-        </Button>
-      </div>
-
+    <div className="container py-4 sm:py-0 max-w-5xl mx-auto overflow-hidden">
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="size-8 animate-spin text-primary" />
+          <Icon
+            icon="lucide:loader"
+            className="size-8 animate-spin text-primary"
+          />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex">
           {chats.length === 0 ? (
-            <div className="col-span-full py-10 text-center">
-              <p className="text-muted-foreground">
-                No chats found. Create your first chat to get started!
-              </p>
-            </div>
+            <Hero />
           ) : (
-            chats.map((chat) => (
-              <ChatItem
-                key={chat.id}
-                chat={chat}
-                onChatSelected={() => router.push(`/chats/${chat.id}`)}
-              />
-            ))
+            <div
+              className={cn(
+                'flex flex-col gap-6 m-12 md:m-16 border-2 h-fit w-full rounded-lg items-center',
+                chats.length > 20 ? 'overflow-y-hidden' : '',
+              )}
+            >
+              {chats.map((chat) => (
+                <ChatItem
+                  className="w-full"
+                  key={chat.id}
+                  chat={chat}
+                  onChatSelected={() => router.push(`/chats/${chat.id}`)}
+                />
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -127,14 +139,17 @@ const ChatsPage = () => {
         onOpenChange={setOpen}
         onChatCreated={handleChatCreated}
       />
+    </div>
+  );
+};
 
-      {/* Interactive tutorial */}
-      {/* {showTutorial && (
-        <ChatTutorial
-          onDismiss={handleDismissTutorial}
-          onCreateChat={handleCreateFromTutorial}
-        />
-      )} */}
+const Hero = () => {
+  return (
+    <div className="flex flex-col w-screen max-w-screen-lg h-fit max-h-full justify-center items-center overflow-hidden">
+      <Greeting />
+      <Link href="/chats/new" className="welcome-button">
+        Chat with AI Agents
+      </Link>
     </div>
   );
 };

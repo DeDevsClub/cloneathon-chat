@@ -13,8 +13,18 @@ export async function middleware(request: NextRequest) {
   });
 
   // 1. Handle protected routes
-  const protectedRoutes = ['/tests/ids', '/tests', '/tests/chat'];
-  if (protectedRoutes.includes(pathname)) {
+  const adminRoutes = ['/tests/ids', '/tests', '/tests/chat'];
+  const guestRoutes = ['/login', '/signup', '/', '/chats'];
+  const isGuest = guestRegex.test(token?.email ?? ''); // Can use token.email directly
+  // console.log({ isGuest });
+  if (guestRoutes.includes(pathname) && isGuest) {
+    console.log('Handling guest route:', pathname);
+    console.log('No token for protected route, redirecting to guest auth.');
+    const redirectUrl = encodeURIComponent(request.url);
+    return NextResponse.redirect(new URL(`/login`, request.url));
+  }
+
+  if (adminRoutes.includes(pathname)) {
     console.log('Handling protected route:', pathname);
     if (!token) {
       console.log('No token for protected route, redirecting to guest auth.');
@@ -62,12 +72,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     } else {
       // Not a guest-allowed path and no token, redirect to login
-      console.log(
-        'No token for non-guest path, redirecting to login:',
-        pathname,
-      );
-      const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
-      return NextResponse.redirect(loginUrl);
+      // console.log(
+      //   'No token for non-guest path, redirecting to login:',
+      //   pathname,
+      // );
+      // const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
+      // return NextResponse.redirect(loginUrl);
     }
   } else {
     // Token exists, handle authenticated user logic
@@ -83,12 +93,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // For all other cases where a token exists and it's not a special case above
-    console.log(
-      'Authenticated access for token:',
-      token.email,
-      'to path:',
-      pathname,
-    );
+    // console.log('Authenticated access for token:', token, 'to path:', pathname);
     return NextResponse.next();
   }
 }

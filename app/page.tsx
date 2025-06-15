@@ -8,7 +8,6 @@ import {
   BrainCircuit,
   ShieldCheck,
   Palette,
-  Plus,
 } from 'lucide-react'; // Example icons
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';

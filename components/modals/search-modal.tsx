@@ -128,6 +128,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
               className="mt-4 flex w-full items-center gap-3 rounded-md p-2 text-left text-sm hover:bg-muted"
             >
               <Plus size={16} className="text-violet-400" />
+              {/* {'New Chat'} */}
               <span className="truncate text-violet-300">
                 Start new chat:{' '}
                 <span className="font-medium text-foreground">

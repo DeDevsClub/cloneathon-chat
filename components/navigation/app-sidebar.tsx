@@ -88,8 +88,8 @@ export function AppSidebar({ user }: AppSidebarProps) {
               if (user?.id) {
                 createChat();
               } else {
-                console.error('Invalid user ID for chat creation:');
-                router.push('/projects');
+                // console.error('Invalid user ID for chat creation:');
+                router.push('/login');
               }
             }}
           >

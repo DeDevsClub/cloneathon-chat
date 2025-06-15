@@ -27,7 +27,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
-import { ModelSelector } from './model-selector';
+// import { ModelSelector } from './model-selector';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 // import { saveChatModelAsCookie } from '@/app/chats/actions';

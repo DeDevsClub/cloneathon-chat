@@ -238,7 +238,7 @@ export function SearchResults({ data }: SearchResultsProps) {
           <span className="font-medium">No Results Found</span>
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {`No search results found for ${data.query}`
+          {`No search results found for ${data.query}`}
         </p>
       </div>
     );

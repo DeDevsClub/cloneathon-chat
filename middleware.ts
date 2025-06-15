@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   if (guestRoutes.includes(pathname) && isGuest) {
     console.log('Handling guest route:', pathname);
     console.log('No token for protected route, redirecting to guest auth.');
-    const redirectUrl = encodeURIComponent(request.url);
+    // constq redirectUrl = encodeURIComponent(request.url);
     return NextResponse.redirect(new URL(`/login`, request.url));
   }
 
@@ -36,9 +36,10 @@ export async function middleware(request: NextRequest) {
 
     // Token exists, check authorization
     // Ensure AUTHORIZED_EMAIL is set in your .env file
-    const isAuthorized = token.email
+    const isAuthorized = token?.email
       ? process.env.AUTHORIZED_EMAILS?.includes(token.email)
       : false;
+    console.log({ isAuthorized });
     if (!isAuthorized) {
       console.log(
         'User not authorized for protected route, redirecting to guest auth.',
@@ -59,12 +60,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. Handle /api/auth routes (allow them to pass through)
-  if (pathname.startsWith('/api/auth')) {
-    return NextResponse.next();
-  }
+  // if (pathname.startsWith('/api/auth')) {
+  //   return NextResponse.next();
+  // }
 
   // 4. Handle all other routes (general authentication check)
-  if (!token) {
+  if (!token && isGuest) {
     // No token, check if it's a guest-allowed public path (e.g., landing page, /login itself)
     // Ensure guestRegex is correctly defined in lib/constants.ts
     if (guestRegex.test(pathname)) {
@@ -72,13 +73,27 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     } else {
       // Not a guest-allowed path and no token, redirect to login
-      // console.log(
-      //   'No token for non-guest path, redirecting to login:',
-      //   pathname,
-      // );
-      // const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
-      // return NextResponse.redirect(loginUrl);
+      console.log(
+        'No token for non-guest path, redirecting to login:',
+        pathname,
+      );
+      const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
+      return NextResponse.redirect(loginUrl);
     }
+  } else {
+    // Token exists, handle authenticated user logic
+    // Note: token is guaranteed to be non-null here
+    const isGuest = guestRegex.test(token?.email ?? ''); // Can use token.email directly
+    // If an authenticated non-guest user tries to access /login or /signup, redirect to home
+    if (token && !isGuest && ['/login', '/signup'].includes(pathname)) {
+      console.log(
+        'Authenticated non-guest user on login/signup page, redirecting to home.',
+      );
+      return NextResponse.redirect(new URL('/chats', request.url));
+    }
+    // For all other cases where a token exists and it's not a special case above
+    // console.log('Authenticated access for token:', token, 'to path:', pathname);
+    return NextResponse.next();
   }
 }
 

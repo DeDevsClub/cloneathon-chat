@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useTransition, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { Icon } from '@iconify/react';
@@ -20,6 +20,7 @@ import {
 import { signup, type RegisterActionState } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession } from 'next-auth/react';
+import router from 'next/router';
 
 export default function Page() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function Page() {
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [mounted, setMounted] = useState(false);
-
+  const [isPending, startTransition] = useTransition();
   const [state, formAction] = useActionState<RegisterActionState, FormData>(
     signup,
     {
@@ -75,19 +76,28 @@ export default function Page() {
         description: 'Failed validating your submission',
       });
     } else if (state.status === 'success') {
-      toast({ type: 'success', description: 'Account created successfully' });
       setIsSuccessful(true);
       updateSession();
-      // Redirect to home page after successful account creation
-      setTimeout(() => {
-        router.push('/chats');
-      }, 500); // Short delay to allow the success message to be seen
+      router.push('/chats');
+      toast({ type: 'success', description: 'Account created successfully' });
     }
-  }, [state, updateSession, router]);
+  }, [
+    state,
+    updateSession,
+    router,
+    startTransition,
+    updateSession,
+    isSuccessful,
+    setIsSuccessful,
+    setTimeout,
+  ]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
     formAction(formData);
+    setIsSuccessful(true);
+    updateSession();
+    router.push('/chats');
   };
 
   return (

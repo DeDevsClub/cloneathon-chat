@@ -62,9 +62,9 @@ export default function NewChatPage(props: PageProps) {
         const chatId = uuidv4();
 
         // Create initial chat with default title
-        const messageContent = 'Hello! This is a new chat.';
 
         const messageId = uuidv4(); // `msg-${uuidv4()}`;
+        const messageContent = `msg-${messageId.slice(0, 4)}`;
         const message = {
           id: messageId,
           content: messageContent,

@@ -5,41 +5,92 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  /*
-   * Playwright starts the dev server and requires a 200 status to
-   * begin the tests, so this ensures that the tests can start
-   */
-  if (pathname.startsWith('/ping')) {
-    return new Response('pong', { status: 200 });
-  }
-
-  if (pathname.startsWith('/api/auth')) {
-    return NextResponse.next();
-  }
-
+  // Fetch token once at the beginning
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
     secureCookie: !isDevelopmentEnvironment,
   });
 
+  // 1. Handle protected routes
+  const protectedRoutes = ['/tests/ids', '/tests', '/tests/chat'];
+  if (protectedRoutes.includes(pathname)) {
+    console.log('Handling protected route:', pathname);
+    if (!token) {
+      console.log('No token for protected route, redirecting to guest auth.');
+      const redirectUrl = encodeURIComponent(request.url);
+      return NextResponse.redirect(
+        new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url),
+      );
+    }
+
+    // Token exists, check authorization
+    // Ensure AUTHORIZED_EMAIL is set in your .env file
+    const isAuthorized = token.email
+      ? process.env.AUTHORIZED_EMAILS?.includes(token.email)
+      : false;
+    if (!isAuthorized) {
+      console.log(
+        'User not authorized for protected route, redirecting to guest auth.',
+      );
+      const redirectUrl = encodeURIComponent(request.url);
+      return NextResponse.redirect(
+        new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url),
+      );
+    }
+
+    console.log('User authorized for protected route.');
+    return NextResponse.next(); // Authorized for protected route
+  }
+
+  // 2. Handle /ping route for Playwright
+  if (pathname.startsWith('/ping')) {
+    return new Response('pong', { status: 200 });
+  }
+
+  // 3. Handle /api/auth routes (allow them to pass through)
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
+
+  // 4. Handle all other routes (general authentication check)
   if (!token) {
-    // Properly encode the current URL for the redirect
-    const redirectUrl = encodeURIComponent(request.url);
+    // No token, check if it's a guest-allowed public path (e.g., landing page, /login itself)
+    // Ensure guestRegex is correctly defined in lib/constants.ts
+    if (guestRegex.test(pathname)) {
+      console.log('Guest-allowed path, proceeding without token:', pathname);
+      return NextResponse.next();
+    } else {
+      // Not a guest-allowed path and no token, redirect to login
+      console.log(
+        'No token for non-guest path, redirecting to login:',
+        pathname,
+      );
+      const loginUrl = new URL('/login', request.url); // Adjust '/login' if your login path is different
+      return NextResponse.redirect(loginUrl);
+    }
+  } else {
+    // Token exists, handle authenticated user logic
+    // Note: token is guaranteed to be non-null here
+    const isGuest = guestRegex.test(token.email ?? ''); // Can use token.email directly
 
-    // Create the redirect URL with the encoded current URL as a parameter
-    return NextResponse.redirect(
-      new URL(`/api/auth/guest?redirectUrl=${redirectUrl}`, request.url),
+    // If an authenticated non-guest user tries to access /login or /signup, redirect to home
+    if (!isGuest && ['/login', '/signup'].includes(pathname)) {
+      console.log(
+        'Authenticated non-guest user on login/signup page, redirecting to home.',
+      );
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    // For all other cases where a token exists and it's not a special case above
+    console.log(
+      'Authenticated access for token:',
+      token.email,
+      'to path:',
+      pathname,
     );
+    return NextResponse.next();
   }
-
-  const isGuest = guestRegex.test(token?.email ?? '');
-
-  if (token && !isGuest && ['/login', '/signup'].includes(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  return NextResponse.next();
 }
 
 export const config = {

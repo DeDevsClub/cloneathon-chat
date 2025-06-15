@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getToken } from 'next-auth/jwt';
-// import { updateChatProject } from '@/lib/db/chat';
 import { getUser } from '@/lib/db/queries';
 import { updateProject } from '@/lib/db';
 
@@ -94,7 +93,7 @@ export async function PATCH(request: NextRequest) {
     const validationResult = updateChatProjectSchema.safeParse(body);
 
     if (!validationResult.success) {
-      // console.error('Validation error:', validationResult.error);
+      console.error('Validation error:', validationResult.error);
       return NextResponse.json(
         { error: validationResult.error.errors },
         { status: 400 },

@@ -3,27 +3,25 @@
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr'; // useSWR removed as unused
 import { ChatHeader } from '@/components/chat/chat-header';
-import { fetcher, fetchWithErrorHandlers, generateUUID } from '@/lib/utils';
-import { Artifact } from '@/components/chat/artifact';
+import { fetchWithErrorHandlers, generateUUID } from '@/lib/utils'; // fetcher removed as unused
+import { Artifact, type UIArtifact } from '@/components/chat/artifact'; // Added UIArtifact import
 import { MultimodalInput } from '@/components/chat/multimodal-input';
 import { Messages } from '@/components/chat/messages';
-import type { VisibilityType } from '@/components/visibility-selector';
-import { useArtifactSelector } from '@/hooks/use-artifact';
+import type { VisibilityType } from '@/components/visibility-selector'; // Restored VisibilityType import
+import { useArtifactSelector } from '@/hooks/use-artifact'; // Restored useArtifactSelector and corrected path
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from '@/components/navigation/sidebar-history';
-import { toast } from '@/components/toast';
 import type { Session } from 'next-auth';
 import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
-import { ChatSDKError } from '@/lib/errors';
-import { SuggestedActions } from '@/components/chat/suggested-actions';
+// import { ChatSDKError } from '@/lib/errors';
 
 export function Chat({
-  projectId,
   chatId,
+  projectId,
   initialMessages,
   initialChatModel,
   initialVisibilityType,
@@ -31,8 +29,8 @@ export function Chat({
   session,
   autoResume,
 }: {
-  projectId: string | null;
   chatId: string;
+  projectId: string | null;
   initialMessages: Array<UIMessage>;
   initialChatModel: string;
   initialVisibilityType: VisibilityType;
@@ -115,11 +113,19 @@ export function Chat({
     setInput,
     append,
   } = useChat({
+    id: chatId,
+    initialMessages,
+    experimental_throttle: 100,
+    sendExtraMessageFields: true,
+    generateId: generateUUID,
+    fetch: fetchWithErrorHandlers,
+    api: '/api/chats', // Use the correct AI chat endpoint
+
     onFinish(message, { usage, finishReason }) {
+      mutate(unstable_serialize(getChatHistoryPaginationKey));
       // console.log('Usage', usage);
       // console.log('FinishReason', finishReason);
     },
-    experimental_throttle: 100,
   });
 
   const searchParams = useSearchParams();
@@ -140,7 +146,9 @@ export function Chat({
   }, [hasAppendedQuery, status, input, messages, projectId]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+  const isArtifactVisible = useArtifactSelector(
+    (state: UIArtifact) => state.isVisible,
+  );
 
   useAutoResume({
     autoResume,

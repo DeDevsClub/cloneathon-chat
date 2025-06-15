@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getProjectForChat, getMessagesForChat } from '@/app/(chat)/actions';
+import { getProjectForChat, getMessagesForChat } from '@/app/chats/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Message } from '@/lib/db/schema';

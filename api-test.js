@@ -16,21 +16,20 @@ async function testChatApi() {
 
   // Create a payload that matches the expected schema
   const payload = {
-    id: chatId,
+    // id: chatId, // Removed as chatId is now in the URL
     projectId: projectId || null,
-    message: {
-      id: messageId,
-      role: 'user',
-      parts: [
-        {
-          type: 'text',
-          text: 'Hello, this is a test message to verify chat API functionality with project context',
-        },
-      ],
-      experimental_attachments: [],
-    },
-    selectedChatModel: 'chat-model',
-    selectedVisibilityType: 'private',
+    messages: [
+      {
+        id: messageId,
+        role: 'user',
+        content: 'Hello, this is a test message to verify chat API functionality with project context',
+        // 'parts' structure was from a different schema, UIMessage uses 'content'
+        // experimental_attachments: [], // Ensure UIMessage structure is matched
+      }
+    ],
+    // These fields might not be used by the simplified POST handler
+    // selectedChatModel: 'chat-model',
+    // selectedVisibilityType: 'private',
   };
 
   console.log('\nSending request to /api/chats...');

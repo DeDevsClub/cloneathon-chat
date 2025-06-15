@@ -4,51 +4,6 @@ import { chat } from './schema';
 import { and, eq, desc } from 'drizzle-orm';
 
 /**
- * Updates the project association of a chat
- */
-export async function updateChatProject({
-  chatId,
-  projectId,
-}: {
-  chatId: string;
-  projectId: string | null;
-}) {
-  try {
-    // First check if chat exists
-    const [foundChat] = await db
-      .select()
-      .from(chat)
-      .where(eq(chat.id, chatId))
-      .limit(1);
-
-    if (!foundChat) {
-      throw new ChatSDKError(
-        'not_found:database',
-        `Chat with id ${chatId} not found`,
-      );
-    }
-
-    // Update the chat's project
-    const [updatedChat] = await db
-      .update(chat)
-      .set({ projectId })
-      .where(eq(chat.id, chatId))
-      .returning();
-
-    return updatedChat;
-  } catch (error) {
-    if (error instanceof ChatSDKError) {
-      throw error;
-    }
-
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to update chat project',
-    );
-  }
-}
-
-/**
  * Creates a new chat with optional project association
  */
 export async function createChat({

@@ -85,7 +85,8 @@
   <div class="container">
     <div class="input-section">
       <div class="controls">
-        <input type="text" id="endpoint" class="endpoint-input" value="/api/chats" placeholder="API Endpoint">
+        <input type="text" id="endpoint" class="endpoint-input" value="/api/chats" placeholder="API Endpoint Base">
+        <input type="text" id="chatId" class="endpoint-input" placeholder="Chat ID (optional, will be generated)">
         <button id="clear-btn">Clear Output</button>  
       </div>
       <textarea id="message-input" placeholder="Type your message here..."></textarea>
@@ -103,8 +104,25 @@
     const clearBtn = document.getElementById('clear-btn');
     const output = document.getElementById('output');
     const endpointInput = document.getElementById('endpoint');
+    const chatIdInput = document.getElementById('chatId'); // Added chatId input reference
     
     let messages = [];
+
+    function generateUUID() { // Public Domain/MIT
+        var d = new Date().getTime();//Timestamp
+        var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16;//random number between 0 and 16
+            if(d > 0){//Use timestamp until depleted
+                r = (d + r)%16 | 0;
+                d = Math.floor(d/16);
+            } else {//Use microseconds since page-load if supported
+                r = (d2 + r)%16 | 0;
+                d2 = Math.floor(d2/16);
+            }
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    }
 
     sendBtn.addEventListener('click', async () => {
       const userMessage = messageInput.value.trim();
@@ -135,10 +153,18 @@
       output.appendChild(loadingDiv);
       
       try {
-        const endpoint = endpointInput.value || '/api/chats';
+        const baseEndpoint = endpointInput.value.trim() || '/api/chats';
+        let currentChatId = chatIdInput.value.trim();
+        if (!currentChatId) {
+            currentChatId = generateUUID();
+            chatIdInput.value = currentChatId; // Populate the input field if generated
+        }
         
+        const fullEndpoint = `${baseEndpoint.replace(/\/$/, '')}/${currentChatId}`; // Construct full endpoint
+        console.log('Sending POST to:', fullEndpoint);
+
         // Send request to API
-        const response = await fetch(endpoint, {
+        const response = await fetch(fullEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

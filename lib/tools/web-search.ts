@@ -12,6 +12,17 @@ interface BraveSearchResult {
   age?: string;
   page_age?: string;
   family_friendly?: boolean;
+  thumbnail?: {
+    src: string;
+    width?: number;
+    height?: number;
+  };
+  meta_url?: {
+    scheme: string;
+    netloc: string;
+    hostname: string;
+    favicon: string;
+  };
 }
 
 interface BraveSearchResponse {
@@ -21,7 +32,25 @@ interface BraveSearchResponse {
   news?: {
     results: BraveSearchResult[];
   };
+  images?: {
+    results: BraveImageResult[];
+  };
 }
+
+type BraveImageResult = {
+  title: string;
+  url: string;
+  thumbnail: {
+    src: string;
+    width: number;
+    height: number;
+  };
+  properties: {
+    url: string;
+    width: number;
+    height: number;
+  };
+};
 
 export const webSearchTool = tool({
   description: 'Search the web for current information using Brave Search API',
@@ -48,24 +77,34 @@ export const webSearchTool = tool({
         };
       }
 
-      const searchUrl = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=8&text_decorations=0&search_lang=en&country=US&safesearch=moderate&freshness=pd`;
-      
-      const response = await fetch(searchUrl, {
-        headers: {
-          'Accept': 'application/json',
-          'Accept-Encoding': 'gzip',
-          'X-Subscription-Token': apiKey,
-        },
-      });
+      // Make concurrent requests for web and image results
+      const [webResponse, imageResponse] = await Promise.all([
+        fetch(`https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=8&text_decorations=0&search_lang=en&country=US&safesearch=moderate&freshness=pd`, {
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip',
+            'X-Subscription-Token': apiKey,
+          },
+        }),
+        fetch(`https://api.search.brave.com/res/v1/images/search?q=${encodeURIComponent(query)}&count=6&safesearch=moderate`, {
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip',
+            'X-Subscription-Token': apiKey,
+          },
+        })
+      ]);
 
-      if (!response.ok) {
-        throw new Error(`Brave Search API error: ${response.status} ${response.statusText}`);
+      if (!webResponse.ok) {
+        throw new Error(`Brave Search API error: ${webResponse.status} ${webResponse.statusText}`);
       }
 
-      const data: BraveSearchResponse = await response.json();
+      const webData: BraveSearchResponse = await webResponse.json();
+      const imageData = imageResponse.ok ? await imageResponse.json() : null;
       
-      const webResults = data.web?.results || [];
-      const newsResults = data.news?.results || [];
+      const webResults = webData.web?.results || [];
+      const newsResults = webData.news?.results || [];
+      const imageResults = imageData?.images?.results || [];
       
       // Combine and format results
       const formattedResults = [
@@ -75,6 +114,8 @@ export const webSearchTool = tool({
           description: result.description,
           type: 'web' as const,
           age: result.age || result.page_age,
+          thumbnail: result.thumbnail,
+          meta_url: result.meta_url,
         })),
         ...newsResults.slice(0, 2).map(result => ({
           title: result.title,
@@ -82,6 +123,16 @@ export const webSearchTool = tool({
           description: result.description,
           type: 'news' as const,
           age: result.age || result.page_age,
+          thumbnail: result.thumbnail,
+          meta_url: result.meta_url,
+        })),
+        ...imageResults.slice(0, 2).map((result: BraveImageResult) => ({
+          title: result.title,
+          url: result.url,
+          description: '',
+          type: 'image' as const,
+          thumbnail: result.thumbnail,
+          properties: result.properties,
         }))
       ];
 
@@ -90,7 +141,7 @@ export const webSearchTool = tool({
         results: formattedResults,
         timestamp: new Date().toISOString(),
         source: 'brave',
-        total_results: webResults.length + newsResults.length
+        total_results: webResults.length + newsResults.length + imageResults.length
       };
     } catch (error) {
       console.error('Brave Search error:', error);

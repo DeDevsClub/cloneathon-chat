@@ -1,5 +1,5 @@
 {
-  "id": "0ce2353e-a133-4fac-939e-896d6bbc2f3b",
+  "id": "a3fd771e-6c38-4cf5-ae0a-2470017aaf49",
   "prevId": "27a7ce2b-f951-4dea-b791-05f5aedab397",
   "version": "7",
   "dialect": "postgresql",
@@ -66,7 +66,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'You are a helpful AI assistant. Your goal is to provide accurate, clear, and concise responses to queries. If you do not know the answer to a question, it is better to state that you do not know rather than providing potentially incorrect information. Be polite and respectful in all your interactions.'"
+          "default": "'You are a helpful AI assistant. Your goal is to provide accurate, clear, and concise responses to queries. \nIf you do not know the answer to a question, it is better to state that you do not know rather than providing potentially incorrect information. \nBe polite and respectful in all your interactions.'"
         },
         "model": {
           "name": "model",
@@ -128,8 +128,12 @@
           "name": "Chat_userId_User_id_fk",
           "tableFrom": "Chat",
           "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -137,8 +141,12 @@
           "name": "Chat_projectId_Project_id_fk",
           "tableFrom": "Chat",
           "tableTo": "Project",
-          "columnsFrom": ["projectId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -276,8 +284,12 @@
           "name": "Document_userId_User_id_fk",
           "tableFrom": "Document",
           "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -285,8 +297,12 @@
           "name": "Document_chatId_Chat_id_fk",
           "tableFrom": "Document",
           "tableTo": "Chat",
-          "columnsFrom": ["chatId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -294,8 +310,12 @@
           "name": "Document_messageId_Message_id_fk",
           "tableFrom": "Document",
           "tableTo": "Message",
-          "columnsFrom": ["messageId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "messageId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -431,8 +451,12 @@
           "name": "Message_chatId_Chat_id_fk",
           "tableFrom": "Message",
           "tableTo": "Chat",
-          "columnsFrom": ["chatId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -440,8 +464,12 @@
           "name": "Message_projectId_Project_id_fk",
           "tableFrom": "Message",
           "tableTo": "Project",
-          "columnsFrom": ["projectId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -542,8 +570,12 @@
           "name": "Project_userId_User_id_fk",
           "tableFrom": "Project",
           "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -647,8 +679,12 @@
           "name": "Stream_chatId_Chat_id_fk",
           "tableFrom": "Stream",
           "tableTo": "Chat",
-          "columnsFrom": ["chatId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "chatId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -656,8 +692,12 @@
           "name": "Stream_userId_User_id_fk",
           "tableFrom": "Stream",
           "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -780,8 +820,12 @@
           "name": "Suggestion_documentId_Document_id_fk",
           "tableFrom": "Suggestion",
           "tableTo": "Document",
-          "columnsFrom": ["documentId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "documentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -789,8 +833,12 @@
           "name": "Suggestion_userId_User_id_fk",
           "tableFrom": "Suggestion",
           "tableTo": "User",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -859,7 +907,9 @@
         "User_email_unique": {
           "name": "User_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       }
     }

@@ -166,6 +166,7 @@ export function Chat({
           reload={reload}
           isReadonly={isReadonly || false}
           selectedVisibilityType={visibilityType || 'private'}
+          selectedModelId={currentModel}
         />
       </div>
     </div>

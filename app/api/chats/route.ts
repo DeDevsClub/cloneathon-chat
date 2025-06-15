@@ -17,7 +17,8 @@ export const maxDuration = 60;
 // Type for the parts we construct
 type MessagePart =
   | { type: 'text'; text: string }
-  | { type: 'tool-call'; toolCallId: string; toolName: string; args: any };
+  | { type: 'tool-call'; toolCallId: string; toolName: string; args: any }
+  | { type: 'reasoning'; reasoning: string };
 
 export async function POST(req: Request) {
   try {
@@ -191,12 +192,14 @@ export async function POST(req: Request) {
 
     // Call the language model after initial chat and messages are saved
     console.log('About to call streamText...');
-    console.log('Model:', myProvider.languageModel('chat-model'));
+    const modelId = model || 'chat-model';
+    console.log('Model ID:', modelId);
+    console.log('Model:', myProvider.languageModel(modelId));
     console.log('Messages length:', messages.length);
     console.log('System prompt:', prompt);
     
     const result = streamText({
-      model: myProvider.languageModel('chat-model'),
+      model: myProvider.languageModel(modelId),
       toolCallStreaming: toolCallStreaming || false,
       messages: messages,
       system: prompt,
@@ -237,11 +240,20 @@ export async function POST(req: Request) {
       async onFinish(result: {
         text: string;
         toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
+        reasoning?: string;
       }) {
         try {
-          const { text, toolCalls } = result;
+          const { text, toolCalls, reasoning } = result;
           const assistantMessageParts: MessagePart[] = [];
           let assistantTextContent = '';
+
+          // Add reasoning steps if available (when using reasoning model)
+          if (reasoning) {
+            assistantMessageParts.push({ 
+              type: 'reasoning', 
+              reasoning: reasoning 
+            } as any);
+          }
 
           if (text) {
             assistantMessageParts.push({ type: 'text', text });

@@ -68,6 +68,7 @@ function PureArtifact({
   reload,
   isReadonly,
   selectedVisibilityType,
+  selectedModelId,
 }: {
   chatId: string;
   projectId: string | null;
@@ -84,6 +85,7 @@ function PureArtifact({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   selectedVisibilityType: VisibilityType;
+  selectedModelId: string;
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 
@@ -327,6 +329,7 @@ function PureArtifact({
                   <MultimodalInput
                     chatId={chatId}
                     projectId={projectId || null}
+                    selectedModelId={selectedModelId}
                     input={input}
                     setInput={setInput}
                     handleSubmit={handleSubmit}

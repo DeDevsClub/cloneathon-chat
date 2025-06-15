@@ -113,26 +113,7 @@ const ChatsPage = () => {
         </div>
       ) : (
         <div className="flex">
-          {chats.length === 0 ? (
-            <Hero />
-          ) : (
-            <div
-              className={cn(
-                'flex flex-col gap-6 w-dvw h-dvh m-8 justify-start items-start sm:m-12 md:m-16',
-                // 'flex flex-col gap-6 m-12 md:m-16 border-2 h-fit w-full rounded-lg items-center',
-                chats.length > 20 ? 'overflow-y-hidden' : '',
-              )}
-            >
-              {chats.map((chat) => (
-                <ChatItem
-                  className="w-full"
-                  key={chat.id}
-                  chat={chat}
-                  onChatSelected={() => router.push(`/chats/${chat.id}`)}
-                />
-              ))}
-            </div>
-          )}
+          <Hero />
         </div>
       )}
 
@@ -147,7 +128,7 @@ const ChatsPage = () => {
 
 const Hero = () => {
   return (
-    <div className="flex flex-col w-full max-w-screen-lg h-screen max-h-full justify-center items-center overflow-hidden">
+    <div className="flex flex-col w-full max-w-screen-2xl h-screen max-h-full justify-center items-center overflow-hidden">
       <Greeting />
       <Link href="/chats/new" className="welcome-button">
         Chat with AI Agents

@@ -145,7 +145,7 @@ const ChatsPage = () => {
 
 const Hero = () => {
   return (
-    <div className="flex flex-col w-screen max-w-screen-lg h-fit max-h-full justify-center items-center overflow-hidden">
+    <div className="flex flex-col w-screen max-w-screen-lg h-full max-h-full justify-center items-center overflow-hidden">
       <Greeting />
       <Link href="/chats/new" className="welcome-button">
         Chat with AI Agents

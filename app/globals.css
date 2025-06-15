@@ -105,7 +105,7 @@
 }
 
 .welcome-button {
-  @apply fixed bottom-64 sm:bottom-12 w-full max-w-screen-lg flex rounded-lg justify-center items-center text-center mx-auto h-12 sm:h-16 font-semibold sm:text-lg animate-bounce hover:bg-neutral-700 bg-neutral-800 border-4 border-violet-800 text-white hover:border-violet-700;
+  @apply fixed bottom-32 sm:bottom-12 w-full max-w-screen-lg flex rounded-lg justify-center items-center text-center mx-auto h-12 sm:h-16 font-semibold sm:text-lg animate-bounce hover:bg-neutral-700 bg-neutral-800 border-4 border-violet-800 text-white hover:border-violet-700;
 }
 
 .skeleton {

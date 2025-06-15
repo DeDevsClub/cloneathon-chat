@@ -76,7 +76,7 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
   }
 }
 
-// GET /api/projects/[id] - Get a specific project
+// GET /api/projects/[projectId] - Get a specific project
 export async function GET(request: NextRequest) {
   // Extract projectId from URL
   const url = new URL(request.url);
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/projects/[id] - Update a project
+// PATCH /api/projects/[projectId] - Update a project
 export async function PATCH(request: NextRequest) {
   // Extract projectId from URL
   const url = new URL(request.url);
@@ -208,7 +208,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// DELETE /api/projects/[id] - Delete a project
+// DELETE /api/projects/[projectId] - Delete a project
 export async function DELETE(request: NextRequest) {
   // Extract projectId from URL
   const url = new URL(request.url);

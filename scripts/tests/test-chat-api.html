@@ -85,7 +85,7 @@
   <div class="container">
     <div class="input-section">
       <div class="controls">
-        <input type="text" id="endpoint" class="endpoint-input" value="/api/chat" placeholder="API Endpoint">
+        <input type="text" id="endpoint" class="endpoint-input" value="/api/chats" placeholder="API Endpoint">
         <button id="clear-btn">Clear Output</button>
       </div>
       <textarea id="message-input" placeholder="Type your message here..."></textarea>
@@ -135,7 +135,7 @@
       output.appendChild(loadingDiv);
       
       try {
-        const endpoint = endpointInput.value || '/api/chat';
+        const endpoint = endpointInput.value || '/api/chats';
         
         // Send request to API
         const response = await fetch(endpoint, {

@@ -11,7 +11,7 @@ export const DEFAULT_VISIBILITY_TYPE = 'private';
 
 // API endpoints and paths
 export const API_PATHS = {
-  CHAT: '/api/chat',
+  CHATS: '/api/chats',
   PROJECTS: '/api/projects',
   DEBUG: '/api/debug',
 };

@@ -104,9 +104,9 @@ The application is organized into several core components and modules:
    - Relationship management between entities
    - Automatic default project creation for new users
 
-3. **AI Integration** (`lib/ai/*`, `lib/ai/actions.tsx`, `app/api/chat/route.ts`)
+3. **AI Integration** (`lib/ai/*`, `lib/ai/actions.tsx`, `app/api/chats/route.ts`)
 
-   - The primary chat API endpoint (`POST /api/chat`) has been significantly simplified. It now directly uses `@ai-sdk/openai` and `streamText` for generating AI responses, focusing on core text streaming.
+   - The primary chat API endpoint (`POST /api/chats`) has been significantly simplified. It now directly uses `@ai-sdk/openai` and `streamText` for generating AI responses, focusing on core text streaming.
    - UI-related AI actions may be handled in files like `lib/ai/actions.tsx`.
    - More complex AI logic (e.g., custom tool usage, detailed prompt engineering, robust message persistence, rate limiting, advanced telemetry) that was previously part of the main API route is currently streamlined or commented out. These features are planned to be refactored or re-introduced, possibly through dedicated server actions, separate API endpoints, or other modular approaches.
 
@@ -117,7 +117,7 @@ The application is organized into several core components and modules:
    - Metadata management for various artifact types
 
 5. **API Routes** (`app/api/*`)
-   - RESTful endpoints for data access (e.g., `/api/chat/history`, `/api/chat/:chatId` for messages, simplified from previous nested structures).
+   - RESTful endpoints for data access (e.g., `/api/chats/history`, `/api/chats/:chatId` for messages, simplified from previous nested structures).
    - Webhook handlers and external integrations
    - Authentication middleware for protected routes
 
@@ -144,10 +144,10 @@ The application follows several key workflows that define the user experience:
 
 1. User selects an existing chat or creates a new one.
 2. User inputs a message or query.
-3. The message, along with history, is sent to the `POST /api/chat` endpoint.
+3. The message, along with history, is sent to the `POST /api/chats` endpoint.
 4. The simplified API endpoint uses `@ai-sdk/openai` and `streamText` to get a response from the AI model.
 5. Responses are streamed back in real-time to the client.
-6. Database persistence of user and assistant messages, which was previously handled in the `onFinish` callback of `streamText` within the API route, may now be handled by client-side logic after receiving the full response, or through separate API calls/server actions (this part is less clear from the current `POST /api/chat` implementation).
+6. Database persistence of user and assistant messages, which was previously handled in the `onFinish` callback of `streamText` within the API route, may now be handled by client-side logic after receiving the full response, or through separate API calls/server actions (this part is less clear from the current `POST /api/chats` implementation).
 7. Chat history is updated and accessible for future reference.
 
 ### Document Management Flow
@@ -163,7 +163,7 @@ The application follows several key workflows that define the user experience:
 1. **Client to Server**:
 
    - Form submissions and user interactions (e.g., sending a chat message).
-   - Real-time updates via fetch requests (e.g., to `/api/chat`) or server actions.
+   - Real-time updates via fetch requests (e.g., to `/api/chats`) or server actions.
    - File uploads and document changes.
 
 2. **Server to Database**:
@@ -171,17 +171,17 @@ The application follows several key workflows that define the user experience:
    - CRUD operations via Drizzle ORM.
    - Transaction management for complex operations.
    - Data validation and sanitization.
-   - (Note: Direct DB operations in the main `POST /api/chat` for message saving are currently commented out/simplified).
+   - (Note: Direct DB operations in the main `POST /api/chats` for message saving are currently commented out/simplified).
 
 3. **Server to AI Services**:
 
    - Messages are sent to AI services (e.g., OpenAI via `@ai-sdk/openai`).
-   - The current `POST /api/chat` sends messages directly without the elaborate prompt engineering or tool usage seen in previous versions.
+   - The current `POST /api/chats` sends messages directly without the elaborate prompt engineering or tool usage seen in previous versions.
    - Stream handling for real-time responses.
 
 4. **Server to Client**:
    - Initial page data via SSR/SSG.
-   - Real-time updates via streaming responses from `/api/chat`.
+   - Real-time updates via streaming responses from `/api/chats`.
    - State synchronization and notifications.
 
 ## Dependencies
@@ -209,7 +209,7 @@ The application relies on a carefully selected set of dependencies to provide it
 
 - **AI SDK (`@ai-sdk/react`, `@ai-sdk/openai`)**: Core library for AI integration, including React hooks and utilities. Direct usage of provider-specific packages like `@ai-sdk/openai`.
 - **XAI**: Explainable AI utilities for transparency (usage may vary based on current AI integration complexity).
-- Resumable Stream: Its direct usage in the main chat API (`POST /api/chat`) has been removed/commented out, simplifying the streaming logic at that endpoint.
+- Resumable Stream: Its direct usage in the main chat API (`POST /api/chats`) has been removed/commented out, simplifying the streaming logic at that endpoint.
 
 ### UI and Styling
 

@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Search, Plus, Clock, MessageSquare } from 'lucide-react';
 // import { useChatStore } from '@/lib/store';
 import { useRouter } from 'next/navigation';
-import { Button } from '../ui/button';
-// import type { Conversation } from '@/lib/types';
+import { Button } from '@/components/ui/button';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -39,9 +38,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
   }, [searchTerm]);
 
   const handleSelectConversation = (conversationId: string) => {
-    // const storeSelectConversation = useChatStore(state => state.selectConversation); // If you want to sync global store selection
-    // storeSelectConversation(conversationId);
-    // router.push(`/projects/${projectId}`);
+    router.push(`/chats/${conversationId}`);
     onOpenChange(false); // Close modal on selection
   };
 
@@ -56,7 +53,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
       createdAt: new Date(),
     };
     // addConversation(newConversationEntry);
-    // router.push(`/projects/${projectId}`);
+    router.push(`/chats/${newChatId}`);
     onOpenChange(false);
   };
 
@@ -80,7 +77,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 if (filteredConversations.length > 0 && searchTerm) {
-                  // handleSelectConversation(filteredConversations[0].id);
+                  handleSelectConversation(filteredConversations[0].id);
                 } else {
                   handleStartNewChat();
                 }
@@ -105,7 +102,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
               {filteredConversations.map((convo) => (
                 <li key={convo.id}>
                   <Button
-                    // onClick={() => handleSelectConversation(convo.id)}
+                    onClick={() => handleSelectConversation(convo.id)}
                     className="flex w-full items-center gap-3 rounded-md p-2 text-left text-sm hover:bg-muted"
                   >
                     <MessageSquare

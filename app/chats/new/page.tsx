@@ -76,13 +76,14 @@ export default function NewChatPage(props: PageProps) {
               createdAt: new Date().toISOString(),
               experimental_attachments: [],
               model: 'chat-model', // Ensure model is part of the message if needed by backend
+              projectId: projectId || null,
             },
           ],
         };
         // console.log({ payload });
         // console.log('Preparing chat creation payload:', payload);
 
-        const response = await fetch(AppRoutes.api.chat.base, {
+        const response = await fetch(AppRoutes.api.chats.base, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function NewChatPage(props: PageProps) {
         if (projectId) {
           // console.log('Updating chat with project ID: %s', projectId);
           const projectUpdateResponse = await fetch(
-            `${AppRoutes.api.chat.base}/${chatId}`,
+            `${AppRoutes.api.chats.base}/${chatId}`,
             {
               method: 'PATCH',
               headers: {
@@ -120,7 +121,7 @@ export default function NewChatPage(props: PageProps) {
         // Redirect to the new chat
         router.push(AppRoutes.chats.detail(chatId));
         // Revalidate the first page of chat history to update the sidebar
-        mutate(`/api/chat/history?limit=${PAGE_SIZE}`);
+        mutate(`/api/chats/history?limit=${PAGE_SIZE}`);
       } catch (error: unknown) {
         console.error('Error creating chat:', error);
         const errorMessage =

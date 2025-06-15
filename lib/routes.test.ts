@@ -26,11 +26,10 @@ console.log(`Chat detail: ${AppRoutes.chats.detail(TEST_CHAT_ID)}`);
 
 // Test API routes
 console.log('\n--- Testing API routes ---');
-console.log(`Chat API base: ${AppRoutes.api.chat.base}`);
-console.log(`Chat API by ID: ${AppRoutes.api.chat.byId(TEST_CHAT_ID)}`);
-console.log(`Chat API project: ${AppRoutes.api.chat.project}`);
-console.log(`Chat API messages: ${AppRoutes.api.chat.messages(TEST_CHAT_ID)}`);
-console.log(`Chat API history: ${AppRoutes.api.chat.history(TEST_CHAT_ID)}`);
+console.log(`Chat API base: ${AppRoutes.api.chats.base}`);
+console.log(`Chat API by ID: ${AppRoutes.api.chats.byId(TEST_CHAT_ID)}`);
+console.log(`Chat API messages: ${AppRoutes.api.chats.messages(TEST_CHAT_ID)}`);
+console.log(`Chat API history: ${AppRoutes.api.chats.history(TEST_CHAT_ID)}`);
 console.log(`Projects API base: ${AppRoutes.api.projects.base}`);
 console.log(
   `Projects API by ID: ${AppRoutes.api.projects.byId(TEST_PROJECT_ID)}`,
@@ -41,7 +40,6 @@ console.log(
 
 // Test newly added API routes
 console.log('\n--- Testing new API routes ---');
-console.log(`Chat Project update: ${AppRoutes.api.chatProject.update}`);
 
 // Test helper functions
 console.log('\n--- Testing helper functions ---');
@@ -59,7 +57,7 @@ console.log(`Expected project chat URL: ${expectedProjectChatUrl}`);
 console.log(`Actual project chat URL: ${actualProjectChatUrl}`);
 console.log(`Match: ${expectedProjectChatUrl === actualProjectChatUrl}`);
 
-const expectedHistoryEndpoint = `/api/chat/${TEST_CHAT_ID}/history`;
+const expectedHistoryEndpoint = `/api/chats/${TEST_CHAT_ID}/history`;
 const actualHistoryEndpoint = getChatHistoryEndpoint(TEST_CHAT_ID);
 console.log(`Expected history endpoint: ${expectedHistoryEndpoint}`);
 console.log(`Actual history endpoint: ${actualHistoryEndpoint}`);

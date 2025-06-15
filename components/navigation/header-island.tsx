@@ -25,6 +25,7 @@ export function HeaderIsland({
 }: HeaderIslandProps) {
   const router = useRouter();
   const { setTheme, theme } = useTheme();
+
   const handleProjectsClick = () => {
     router.push('/projects');
   };

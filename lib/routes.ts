@@ -10,49 +10,34 @@ export const AppRoutes = {
   // Projects
   projects: {
     list: '/projects',
-    detail: (id: string) => `/projects/${id}`,
-    edit: (id: string) => `/projects/${id}/edit`,
+    detail: (projectId: string) => `/projects/${projectId}`,
+    edit: (projectId: string) => `/projects/${projectId}/edit`,
     new: '/projects/new',
   },
 
   // Chats
   chats: {
     list: () => `/chats`,
-    detail: (id: string) => `/chats/${id}`,
+    detail: (chatId: string) => `/chats/${chatId}`,
     new: '/chats/new',
   },
 
   // API Routes
   api: {
-    chat: {
-      base: '/api/chat',
-      byId: (id: string) => `/api/chat/${id}`,
-      messages: (chatId: string) => `/api/chat/${chatId}`,
-      history: (chatId: string) => `/api/chat/${chatId}`,
+    chats: {
+      base: '/api/chats',
+      byId: (chatId: string) => `/api/chats/${chatId}`,
+      messages: (chatId: string) => `/api/chats/${chatId}`,
+      history: (chatId: string) => `/api/chats/${chatId}`,
     },
     projects: {
       base: '/api/projects',
-      byId: (id: string) => `/api/projects/${id}`,
-      chats: (id: string) => `/api/projects/${id}/chats`,
+      byId: (projectId: string) => `/api/projects/${projectId}`,
+      chats: (projectId: string) => `/api/projects/${projectId}/chats`,
     },
     test: {
       endpoints: '/api/test-endpoints',
     },
-    api: {
-      chat: {
-        base: '/api/chat',
-        byId: (id: string) => `/api/chat/${id}`,
-        project: '/api/chat/project',
-        messages: (chatId: string) => `/api/chat/${chatId}`,
-        history: (chatId: string) => `/api/chat/${chatId}`,
-      },
-    },
-    chatProject: {
-      update: '/api/chat',
-    },
-    // ai: {
-    //   chat: '/api/ai/chat',
-    // },
   },
 };
 
@@ -67,14 +52,14 @@ export function navigateToProjectChat(chatId: string): string {
  * Helper function to get the API endpoint for chat history
  */
 export function getChatHistoryEndpoint(chatId: string): string {
-  return AppRoutes.api.chat.history(chatId);
+  return AppRoutes.api.chats.history(chatId);
 }
 
 /**
  * Helper function to get the API endpoint for chat messages
  */
 export function getChatMessagesEndpoint(chatId: string): string {
-  return AppRoutes.api.chat.messages(chatId);
+  return AppRoutes.api.chats.messages(chatId);
 }
 
 /**
@@ -87,5 +72,5 @@ export function getChatMessagesEndpoint(chatId: string): string {
  *
  * Example 2: Fetch chat history using the API endpoint
  * const historyEndpoint = getChatHistoryEndpoint("chat_67890");
- * // Result: "/api/chat/chat_67890"
+ * // Result: "/api/chats/chat_67890"
  */

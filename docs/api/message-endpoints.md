@@ -9,16 +9,16 @@ Retrieves all messages that belong to a specific chat, ordered chronologically.
 ### Test Endpoint
 
 ```
-GET /api/test-endpoints?chatId=<chat_id>
+GET /api/test-endpoints/:chatId
 ```
 
 This endpoint is protected and requires authentication.
 
 ### Parameters
 
-| Parameter | Type   | Description        | Required |
-|-----------|--------|--------------------|----------|
-| chatId    | string | ID of the chat     | Yes      |
+| Parameter | Type   | Description    | Required |
+| --------- | ------ | -------------- | -------- |
+| chatId    | string | ID of the chat | Yes      |
 
 ### Response
 
@@ -44,18 +44,18 @@ This endpoint is protected and requires authentication.
 
 ### Error Responses
 
-| Status | Description                         |
-|--------|-------------------------------------|
-| 400    | Chat ID is missing                  |
-| 401    | User is not authenticated           |
-| 500    | Server error retrieving messages    |
+| Status | Description                      |
+| ------ | -------------------------------- |
+| 400    | Chat ID is missing               |
+| 401    | User is not authenticated        |
+| 500    | Server error retrieving messages |
 
 ### CURL Examples
 
 #### Get Messages for a Chat
 
 ```bash
-curl -X GET 'http://localhost:3004/api/test-endpoints?chatId=YOUR_CHAT_ID' \
+curl -X GET 'http://localhost:3004/api/test-endpoints/YOUR_CHAT_ID' \
   -H 'Cookie: next-auth.session-token=YOUR_SESSION_TOKEN'
 ```
 
@@ -64,7 +64,7 @@ curl -X GET 'http://localhost:3004/api/test-endpoints?chatId=YOUR_CHAT_ID' \
 The underlying database function can be imported and used directly in server components:
 
 ```typescript
-import { getMessagesByChatId } from '@/lib/db/queries';
+import { getMessagesByChatId } from "@/lib/db/queries";
 
 // Inside an async function
 const messages = await getMessagesByChatId({ id: chatId });
@@ -84,8 +84,8 @@ export async function getMessagesByChatId({ id }: { id: string }) {
       .orderBy(asc(message.createdAt));
   } catch (error) {
     throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to get messages by chat id',
+      "bad_request:database",
+      "Failed to get messages by chat id"
     );
   }
 }

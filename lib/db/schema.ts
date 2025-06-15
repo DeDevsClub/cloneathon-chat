@@ -118,34 +118,6 @@ export const message = pgTable(
 export type Message = InferSelectModel<typeof message>;
 
 /**
- * Vote Table - User votes/ratings on messages
- */
-export const vote = pgTable(
-  'Vote',
-  {
-    // Using composite primary key of all three IDs
-    chatId: uuid('chatId')
-      .notNull()
-      .references(() => chat.id, { onDelete: 'cascade' }),
-    messageId: uuid('messageId')
-      .notNull()
-      .references(() => message.id, { onDelete: 'cascade' }),
-    userId: uuid('userId')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    isUpvoted: boolean('isUpvoted').notNull(),
-    createdAt: timestamp('createdAt').defaultNow().notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.chatId, table.messageId, table.userId] }),
-    messageIdIdx: index('vote_messageId_idx').on(table.messageId),
-    userIdIdx: index('vote_userId_idx').on(table.userId),
-  }),
-);
-
-export type Vote = InferSelectModel<typeof vote>;
-
-/**
  * Document Table - Stores artifacts/documents created during chats
  */
 export const document = pgTable(
@@ -241,7 +213,6 @@ export const userRelations = relations(user, ({ many }) => ({
   chats: many(chat),
   documents: many(document),
   suggestions: many(suggestion),
-  votes: many(vote),
   streams: many(stream),
 }));
 
@@ -265,7 +236,6 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
   messages: many(message),
   documents: many(document),
   streams: many(stream),
-  votes: many(vote),
 }));
 
 export const messageRelations = relations(message, ({ one, many }) => ({
@@ -277,23 +247,7 @@ export const messageRelations = relations(message, ({ one, many }) => ({
     fields: [message.projectId],
     references: [project.id],
   }),
-  votes: many(vote),
   documents: many(document),
-}));
-
-export const voteRelations = relations(vote, ({ one }) => ({
-  message: one(message, {
-    fields: [vote.messageId],
-    references: [message.id],
-  }),
-  chat: one(chat, {
-    fields: [vote.chatId],
-    references: [chat.id],
-  }),
-  user: one(user, {
-    fields: [vote.userId],
-    references: [user.id],
-  }),
 }));
 
 export const documentRelations = relations(document, ({ one, many }) => ({

@@ -40,15 +40,14 @@ const visibilities: Array<{
 ];
 
 export function VisibilitySelector({
-  chatId,
   className,
   selectedVisibilityType,
+  chatId,
 }: {
   chatId: string;
   selectedVisibilityType: VisibilityType;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
-
   const { visibilityType, setVisibilityType } = useChatVisibility({
     chatId,
     initialVisibilityType: selectedVisibilityType,

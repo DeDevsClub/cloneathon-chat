@@ -4,7 +4,9 @@ import { generateText, type UIMessage } from 'ai';
 import { cookies } from 'next/headers';
 import {
   deleteMessagesByChatIdAfterTimestamp,
+  getChatById,
   getMessageById,
+  getMessagesByChatId,
   updateChatVisiblityById,
 } from '@/lib/db/queries';
 import type { VisibilityType } from '@/components/visibility-selector';
@@ -50,4 +52,24 @@ export async function updateChatVisibility({
   visibility: VisibilityType;
 }) {
   await updateChatVisiblityById({ chatId, visibility });
+}
+
+export async function getProjectForChat(chatId: string) {
+  try {
+    const chat = await getChatById({ id: chatId });
+    return chat.projectId;
+  } catch (error) {
+    console.error('Error fetching project for chat:', error);
+    return null;
+  }
+}
+
+export async function getMessagesForChat({ chatId }: { chatId: string }) {
+  try {
+    const messages = await getMessagesByChatId({ id: chatId });
+    return messages;
+  } catch (error) {
+    console.error('Error fetching messages for chat:', error);
+    return null;
+  }
 }

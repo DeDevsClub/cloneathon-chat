@@ -12,7 +12,6 @@ This document provides a comprehensive overview of the database architecture use
     - [Project Table](#project-table)
     - [Chat Table](#chat-table)
     - [Message Table](#message-table)
-    - [Vote Table](#vote-table)
     - [Document Table](#document-table)
     - [Suggestion Table](#suggestion-table)
     - [Stream Table](#stream-table)
@@ -137,26 +136,6 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 - `attachments`: JSON array of attachments
 - `createdAt`: Timestamp of creation
 
-### Vote Table
-
-```
-┌─────────────────────┐
-│ Vote                │
-├─────────────────────┤
-│ chatId: uuid (PK)   │
-│ messageId: uuid (PK)│
-│ isUpvoted: boolean  │
-└─────────────────────┘
-```
-
-**Description**: Stores user votes/ratings on messages.
-
-**Fields**:
-
-- `chatId`: Part of composite primary key, foreign key to Chat table
-- `messageId`: Part of composite primary key, foreign key to Message table
-- `isUpvoted`: Boolean indicating upvote (true) or downvote (false)
-
 ### Document Table
 
 ```
@@ -239,7 +218,7 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 
 ```
 ┌───────┐     ┌─────────┐     ┌──────┐     ┌─────────┐     ┌────────────┐
-│ User  │1   *│ Project │1   *│ Chat │1   *│ Message │1   *│ Vote       │
+│ User  │1   *│ Project │1   *│ Chat │1   *│ Message │1   *│ Stream     │
 └───┬───┘     └────┬────┘     └──┬───┘     └────┬────┘     └────────────┘
     │              │            │            │
     │              │            │            │
@@ -258,9 +237,8 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 3. **Project - Chat**: One-to-many (a project can contain multiple chats)
 4. **Chat - Message**: One-to-many (a chat can have multiple messages)
 5. **Chat - Stream**: One-to-many (a chat can have multiple stream connections)
-6. **Message - Vote**: One-to-many (a message can have multiple votes)
-7. **User - Document**: One-to-many (a user can create multiple documents)
-8. **Document - Suggestion**: One-to-many (a document can have multiple suggestions)
+6. **User - Document**: One-to-many (a user can create multiple documents)
+7. **Document - Suggestion**: One-to-many (a document can have multiple suggestions)
 
 ## UI Data Integration
 
@@ -314,7 +292,7 @@ The application uses a PostgreSQL database with Drizzle ORM for type-safe databa
 
 **Chat Detail** (`app/(chat)/projects/[id]/chats/[chatId]/page.tsx`)
 
-- **Database Tables**: Chat, Message, Vote, Stream
+- **Database Tables**: Chat, Message, Stream
 - **Usage**: Displays chat conversation and handles message streaming
 - **Operations**: Read, Create (for new messages)
 

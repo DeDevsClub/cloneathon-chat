@@ -40,8 +40,8 @@ echo "$PAYLOAD" > /tmp/chat-test-payload.json
 echo "Payload saved to /tmp/chat-test-payload.json"
 
 # Make the API request
-echo "Sending request to /api/chat..."
-curl -X POST "http://localhost:3000/api/chat" \
+echo "Sending request to /api/chats..."
+curl -X POST "http://localhost:3000/api/chats" \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD" \
   -v

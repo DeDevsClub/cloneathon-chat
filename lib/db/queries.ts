@@ -25,7 +25,6 @@ import {
   type Suggestion,
   suggestion,
   message,
-  vote,
   type Message,
   type Chat,
   stream,
@@ -125,7 +124,6 @@ export async function saveChat({
 
 export async function deleteChatById({ id }: { id: string }) {
   try {
-    await db.delete(vote).where(eq(vote.chatId, id));
     await db.delete(message).where(eq(message.chatId, id));
     await db.delete(stream).where(eq(stream.chatId, id));
 
@@ -265,26 +263,10 @@ export async function getChatsByUserId({
 }
 
 export async function getChatById({ id }: { id: string }) {
-  const isTestChatId = id.length === 22;
-  if (isTestChatId) {
-    console.log('isTestChatId: %s', isTestChatId);
-    return {
-      id: '571c5af5-601b-4932-91e4-d4bdc40b473b',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      title: 'Test Chat',
-      userId: 'test-user-id',
-      visibility: 'private',
-      projectId: null,
-      lastActivityAt: new Date(),
-    } as Chat;
-  }
   try {
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
-    console.log({ selectedChat });
     return selectedChat;
   } catch (error) {
-    console.error({ isTestChatId });
     throw new ChatSDKError('bad_request:database', 'Failed to get chat by id');
   }
 }
@@ -312,51 +294,6 @@ export async function getMessagesByChatId({ id }: { id: string }) {
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get messages by chat id',
-    );
-  }
-}
-
-export async function voteMessage({
-  userId,
-  chatId,
-  messageId,
-  type,
-}: {
-  userId: string;
-  chatId: string;
-  messageId: string;
-  type: 'up' | 'down';
-}) {
-  try {
-    const [existingVote] = await db
-      .select()
-      .from(vote)
-      .where(and(eq(vote.messageId, messageId)));
-
-    if (existingVote) {
-      return await db
-        .update(vote)
-        .set({ isUpvoted: type === 'up' })
-        .where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
-    }
-    return await db.insert(vote).values({
-      userId,
-      chatId,
-      messageId,
-      isUpvoted: type === 'up',
-    });
-  } catch (error) {
-    throw new ChatSDKError('bad_request:database', 'Failed to vote message');
-  }
-}
-
-export async function getVotesByChatId({ id }: { id: string }) {
-  try {
-    return await db.select().from(vote).where(eq(vote.chatId, id));
-  } catch (error) {
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to get votes by chat id',
     );
   }
 }
@@ -513,12 +450,6 @@ export async function deleteMessagesByChatIdAfterTimestamp({
 
     if (messageIds.length > 0) {
       await db
-        .delete(vote)
-        .where(
-          and(eq(vote.chatId, chatId), inArray(vote.messageId, messageIds)),
-        );
-
-      return await db
         .delete(message)
         .where(
           and(eq(message.chatId, chatId), inArray(message.id, messageIds)),

@@ -64,14 +64,18 @@ function getStreamContext() {
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
   const { messages, id } = await req.json();
-
-  // console.log('chat id', id); // can be used for persisting the chat
+  console.log('chat id', id); // can be used for persisting the chat
 
   // Call the language model
   const result = streamText({
     model: openai('gpt-4o'),
     messages,
     async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
+      // console.log('text', text);
+      // console.log('toolCalls', toolCalls);
+      // console.log('toolResults', toolResults);
+      // console.log('usage', usage);
+      // console.log('finishReason', finishReason);
       // implement your own logic here, e.g. for storing messages
       // or recording token usage
     },
@@ -95,7 +99,7 @@ export async function POST(req: Request) {
 //     console.log({ requestBody });
 //   } catch (error: any) {
 //     console.error(
-//       'Zod validation error in /api/chat/route.ts POST:',
+//       'Zod validation error in /api/chats/route.ts POST:',
 //       error.errors,
 //     );
 //     return new ChatSDKError('bad_request:api', error.message).toResponse();
@@ -274,7 +278,7 @@ export async function POST(req: Request) {
 //                 });
 //               } catch (error) {
 //                 console.error(
-//                   'Failed to save assistant message in /api/chat/route.ts:',
+//                   'Failed to save assistant message in /api/chats/route.ts:',
 //                   error,
 //                 );
 //               }
@@ -293,7 +297,7 @@ export async function POST(req: Request) {
 //         });
 //       },
 //       onError: (error) => {
-//         console.error('Streaming error in /api/chat/route.ts:', error);
+//         console.error('Streaming error in /api/chats/route.ts:', error);
 //         return 'Oops, an error occurred!';
 //       },
 //     });
@@ -308,7 +312,7 @@ export async function POST(req: Request) {
 //       return new Response(stream);
 //     }
 //   } catch (error) {
-//     console.error('POST handler error in /api/chat/route.ts:', error);
+//     console.error('POST handler error in /api/chats/route.ts:', error);
 //     if (error instanceof ChatSDKError) {
 //       return error.toResponse();
 //     }

@@ -42,15 +42,7 @@ export class ChatPage {
 
   async isGenerationComplete() {
     const response = await this.page.waitForResponse((response) =>
-      response.url().includes('/api/chat'),
-    );
-
-    await response.finished();
-  }
-
-  async isVoteComplete() {
-    const response = await this.page.waitForResponse((response) =>
-      response.url().includes('/api/vote'),
+      response.url().includes('/api/chats'),
     );
 
     await response.finished();
@@ -163,12 +155,6 @@ export class ChatPage {
         await lastMessageElement
           .getByTestId('message-reasoning-toggle')
           .click();
-      },
-      async upvote() {
-        await lastMessageElement.getByTestId('message-upvote').click();
-      },
-      async downvote() {
-        await lastMessageElement.getByTestId('message-downvote').click();
       },
     };
   }

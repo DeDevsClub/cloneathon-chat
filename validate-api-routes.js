@@ -75,7 +75,7 @@ async function validateChatPostEndpoint() {
 
   // Test with valid payload
   console.log('1.1: Testing with valid payload...');
-  const response = await fetchAPI(`${BASE_URL}/api/chat`, {
+  const response = await fetchAPI(`${BASE_URL}/api/chats`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -106,7 +106,7 @@ async function validateChatPostEndpoint() {
     selectedVisibilityType: 'private',
   };
 
-  const invalidResponse = await fetchAPI(`${BASE_URL}/api/chat`, {
+  const invalidResponse = await fetchAPI(`${BASE_URL}/api/chats`, {
     method: 'POST',
     body: JSON.stringify(invalidPayload),
   });

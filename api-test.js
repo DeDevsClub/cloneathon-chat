@@ -33,9 +33,9 @@ async function testChatApi() {
     selectedVisibilityType: 'private',
   };
 
-  console.log('\nSending request to /api/chat...');
+  console.log('\nSending request to /api/chats...');
   try {
-    const response = await fetch('http://localhost:3000/api/chat', {
+    const response = await fetch(`http://localhost:3000/api/chats/${chatId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

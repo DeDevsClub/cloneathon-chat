@@ -67,11 +67,11 @@ async function testChatAPI() {
   };
 
   try {
-    console.log(`Sending test message to /api/chat...`);
+    console.log(`Sending test message to /api/chats...`);
     console.log(`Message ID: ${messageId}`);
     console.log(`Request payload: ${JSON.stringify(payload, null, 2)}`);
 
-    const response = await fetchAPI(`${BASE_URL}/api/chat`, {
+    const response = await fetchAPI(`${BASE_URL}/api/chats`, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -173,7 +173,7 @@ async function runTests() {
 
     console.log('\nTest URLs for manual testing:');
     console.log(`Chat URL: ${BASE_URL}/chats/${CHAT_ID}`);
-    console.log(`API endpoint: ${BASE_URL}/api/chat`);
+    console.log(`API endpoint: ${BASE_URL}/api/chats`);
 
     console.log('\nTests completed!');
   } catch (error) {

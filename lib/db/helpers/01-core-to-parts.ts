@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import postgres from 'postgres';
-import { chat, message, vote } from '../schema';
+import { chat, message } from '../schema';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { inArray } from 'drizzle-orm';
 import { appendResponseMessages, type UIMessage } from 'ai';
@@ -28,14 +28,6 @@ type NewMessageInsert = {
   createdAt: Date;
   contentType: string | null;
   textContent: string | null;
-};
-
-type NewVoteInsert = {
-  messageId: string;
-  chatId: string;
-  userId: string;
-  isUpvoted: boolean;
-  createdAt: Date;
 };
 
 interface MessageContentPart {
@@ -107,13 +99,7 @@ async function migrateMessages() {
       .from(message)
       .where(inArray(message.chatId, chatIds));
 
-    const allVotes = await db
-      .select()
-      .from(vote)
-      .where(inArray(vote.chatId, chatIds));
-
     const newMessagesToInsert: NewMessageInsert[] = [];
-    const newVotesToInsert: NewVoteInsert[] = [];
 
     for (const chat of chatBatch) {
       processedCount++;
@@ -128,8 +114,6 @@ async function migrateMessages() {
 
           return getMessageRank(a) - getMessageRank(b);
         });
-
-      const votes = allVotes.filter((v) => v.chatId === chat.id);
 
       const messageSection: Array<UIMessage> = [];
       const messageSections: Array<Array<UIMessage>> = [];
@@ -201,19 +185,6 @@ async function migrateMessages() {
 
           for (const msg of projectedUISection) {
             newMessagesToInsert.push(msg);
-
-            if (msg.role === 'assistant') {
-              const voteByMessage = votes.find((v) => v.messageId === msg.id);
-              if (voteByMessage) {
-                newVotesToInsert.push({
-                  chatId: msg.chatId,
-                  messageId: msg.id,
-                  userId: voteByMessage.userId,
-                  isUpvoted: voteByMessage.isUpvoted,
-                  createdAt: new Date(),
-                });
-              }
-            }
           }
         } catch (error) {
           console.error(`Error processing chat ${chat.id}: ${error}`);
@@ -236,21 +207,6 @@ async function migrateMessages() {
         }));
 
         await db.insert(message).values(validMessageBatch);
-      }
-    }
-
-    for (let j = 0; j < newVotesToInsert.length; j += INSERT_BATCH_SIZE) {
-      const voteBatch = newVotesToInsert.slice(j, j + INSERT_BATCH_SIZE);
-      if (voteBatch.length > 0) {
-        await db.insert(vote).values(
-          voteBatch.map((vote) => ({
-            chatId: vote.chatId,
-            messageId: vote.messageId,
-            userId: vote.userId,
-            isUpvoted: vote.isUpvoted,
-            createdAt: vote.createdAt,
-          })),
-        );
       }
     }
   }

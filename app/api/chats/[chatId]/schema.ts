@@ -7,7 +7,6 @@ const textPartSchema = z.object({
 
 export const postRequestBodySchema = z.object({
   id: z.string().uuid(),
-  projectId: z.string().uuid().optional(),
   message: z.object({
     id: z.string().uuid(),
     createdAt: z.coerce.date(),

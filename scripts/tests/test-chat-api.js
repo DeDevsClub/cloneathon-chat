@@ -118,7 +118,7 @@ async function sendMessage(chatId, projectId) {
     selectedVisibilityType: 'private',
   };
 
-  const response = await fetchWithAuth(`${BASE_URL}/api/chat`, {
+  const response = await fetchWithAuth(`${BASE_URL}/api/chats`, {
     method: 'POST',
     body: JSON.stringify(payload),
   });

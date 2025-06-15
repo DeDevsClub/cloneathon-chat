@@ -203,9 +203,9 @@ export async function POST(request: NextRequest) {
     const newChat = await createChat({
       id,
       userId: user.id,
-      title: title || 'New Chat',
+      title,
       visibility,
-      projectId: projectId || null,
+      projectId,
     });
 
     return NextResponse.json({ chat: newChat }, { status: 201 });

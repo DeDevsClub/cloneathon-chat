@@ -20,7 +20,6 @@ import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 import { SuggestedActions } from '@/components/chat/suggested-actions';
-import { Vote } from '@/lib/db';
 
 export function Chat({
   projectId,
@@ -68,7 +67,7 @@ export function Chat({
   //   sendExtraMessageFields: true,
   //   generateId: generateUUID,
   //   fetch: fetchWithErrorHandlers,
-  //   api: '/api/chat', // Use the correct AI chat endpoint
+  //   api: '/api/chats', // Use the correct AI chat endpoint
   //   experimental_prepareRequestBody: (body) => {
   //     console.log('Preparing request body with projectId:', projectId);
   //     console.log('Chat request body:', JSON.stringify(body, null, 2));
@@ -120,34 +119,25 @@ export function Chat({
       // console.log('Usage', usage);
       // console.log('FinishReason', finishReason);
     },
+    experimental_throttle: 100,
   });
 
-  // const searchParams = useSearchParams();
-  // const query = searchParams.get('query');
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query');
 
   const [hasAppendedQuery, setHasAppendedQuery] = useState(false);
 
   useEffect(() => {
-    // if (query && !hasAppendedQuery) {
-    //   append({
-    //     role: 'user',
-    //     content: query,
-    //   });
+    if (query && !hasAppendedQuery) {
+      append({
+        role: 'user',
+        content: query,
+      });
 
-    setHasAppendedQuery(true);
-    // window.history.replaceState({}, '', `/projects/${projectId}`);
-    // }
-  }, [hasAppendedQuery, status, input, messages]);
-
-  // TODO enable voting
-  const { data: votes } = useSWR<Array<Vote>>(
-    messages?.length >= 2 ? `/api/chat/vote?chatId=${chatId}` : null,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+      setHasAppendedQuery(true);
+      // window.history.replaceState({}, '', `/projects/${projectId}`);
+    }
+  }, [hasAppendedQuery, status, input, messages, projectId]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
@@ -161,30 +151,47 @@ export function Chat({
   });
 
   return (
-    <div className="flex flex-col w-full min-w-full h-dvh justify-center scrollbar-transparent">
-      {/* <ChatHeader
+    <>
+      <ChatHeader
         chatId={chatId}
         selectedModelId={initialChatModel}
         selectedVisibilityType={initialVisibilityType}
         isReadonly={isReadonly}
         session={session}
-      /> */}
-
-      <Messages
-        chatId={chatId}
-        status={status}
-        votes={votes || []}
-        messages={messages}
-        setMessages={setMessages}
-        reload={reload}
-        isReadonly={isReadonly}
-        isArtifactVisible={isArtifactVisible}
       />
 
-      <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">
-        {/* <div className="flex bg-background h-fit justify-center"> */}
-        {!isReadonly && (
-          <MultimodalInput
+      <div className="flex flex-col w-full min-w-full h-dvh justify-center scrollbar-transparent">
+        <Messages
+          chatId={chatId}
+          status={status}
+          messages={messages}
+          setMessages={setMessages}
+          reload={reload}
+          isReadonly={isReadonly}
+          isArtifactVisible={isArtifactVisible}
+        />
+
+        <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">
+          {/* <div className="flex bg-background h-fit justify-center"> */}
+          {!isReadonly && (
+            <MultimodalInput
+              chatId={chatId}
+              projectId={projectId || null}
+              input={input}
+              setInput={setInput}
+              handleSubmit={handleSubmit}
+              status={status}
+              stop={stop}
+              attachments={attachments}
+              setAttachments={setAttachments}
+              messages={messages}
+              setMessages={setMessages}
+              append={append}
+              selectedVisibilityType={visibilityType}
+            />
+          )}
+
+          <Artifact
             chatId={chatId}
             projectId={projectId || null}
             input={input}
@@ -194,32 +201,15 @@ export function Chat({
             stop={stop}
             attachments={attachments}
             setAttachments={setAttachments}
+            append={append}
             messages={messages}
             setMessages={setMessages}
-            append={append}
+            reload={reload}
+            isReadonly={isReadonly}
             selectedVisibilityType={visibilityType}
           />
-        )}
-
-        <Artifact
-          chatId={chatId}
-          projectId={projectId || null}
-          input={input}
-          setInput={setInput}
-          handleSubmit={handleSubmit}
-          status={status}
-          stop={stop}
-          attachments={attachments}
-          setAttachments={setAttachments}
-          append={append}
-          messages={messages}
-          setMessages={setMessages}
-          reload={reload}
-          votes={votes}
-          isReadonly={isReadonly}
-          selectedVisibilityType={visibilityType}
-        />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

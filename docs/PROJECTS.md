@@ -11,17 +11,17 @@ This document outlines the plan for implementing project-level organization of c
 ### New Table: Project
 
 ```typescript
-export const project = pgTable('Project', {
-  id: uuid('id').primaryKey().notNull().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  description: text('description'),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
-  userId: uuid('userId')
+export const project = pgTable("Project", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  userId: uuid("userId")
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  icon: varchar('icon', { length: 64 }),
-  color: varchar('color', { length: 32 }),
+    .references(() => user.id, { onDelete: "cascade" }),
+  icon: varchar("icon", { length: 64 }),
+  color: varchar("color", { length: 32 }),
 });
 
 export const projectRelations = relations(project, ({ one, many }) => ({
@@ -38,15 +38,19 @@ export const projectRelations = relations(project, ({ one, many }) => ({
 Modify the existing `chat` table to include an optional project reference:
 
 ```typescript
-export const chat = pgTable('Chat', {
-  id: uuid('id').primaryKey().notNull().defaultRandom(),
-  createdAt: timestamp('createdAt').defaultNow().notNull(),
-  title: varchar('title', { length: 255 }),
-  userId: uuid('userId')
+export const chat = pgTable("Chat", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  title: varchar("title", { length: 255 }),
+  userId: uuid("userId")
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  visibility: varchar('visibility', { length: 10 }).default('private').notNull(),
-  projectId: uuid('projectId').references(() => project.id, { onDelete: 'set null' }),
+    .references(() => user.id, { onDelete: "cascade" }),
+  visibility: varchar("visibility", { length: 10 })
+    .default("private")
+    .notNull(),
+  projectId: uuid("projectId").references(() => project.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Update chat relations to include project
@@ -70,18 +74,22 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 #### Project Management
 
 1. **Create Project**
+
    - Route: `POST /api/projects`
    - Functionality: Creates a new project for the authenticated user
 
 2. **Get Projects**
+
    - Route: `GET /api/projects`
    - Functionality: Retrieves all projects for the authenticated user
 
 3. **Get Project**
+
    - Route: `GET /api/projects/[id]`
    - Functionality: Retrieves a specific project by ID
 
 4. **Update Project**
+
    - Route: `PATCH /api/projects/[id]`
    - Functionality: Updates project details (name, description, icon, color)
 
@@ -92,16 +100,19 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 #### Chat Management
 
 1. **Update Chat Project**
-   - Route: `PATCH /api/chats/[id]/project`
+
+   - Route: `PATCH /api/chats/[id]`
    - Functionality: Updates which project a chat belongs to
 
 2. **Get Chats by Project**
+
    - Route: `GET /api/projects/[id]/chats`
    - Functionality: Retrieves all chats belonging to a specific project
 
 ### Database Functions
 
 1. Create helper functions in `lib/db/project.ts` for CRUD operations on projects:
+
    - `createProject`
    - `getProjects`
    - `getProject`
@@ -121,6 +132,7 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 #### New Components
 
 1. **Project Management**
+
    - `components/project/project-list.tsx`: Lists all projects
    - `components/project/project-item.tsx`: Individual project item
    - `components/project/project-form.tsx`: Create/edit project form
@@ -133,6 +145,7 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 #### Component Updates
 
 1. **Sidebar**
+
    - Update `components/app-sidebar.tsx` to include projects section
    - Add project filtering/navigation in sidebar
 
@@ -143,6 +156,7 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 ### Pages
 
 1. **Project Management**
+
    - `app/(chat)/projects/page.tsx`: Lists all projects
    - `app/(chat)/projects/[id]/page.tsx`: Project details page that lists its chats
    - `app/(chat)/projects/new/page.tsx`: Create new project form
@@ -153,11 +167,13 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 ### UI Elements and Features
 
 1. **Project Navigation**
+
    - Projects dropdown in sidebar
    - Project filtering and sorting
    - Project-based chat organization
 
 2. **Project Creation and Management**
+
    - Form for creating/editing projects
    - Project color and icon selection
    - Drag and drop for organizing chats between projects
@@ -169,6 +185,7 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 ## 4. State Management
 
 1. **Context Updates**
+
    - Add project context to track active project
    - Update chat context to include project information
 
@@ -179,26 +196,31 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 ## 5. Implementation Plan
 
 ### Phase 1: Database Setup
+
 1. Create database migration for project table
 2. Add projectId field to chat table
 3. Update database relation definitions
 
 ### Phase 2: Backend API
+
 1. Implement project CRUD endpoints
 2. Update chat endpoints to support project filters
 3. Create database helper functions
 
 ### Phase 3: Frontend UI - Core
+
 1. Create basic project components
 2. Update sidebar to include projects section
 3. Add project selection to chat creation
 
 ### Phase 4: Frontend UI - Enhanced
+
 1. Implement project management pages
 2. Add drag and drop between projects
 3. Implement project filtering and sorting
 
 ### Phase 5: Testing & Refinement
+
 1. Test user flows and edge cases
 2. Optimize performance
 3. Refine UI/UX
@@ -206,17 +228,21 @@ export const chatRelations = relations(chat, ({ one, many }) => ({
 ## 6. Technical Considerations
 
 ### Data Migration
+
 - Plan for migrating existing chats (can remain unassigned or assigned to a default project)
 
 ### Performance
+
 - Optimize queries for projects with many chats
 - Consider pagination for chat listing by project
 
 ### Security
+
 - Ensure proper access control to prevent unauthorized access to projects
 - Validate project ownership in all endpoints
 
 ### User Experience
+
 - Default project view for new users
 - Intuitive navigation between projects
 - Clear visual distinction between projects

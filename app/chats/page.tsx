@@ -103,7 +103,7 @@ const ChatsPage = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="container w-fit max-w-[calc(100vw-1rem)] py-4 sm:py-0 mx-auto overflow-hidden">
+    <div className="container w-screen sm:max-w-[calc(100vw-1rem)] sm:py-0 mx-auto overflow-hidden">
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <Icon

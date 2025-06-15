@@ -16,7 +16,7 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col items-center overflow-x-hidden">
+    <main className="min-h-screen min-w-full bg-slate-950 text-slate-100 flex flex-col items-center overflow-hidden">
       {/* Hero Section */}
       <section className="relative w-full h-dvh flex flex-col items-center justify-center text-center p-4 overflow-hidden rounded-xl bg-slate-950">
         {/* Subtle Animated Gradient Background - Placeholder for actual animation */}

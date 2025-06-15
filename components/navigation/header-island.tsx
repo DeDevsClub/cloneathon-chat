@@ -37,7 +37,7 @@ export function HeaderIsland({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex justify-between p-2">
+      <div className="hidden md:flex pointer-events-none fixed inset-x-0 top-0 z-20 justify-between p-2">
         <div className="pointer-events-auto flex items-center gap-1 rounded-lg border border-border bg-card/95 p-1.5 shadow-lg backdrop-blur-md">
           {/* Left Island */}
           <Tooltip>

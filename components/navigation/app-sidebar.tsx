@@ -57,7 +57,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
         onOpenChange={setIsSearchModalOpen}
       />
       <Sidebar className="group-data-[side=left]:border-r-0">
-        <SidebarHeader className="flex flex-row gap-1 sm:ml-12 h-12 rounded-md justify-start items-center mt-2 max-w-full">
+        <SidebarHeader className="flex flex-row gap-1 md:ml-12 h-12 rounded-md justify-start items-center mt-2 max-w-full">
           <SidebarMenu>
             <HeaderIsland
               isSidebarOpen={isOpen}
@@ -72,7 +72,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
               className="flex flex-cols justify-center items-center gap-2 bg-muted rounded-md p-2 cursor-pointer"
             >
               <Icon icon="mdi:chat" className="size-6" />
-              <span className="text-lg font-semibold hover:bg-muted rounded-md cursor-pointer flex flex-row max-w-full gap-2 items-center">
+              <span className="flex text-lg font-semibold hover:bg-muted rounded-md cursor-pointer flex-row max-w-full gap-2 items-center">
                 th3.chat
               </span>
             </Link>

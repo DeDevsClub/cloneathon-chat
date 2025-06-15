@@ -244,15 +244,26 @@ export async function POST(req: Request) {
       }) {
         try {
           const { text, toolCalls, reasoning } = result;
+          console.log('onFinish called with:', { 
+            hasText: !!text, 
+            hasToolCalls: !!toolCalls, 
+            hasReasoning: !!reasoning,
+            reasoningLength: reasoning?.length,
+            reasoning: reasoning ? `${reasoning.substring(0, 200)}...` : undefined // First 200 chars
+          });
+          
           const assistantMessageParts: MessagePart[] = [];
           let assistantTextContent = '';
 
           // Add reasoning steps if available (when using reasoning model)
           if (reasoning) {
+            console.log('Adding reasoning part to message');
             assistantMessageParts.push({ 
               type: 'reasoning', 
               reasoning: reasoning 
             } as any);
+          } else {
+            console.log('No reasoning found in result');
           }
 
           if (text) {

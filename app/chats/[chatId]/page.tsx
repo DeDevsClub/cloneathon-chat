@@ -7,6 +7,7 @@ import type { Session } from 'next-auth';
 import { Chat } from '@/components/chat/chat';
 import type { UIMessage } from 'ai';
 import { getMessagesForChat } from '@/app/chats/actions';
+import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 
 type PageProps = {
   params: Promise<{
@@ -22,6 +23,7 @@ export default function ChatPage(props: PageProps) {
   const { data: session } = useSession();
   const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedModel, setSelectedModel] = useState(DEFAULT_CHAT_MODEL);
 
   if (!session) {
     console.error('No session found');
@@ -58,6 +60,21 @@ export default function ChatPage(props: PageProps) {
     loadMessages();
   }, [chatId]);
 
+  // Load selected model from cookies on client side
+  useEffect(() => {
+    const getModelFromCookies = () => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const modelCookie = cookies.find(cookie => cookie.trim().startsWith('chat-model='));
+        if (modelCookie) {
+          const model = modelCookie.split('=')[1];
+          setSelectedModel(model || DEFAULT_CHAT_MODEL);
+        }
+      }
+    };
+    getModelFromCookies();
+  }, []);
+
   // Show loading state while fetching messages
   if (loading) {
     return (
@@ -75,7 +92,7 @@ export default function ChatPage(props: PageProps) {
       projectId={projectId || null}
       chatId={chatId}
       initialMessages={initialMessages}
-      initialChatModel="chat-model"
+      initialChatModel={selectedModel}
       initialVisibilityType="private"
       isReadonly={false}
       session={session as Session}

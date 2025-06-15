@@ -27,10 +27,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
-// import { ModelSelector } from './model-selector';
+import { ModelSelector } from './model-selector';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-// import { saveChatModelAsCookie } from '@/app/chats/actions';
+import { saveChatModelAsCookie } from '@/app/chats/actions';
 
 function PureMultimodalInput({
   chatId,
@@ -47,7 +47,7 @@ function PureMultimodalInput({
   handleSubmit,
   className,
   selectedVisibilityType,
-  // selectedModelId,
+  selectedModelId,
 }: {
   chatId: string;
   projectId: string | null;
@@ -63,7 +63,7 @@ function PureMultimodalInput({
   handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
   selectedVisibilityType: VisibilityType;
-  // selectedModelId: string;
+  selectedModelId: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -169,10 +169,10 @@ function PureMultimodalInput({
     }
   };
 
-  // const handleModelChange = (modelId: string) => {
-  //   console.log('Model changed to:', modelId);
-  //   saveChatModelAsCookie(modelId);
-  // };
+  const handleModelChange = (modelId: string) => {
+    console.log('Model changed to:', modelId);
+    saveChatModelAsCookie(modelId);
+  };
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -309,10 +309,13 @@ function PureMultimodalInput({
       />
 
       <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-tr-lg">
-        {/* TODO: Add model selector */}
-        {/* {messages.length >= 0 && (
-          <ModelSelector session={session} selectedModelId={selectedModelId} />
-        )} */}
+        {messages.length >= 0 && (
+          <ModelSelector
+            session={session}
+            selectedModelId={selectedModelId}
+            onModelChange={handleModelChange}
+          />
+        )}
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
@@ -339,6 +342,7 @@ export const MultimodalInput = memo(
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
+    if (prevProps.selectedModelId !== nextProps.selectedModelId) return false;
     return true;
   },
 );

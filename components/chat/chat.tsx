@@ -38,6 +38,9 @@ export function Chat({
 }) {
   const { mutate } = useSWRConfig();
 
+  // Track current model
+  const [currentModel, setCurrentModel] = useState(initialChatModel);
+
   const { visibilityType } = useChatVisibility({
     chatId,
     initialVisibilityType,
@@ -143,6 +146,7 @@ export function Chat({
             setMessages={setMessages}
             append={append}
             selectedVisibilityType={visibilityType || 'private'}
+            selectedModelId={currentModel}
           />
         )}
 

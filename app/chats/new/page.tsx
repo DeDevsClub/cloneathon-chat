@@ -62,9 +62,10 @@ export default function NewChatPage(props: PageProps) {
         const chatId = uuidv4();
 
         // Create initial chat with default title
+        const systemPrompt = DEFAULT_SYSTEM_PROMPT;
 
         const messageId = uuidv4(); // `msg-${uuidv4()}`;
-        const messageContent = `msg-${messageId.slice(0, 4)}`;
+        const messageContent = 'Hello';
         const message = {
           id: messageId,
           content: messageContent,
@@ -90,11 +91,11 @@ export default function NewChatPage(props: PageProps) {
           selectedChatModel: 'chat-model',
           messages: [message],
           projectId: projectId || null,
-          // contentType: 'application/vnd.ai.content.v1+json',
-          // textContent: messageContent,
+          contentType: 'application/vnd.ai.content.v1+json',
+          textContent: messageContent,
         };
         console.log({ payload });
-        // console.log('Preparing chat creation payload:', payload);
+        console.log('Preparing chat creation payload:', payload);
 
         const response = await fetch(AppRoutes.api.chats.base, {
           method: 'POST',
@@ -103,7 +104,7 @@ export default function NewChatPage(props: PageProps) {
           },
           body: JSON.stringify(payload),
         });
-        // console.log({ response });
+        console.log({ response });
         if (!response.ok) {
           throw new Error('Failed to create chat');
         }

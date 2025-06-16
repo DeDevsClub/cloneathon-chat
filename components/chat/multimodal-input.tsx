@@ -297,8 +297,8 @@ function PureMultimodalInput({
         ref={textareaRef}
         placeholder={
           toolsEnabled
-            ? "Enter your message here... (Web search enabled 🌐)"
-            : "Enter your message here..."
+            ? "Enter your 🌐 search here"
+            : "Enter your message here"
         }
         value={input}
         onChange={handleInput}
@@ -321,7 +321,7 @@ function PureMultimodalInput({
         }}
       />
 
-      <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-tr-lg">
+      <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-lg">
         {messages.length >= 0 && (
           <ModelSelector
             session={session}
@@ -329,6 +329,8 @@ function PureMultimodalInput({
             onModelChange={handleModelChange}
           />
         )}
+
+{/* tool — button - search - globe */}
         <Button
           variant="ghost"
           size="sm"

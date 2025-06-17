@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getProject, getProjectChats } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
 import { createChat } from '@/lib/db/chat';
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -72,7 +73,7 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
 const createChatSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1, 'Chat title is required').max(255),
-  visibility: z.enum(['public', 'private']).default('private'),
+  visibility: z.enum(['public', 'private']).default(DEFAULT_VISIBILITY_TYPE),
   selectedChatModel: z.string().optional(),
   message: z
     .object({
@@ -82,14 +83,13 @@ const createChatSchema = z.object({
 });
 
 // GET /api/projects/[projectId]/chats - Get all chats for a specific project
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { projectId: string } },
+) {
   try {
-    // Extract projectId from URL
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split('/');
-    const projectId = pathParts[pathParts.indexOf('projects') + 1];
-
-    // console.log('Project ID:', projectId);
+    const projectId = params.projectId;
+    console.log('Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -113,7 +113,6 @@ export async function GET(request: NextRequest) {
       // console.log('No session found');
       // For debugging purposes, allow access even without a valid session
       // In production, you would want to return an unauthorized response
-      // TODO : Remove this in production
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -140,13 +139,12 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { projectId: string } },
+) {
   try {
-    // Extract projectId from URL
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split('/');
-    const projectId = pathParts[pathParts.indexOf('projects') + 1];
-
+    const projectId = params.projectId;
     // console.log('Creating chat for Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
@@ -203,7 +201,7 @@ export async function POST(request: NextRequest) {
     const newChat = await createChat({
       id,
       userId: user.id,
-      title,
+      title: title || 'New Chat',
       visibility,
       projectId,
     });

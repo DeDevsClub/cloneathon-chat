@@ -9,8 +9,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://th3.chat'),
-  title: 'DeDevsClub Cloneathon Chatbot',
-  description: 'DeDevsClub Cloneathon Chatbot using the AI SDK.',
+  title: 'th3.chat',
+  description: 'th3.chat - th3 only chatbot you need.',
 };
 
 export const viewport = {
@@ -74,8 +74,8 @@ export default async function RootLayout({
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          // enableSystem
           disableTransitionOnChange
         >
           <SidebarProvider>

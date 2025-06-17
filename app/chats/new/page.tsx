@@ -35,7 +35,7 @@ export default function NewChatPage() {
   // Get projectId from search parameters
   const projectId = searchParams.get('projectId');
   const systemPrompt = DEFAULT_SYSTEM_PROMPT;
-  const chatModel = 'chat-model';
+  const chatModel = DEFAULT_CHAT_MODEL;
 
   useEffect(() => {
     async function createNewChat() {

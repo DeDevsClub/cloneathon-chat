@@ -34,13 +34,11 @@ export async function POST(req: Request) {
     const {
       messages,
       id,
-      system,
       project,
       systemPrompt,
       title,
       visibility,
       model,
-      textContent,
       toolCallStreaming,
       toolsEnabled,
     } = await req.json();
@@ -213,7 +211,11 @@ export async function POST(req: Request) {
     // Save initial messages (with proper await)
     if (initialDbMessages.length > 0) {
       try {
-        console.log('Attempting to save initial messages:', initialDbMessages.length, 'messages');
+        console.log(
+          'Attempting to save initial messages:',
+          initialDbMessages.length,
+          'messages',
+        );
         const result = await saveMessages({ messages: initialDbMessages });
         console.log('Initial messages saved successfully:', result);
       } catch (error) {
@@ -223,7 +225,10 @@ export async function POST(req: Request) {
           console.error('Error message:', error.message);
           console.error('Error stack:', error.stack);
         }
-        console.error('Messages that failed to save:', JSON.stringify(initialDbMessages, null, 2));
+        console.error(
+          'Messages that failed to save:',
+          JSON.stringify(initialDbMessages, null, 2),
+        );
         // If messages fail to save but chat was created, continue with streaming
         // The chat is already created and can be used
       }

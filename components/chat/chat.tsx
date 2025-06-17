@@ -98,7 +98,7 @@ export function Chat({
       // Send the messages array directly as expected by the OpenAI API
       return {
         ...body, // Keep all original properties
-        projectId: projectId || null, // Add project ID for context
+        projectId: projectId || null,
         selectedChatModel: currentModel || 'chat-model',
         selectedVisibilityType: visibilityType,
         toolsEnabled: toolsEnabled,

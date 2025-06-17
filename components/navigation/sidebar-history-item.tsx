@@ -1,14 +1,7 @@
 import type { Chat } from '@/lib/db/schema';
-import {
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import {
-  GlobeIcon,
-  LockIcon,
-  TrashIcon,
-} from '@/components/icons';
+import { GlobeIcon, LockIcon, TrashIcon } from '@/components/icons';
 import { memo, useState, useRef, useEffect } from 'react';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { Button } from '@/components/ui/button';
@@ -34,7 +27,7 @@ const PureChatItem = ({
     chatId: chat.id,
     initialVisibilityType: chat.visibility,
   });
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(chat.title);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,6 +128,7 @@ const PureChatItem = ({
 
       {!isEditing && (
         <>
+          {/* Sidebar - Rename chat */}
           <Button
             variant="ghost"
             size="sm"
@@ -145,34 +139,34 @@ const PureChatItem = ({
             <Edit3Icon size={12} />
           </Button>
 
+          {/* Sidebar - Change visibility */}
           <Button
-            variant="outline"
-            size="icon"
-            className="absolute top-0 right-0 z-10 size-8 m-2 bg-transparent hover:bg-red-500"
-            onClick={() => onDelete(chat.id)}
-          >
-            <TrashIcon />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="icon"
-            className={`absolute top-0 right-8 z-10 size-8 m-2 bg-transparent ${
-              visibilityType === 'private'
-                ? 'hover:bg-red-500'
-                : 'hover:bg-gray-500'
-            }`}
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 right-10 z-10 size-6 m-2 p-0 opacity-0 group-hover:opacity-100 bg-transparent hover:bg-gray-500/20"
             onClick={() => {
               setVisibilityType(
                 visibilityType === 'private' ? 'public' : 'private',
               );
             }}
+            title="Change visibility"
           >
             {visibilityType === 'private' ? (
               <LockIcon size={12} />
             ) : (
               <GlobeIcon size={12} />
             )}
+          </Button>
+
+          {/* Sidebar - Delete chat */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 right-0 z-10 size-6 m-2 p-0 opacity-0 group-hover:opacity-100 bg-transparent hover:bg-red-500/20"
+            onClick={() => onDelete(chat.id)}
+            title="Delete chat"
+          >
+            <TrashIcon />
           </Button>
         </>
       )}

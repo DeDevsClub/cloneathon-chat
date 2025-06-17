@@ -22,10 +22,11 @@ async function testChatApi() {
       {
         id: messageId,
         role: 'user',
-        content: 'Hello, this is a test message to verify chat API functionality with project context',
+        content:
+          'Hello, this is a test message to verify chat API functionality with project context',
         // 'parts' structure was from a different schema, UIMessage uses 'content'
         // experimental_attachments: [], // Ensure UIMessage structure is matched
-      }
+      },
     ],
     // These fields might not be used by the simplified POST handler
     // selectedChatModel: 'chat-model',

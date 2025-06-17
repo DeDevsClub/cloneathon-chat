@@ -8,7 +8,11 @@ import {
 } from '@/lib/db/queries';
 import { ChatSDKError } from '@/lib/errors';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
+import {
+  DEFAULT_CHAT_MODEL,
+  DEFAULT_SYSTEM_PROMPT,
+  DEFAULT_VISIBILITY_TYPE,
+} from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getEnabledTools } from '@/lib/tools';
 
@@ -91,10 +95,10 @@ export async function POST(req: Request) {
           id: chatId,
           userId: user.id,
           title: chatTitle,
-          visibility: visibility || 'private',
+          visibility: visibility || DEFAULT_VISIBILITY_TYPE,
           projectId: chatProjectId,
           systemPrompt: prompt,
-          model: model || 'gpt-4o',
+          model: model || DEFAULT_CHAT_MODEL,
           contentType: 'application/vnd.ai.content.v1+json',
           textContent: textContent || '',
         });
@@ -198,7 +202,7 @@ export async function POST(req: Request) {
     console.log('Model:', myProvider.languageModel(modelId));
     console.log('Messages length:', messages.length);
     console.log('System prompt:', prompt);
-    
+
     const result = streamText({
       model: myProvider.languageModel(modelId),
       toolCallStreaming: toolCallStreaming || false,
@@ -208,29 +212,35 @@ export async function POST(req: Request) {
       async onFinish(result: {
         text: string;
         toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
-        toolResults?: Array<{ toolCallId: string; toolName: string; result: any }>;
+        toolResults?: Array<{
+          toolCallId: string;
+          toolName: string;
+          result: any;
+        }>;
         reasoning?: string;
       }) {
         try {
           const { text, toolCalls, toolResults, reasoning } = result;
-          console.log('onFinish called with:', { 
-            hasText: !!text, 
-            hasToolCalls: !!toolCalls, 
+          console.log('onFinish called with:', {
+            hasText: !!text,
+            hasToolCalls: !!toolCalls,
             hasToolResults: !!toolResults,
             hasReasoning: !!reasoning,
             reasoningLength: reasoning?.length,
-            reasoning: reasoning ? `${reasoning.substring(0, 200)}...` : undefined // First 200 chars
+            reasoning: reasoning
+              ? `${reasoning.substring(0, 200)}...`
+              : undefined, // First 200 chars
           });
-          
+
           const assistantMessageParts: MessagePart[] = [];
           let assistantTextContent = '';
 
           // Add reasoning steps if available (when using reasoning model)
           if (reasoning) {
             console.log('Adding reasoning part to message');
-            assistantMessageParts.push({ 
-              type: 'reasoning', 
-              reasoning: reasoning 
+            assistantMessageParts.push({
+              type: 'reasoning',
+              reasoning: reasoning,
             } as any);
           } else {
             console.log('No reasoning found in result');

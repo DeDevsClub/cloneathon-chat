@@ -8,6 +8,7 @@ import {
   getMessageById,
   getMessagesByChatId,
   updateChatVisiblityById,
+  updateChatTitleById,
   getChatsByUserId,
 } from '@/lib/db/queries';
 import type { VisibilityType } from '@/components/visibility-selector';
@@ -53,6 +54,16 @@ export async function updateChatVisibility({
   visibility: VisibilityType;
 }) {
   await updateChatVisiblityById({ chatId, visibility });
+}
+
+export async function updateChatTitle({
+  chatId,
+  title,
+}: {
+  chatId: string;
+  title: string;
+}) {
+  await updateChatTitleById({ chatId, title });
 }
 
 export async function getProjectForChat(chatId: string) {

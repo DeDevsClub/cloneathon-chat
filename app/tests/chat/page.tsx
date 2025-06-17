@@ -1,5 +1,6 @@
 'use client';
 
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 import { useState, useEffect, useRef } from 'react';
 
 // Generate a unique ID for messages
@@ -47,10 +48,10 @@ function TestChat() {
           id: chatId, // Required chat ID
           messages: newMessages, // Send messages with IDs
           selectedChatModel: 'chat-model',
-          selectedVisibilityType: 'private',
+          selectedVisibilityType: DEFAULT_VISIBILITY_TYPE,
         }),
       });
-
+      console.log('Response:', response);
       if (!response.ok) {
         console.error('HTTP error:', response.body);
         throw new Error(`HTTP error! status: ${response.status}`);

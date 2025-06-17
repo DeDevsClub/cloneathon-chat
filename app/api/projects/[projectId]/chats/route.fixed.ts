@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getProject, getProjectChats } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
 import { createChat } from '@/lib/db/chat';
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -72,7 +73,7 @@ async function validateUserOwnership(projectId: string, userEmail: string) {
 const createChatSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1, 'Chat title is required').max(255),
-  visibility: z.enum(['public', 'private']).default('private'),
+  visibility: z.enum(['public', 'private']).default(DEFAULT_VISIBILITY_TYPE),
   selectedChatModel: z.string().optional(),
   message: z
     .object({

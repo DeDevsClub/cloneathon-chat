@@ -9,6 +9,7 @@ import type { UIMessage } from 'ai';
 import { getMessagesForChat } from '@/app/chats/actions';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { MobileHeader } from '@/components/chat/mobile-header';
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 
 type PageProps = {
   params: Promise<{
@@ -97,9 +98,9 @@ export default function ChatPage(props: PageProps) {
         <Chat
           projectId={projectId || null}
           chatId={chatId}
-          initialMessages={initialMessages}
-          initialChatModel={selectedModel}
-          initialVisibilityType="private"
+          initialMessages={initialMessages || []}
+          initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
+          initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
           isReadonly={false}
           session={session as Session}
           autoResume={true}

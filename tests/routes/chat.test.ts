@@ -2,6 +2,7 @@ import { generateUUID } from '@/lib/utils';
 import { expect, test } from '../fixtures';
 import { TEST_PROMPTS } from '../prompts/routes';
 import { getMessageByErrorCode } from '@/lib/errors';
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 
 const chatIdsCreatedByAda: Array<string> = [];
 
@@ -28,7 +29,7 @@ test.describe
           id: chatId,
           message: TEST_PROMPTS.SKY.MESSAGE,
           selectedChatModel: 'chat-model',
-          selectedVisibilityType: 'private',
+          selectedVisibilityType: DEFAULT_VISIBILITY_TYPE,
         },
       });
       expect(response.status()).toBe(200);
@@ -52,7 +53,7 @@ test.describe
           id: chatId,
           message: TEST_PROMPTS.GRASS.MESSAGE,
           selectedChatModel: 'chat-model',
-          selectedVisibilityType: 'private',
+          selectedVisibilityType: DEFAULT_VISIBILITY_TYPE,
         },
       });
       expect(response.status()).toBe(403);
@@ -167,7 +168,7 @@ test.describe
             createdAt: new Date().toISOString(),
           },
           selectedChatModel: 'chat-model',
-          selectedVisibilityType: 'private',
+          selectedVisibilityType: DEFAULT_VISIBILITY_TYPE,
         },
       });
 

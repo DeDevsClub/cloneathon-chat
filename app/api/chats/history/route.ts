@@ -1,6 +1,6 @@
 import { auth } from '@/app/(auth)/auth';
 import type { NextRequest } from 'next/server';
-import { getChatsByUserId } from '@/lib/db/queries';
+import { getChatsByUserId, getChatsWithProjectsByUserId } from '@/lib/db/queries';
 import { ChatSDKError } from '@/lib/errors';
 
 export async function GET(request: NextRequest) {
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const limit = Number.parseInt(searchParams.get('limit') || '10');
   const startingAfter = searchParams.get('starting_after');
   const endingBefore = searchParams.get('ending_before');
+  const groupBy = searchParams.get('group_by') || 'date'; // 'date' or 'project'
 
   if (startingAfter && endingBefore) {
     return new ChatSDKError(
@@ -23,12 +24,20 @@ export async function GET(request: NextRequest) {
     return new ChatSDKError('unauthorized:chat').toResponse();
   }
 
-  const chats = await getChatsByUserId({
-    id: session.user.id,
-    limit,
-    startingAfter,
-    endingBefore,
-  });
+  // Use the appropriate function based on grouping preference
+  const chats = groupBy === 'project' 
+    ? await getChatsWithProjectsByUserId({
+        id: session.user.id,
+        limit,
+        startingAfter,
+        endingBefore,
+      })
+    : await getChatsByUserId({
+        id: session.user.id,
+        limit,
+        startingAfter,
+        endingBefore,
+      });
 
   return Response.json(chats);
 }

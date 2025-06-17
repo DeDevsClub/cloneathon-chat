@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, Clock, MessageSquare } from 'lucide-react';
 // import { useChatStore } from '@/lib/store';
@@ -64,6 +71,12 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
         className="fixed left-1/2 top-1/4 w-full max-w-xl -translate-x-1/2 -translate-y-1/4 rounded-xl border-border bg-card p-0 text-foreground shadow-2xl outline-none"
         onOpenAutoFocus={(e) => e.preventDefault()} // Prevent default autofocus, we handle it manually
       >
+        <DialogHeader>
+          <DialogTitle>Search</DialogTitle>
+          <DialogDescription>
+            Search for existing chats or start a new one.
+          </DialogDescription>
+        </DialogHeader>
         <div className="flex items-center gap-2 border-b border-border px-4 py-3">
           <Search size={18} className="text-muted-foreground" />
           <span className="text-sm text-muted-foreground">/</span>

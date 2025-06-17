@@ -282,6 +282,118 @@ export async function getChatsByUserId({
   }
 }
 
+export async function getChatsWithProjectsByUserId({
+  id,
+  limit,
+  startingAfter,
+  endingBefore,
+}: {
+  id: string;
+  limit: number;
+  startingAfter: string | null;
+  endingBefore: string | null;
+}) {
+  try {
+    const extendedLimit = limit + 1;
+
+    // Query that gets all chats for the user with project information
+    const query = (whereCondition?: SQL<any>) => {
+      const baseQuery = db
+        .select({
+          id: chat.id,
+          createdAt: chat.createdAt,
+          updatedAt: chat.updatedAt,
+          title: chat.title,
+          userId: chat.userId,
+          visibility: chat.visibility,
+          projectId: chat.projectId,
+          lastActivityAt: chat.lastActivityAt,
+          systemPrompt: chat.systemPrompt,
+          model: chat.model,
+          // Project information
+          projectName: project.name,
+          projectDescription: project.description,
+          projectIcon: project.icon,
+          projectColor: project.color,
+        })
+        .from(chat)
+        .leftJoin(project, eq(chat.projectId, project.id))
+        .where(
+          whereCondition
+            ? and(
+                whereCondition,
+                or(
+                  eq(chat.userId, id),
+                  and(
+                    not(isNull(chat.projectId)),
+                    eq(project.userId, id),
+                  ),
+                ),
+              )
+            : or(
+                eq(chat.userId, id),
+                and(
+                  not(isNull(chat.projectId)),
+                  eq(project.userId, id),
+                ),
+              ),
+        )
+        .orderBy(desc(chat.lastActivityAt)) // Order by last activity instead of creation date
+        .limit(extendedLimit);
+      return baseQuery;
+    };
+
+    let filteredChats = [];
+
+    if (startingAfter) {
+      const [selectedChat] = await db
+        .select()
+        .from(chat)
+        .where(eq(chat.id, startingAfter))
+        .limit(1);
+
+      if (!selectedChat) {
+        throw new ChatSDKError(
+          'not_found:database',
+          `Chat with id ${startingAfter} not found`,
+        );
+      }
+
+      filteredChats = await query(gt(chat.lastActivityAt, selectedChat.lastActivityAt));
+    } else if (endingBefore) {
+      const [selectedChat] = await db
+        .select()
+        .from(chat)
+        .where(eq(chat.id, endingBefore))
+        .limit(1);
+
+      if (!selectedChat) {
+        throw new ChatSDKError(
+          'not_found:database',
+          `Chat with id ${endingBefore} not found`,
+        );
+      }
+
+      filteredChats = await query(lt(chat.lastActivityAt, selectedChat.lastActivityAt));
+    } else {
+      filteredChats = await query();
+    }
+
+    const hasMore = filteredChats.length > limit;
+
+    return {
+      chats: hasMore ? filteredChats.slice(0, limit) : filteredChats,
+      hasMore,
+    };
+  } catch (error) {
+    console.error('Error in getChatsWithProjectsByUserId:', error);
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get chats with projects by user id',
+    );
+  }
+}
+
 export async function getChatById({ id }: { id: string }) {
   if (!id) {
     throw new ChatSDKError('bad_request:database', 'Chat ID is required');

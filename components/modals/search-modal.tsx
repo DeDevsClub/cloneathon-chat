@@ -51,7 +51,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   // Flatten all chats from all date groups
@@ -71,7 +71,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     return allChats.filter(
       (chat) =>
         chat.title.toLowerCase().includes(searchLower) ||
-        chat.projectName?.toLowerCase().includes(searchLower)
+        chat.projectName?.toLowerCase().includes(searchLower),
     );
   }, [allChats, searchTerm]);
 
@@ -96,20 +96,23 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
       if (countResponse.ok) {
         const countData = await countResponse.json();
         if (countData.count >= countData.maxCount) {
-          toast.error(`You have reached the maximum number of chats allowed (${countData.maxCount}). Please delete some chats before creating new ones.`, {
-            duration: 6000,
-            action: {
-              label: 'Manage Chats',
-              onClick: () => {
-                router.push('/chats');
-                onOpenChange(false);
+          toast.error(
+            `You have reached the maximum number of chats allowed (${countData.maxCount}). Please delete some chats before creating new ones.`,
+            {
+              duration: 6000,
+              action: {
+                label: 'Manage Chats',
+                onClick: () => {
+                  router.push('/chats');
+                  onOpenChange(false);
+                },
               },
             },
-          });
+          );
           return;
         }
       }
-      
+
       // Navigate to new chat page with optional title
       const queryParams = searchTerm.trim()
         ? `?title=${encodeURIComponent(searchTerm.trim())}`
@@ -270,7 +273,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
                   <>
                     Start new chat:{' '}
                     <span className="font-medium text-foreground">
-                      "{searchTerm}"
+                      {searchTerm}
                     </span>
                   </>
                 ) : (

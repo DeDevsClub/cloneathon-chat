@@ -6,16 +6,15 @@
 
 > Allows users to upload and share files within conversations.
 
-- [ ] **Storage**: Use a combination of local storage for development and cloud storage (like AWS S3 or Vercel Blob) for production.
-- [ ] **File Types**: Support common formats including images (.jpg, .png, .gif), documents (.pdf, .docx), and other media files.
-- [ ] **Size Limitations**: Implement a 10MB file size limit per upload to prevent abuse.
-- [ ] **Preview Support**: Generate thumbnails for images and previews for PDFs when possible.
+- [x] **Storage**: Use a combination of local storage for development and cloud storage (like AWS S3 or Vercel Blob) for production.
+- [x] **File Types**: Support common formats including images (.jpg, .png, .gif), documents (.pdf, .docx), and other media files.
+- [x] **Size Limitations**: Implement a 10MB file size limit per upload to prevent abuse.
+- [x] **Preview Support**: Generate thumbnails for images and previews for PDFs when possible.
 
-## User Experience
+### User Experience
 
-- [ ] Drag-and-drop (DnD) interface for easy uploads.
-- [ ] Consider using [UploadThing](https://docs.uploadthing.com/getting-started/appdir) for cloud storage integration.
-- [ ] Progress indicators for large file uploads.
+- [x] Drag-and-drop (DnD) interface for easy uploads.
+- [x] Progress indicators for large file uploads.
 - [ ] Inline display of compatible file types.
 - [ ] Download options for all attachments.
 
@@ -23,16 +22,16 @@
 
 > Provides beautiful code formatting and highlighting for code snippets shared in conversations.
 
-- [ ] **Library**: Integrate `Prism.js` or `Highlight.js` with the Shadcn UI theme.
-- [ ] **Language Support**: Include popular programming languages like TypeScript, Python, SQL, and more.
+- [x] **Library**: Integrate `Prism.js` or `Highlight.js` with the Shadcn UI theme.
+- [x] **Language Support**: Include popular programming languages like TypeScript, Python, SQL, and more.
 - [ ] **Features**: Line numbers, copy-to-clipboard functionality, and language detection.
 
-## User Experience
+### User Experience
 
-- [ ] **Code blocks** are visually distinct from regular text.
-- [ ] **Syntax** is colored according to language rules.
-- [ ] Users can select a **language** or let the system auto-detect it.
-- [ ] **Dark/light mode** support that matches the application theme.
+- [x] **Code blocks** are visually distinct from regular text.
+- [x] **Syntax** is colored according to language rules.
+- [x] Users can select a **language** or let the system auto-detect it.
+- [x] **Dark/light mode** support that matches the application theme.
 
 # 3. Chat Branching
 
@@ -42,7 +41,7 @@
 - [ ] **State Management**: Use React Context to manage the complex state of branched conversations.
 - [ ] **Storage**: Store conversation trees with references to parent/child relationships.
 
-## User Experience
+### User Experience
 
 - [ ] **Visual indicator** showing branch points in conversations.
 - [ ] **Branch creation** from any message with a simple UI action.
@@ -57,7 +56,7 @@
 - [ ] **Prompt Handling**: Parse text commands within messages that trigger image generation.
 - [ ] **Optimization**: Implement caching and size optimization for generated images.
 
-## User Experience
+### User Experience
 
 - [ ] Special command syntax (e.g., `/imagine a sunset over mountains`).
 - [ ] Loading states while images are being generated.
@@ -72,24 +71,24 @@
 - [ ] **Message Buffering**: Store partial messages server-side until fully delivered.
 - [ ] **State Recovery**: Use session tokens to resume from exact point of interruption.
 
-## User Experience
+### User Experience
 
-- [ ] Seamless continuation of AI responses after browser refresh.
+- [x] Seamless continuation of AI responses after browser refresh.
 - [ ] Visual indicator showing resumption of previous response.
 - [ ] Local storage backup of in-progress messages.
-- [ ] Connection status indicators for user awareness.
+- [x] Connection status indicators for user awareness.
 
 ## 6. Chat Sharing
 
 > Enables users to share entire conversations or specific message threads with others.
 
-- [ ] **Sharing Mechanism**: Generate unique, secure URLs for shared conversations.
-- [ ] **Permission Levels**: Configure read-only, comment-only, or full participation access.
+- [x] **Sharing Mechanism**: Generate unique, secure URLs for shared conversations.
+- [x] **Permission Levels**: Configure read-only, comment-only, or full participation access.
 - [ ] **Export Options**: Support for exporting chats as PDF, markdown, or plain text.
 
-## User Experience
+### User Experience
 
-- [ ] Simple **share button** that generates a link.
+- [x] Simple **share button** that generates a link.
 - [ ] Options to set expiration time for shared links.
 - [ ] Preview of how shared conversation will appear to recipients.
 - [ ] Integration with common social platforms and messaging apps.
@@ -98,16 +97,16 @@
 
 > Incorporates real-time web search capabilities directly within the chat interface.
 
-- [ ] **Search API**: Integrate with search engines like Google Custom Search, Bing API, or DuckDuckGo.
-- [ ] **Result Parsing**: Extract and format relevant information from search results.
-- [ ] **Citation Handling**: Automatically add source links for information retrieved.
+- [x] **Search API**: Integrate with search engines like Google Custom Search, Bing API, or DuckDuckGo.
+- [x] **Result Parsing**: Extract and format relevant information from search results.
+- [x] **Citation Handling**: Automatically add source links for information retrieved.
 
-## User Experience
+### User Experience
 
 - [ ] **Trigger searches** with a special prefix (e.g., `/search climate change facts`).
-- [ ] **Display search results** inline within the conversation.
+- [x] **Display search results** inline within the conversation.
 - [ ] Allow users to **request more detailed information** on specific results.
-- [ ] Option to **open full web pages in a side panel** without leaving the chat.
+- [x] Option to **open full web pages in a side panel** without leaving the chat.
 
 # 8. Collaborative Whiteboards (Creative Feature)
 
@@ -118,7 +117,7 @@
 - [ ] **Object Types**: Support for basic shapes, text, connectors, and free-hand drawing.
 - [ ] **Export**: Save whiteboards as images that can be shared in the conversation.
 
-## User Experience
+### User Experience
 
 - [ ] **Trigger a whiteboard** with `/whiteboard` command.
 - [ ] **Inline embedding** within the conversation flow.
@@ -132,16 +131,16 @@
 
 **Recommended order for implementing these bonus features**:
 
-- [ ] **Attachment Support** (relatively straightforward, high user value)
-- [ ] **Syntax Highlighting** (enhances developer-focused conversations)
-- [ ] **Chat Sharing** (increases user engagement through collaboration)
-- [ ] **Resumable Streams** (improves reliability of core functionality)
+- [x] **Attachment Support** (relatively straightforward, high user value)
+- [x] **Syntax Highlighting** (enhances developer-focused conversations)
+- [x] **Chat Sharing** (increases user engagement through collaboration)
+- [x] **Resumable Streams** (improves reliability of core functionality)
 - [ ] **Image Generation Support** (adds creative capabilities)
-- [ ] **Web Search** (enhances information access)
+- [x] **Web Search** (enhances information access)
 - [ ] **Chat Branching** (complex but powerful feature)
 - [ ] **Collaborative Whiteboards** (most complex, implement last)
 
-## Technical Considerations
+### Technical Considerations
 
 - [ ] All features should maintain compatibility with the existing `Next.js` app router structure.
 - [ ] Implement proper **error handling** and **fallbacks** for each feature.

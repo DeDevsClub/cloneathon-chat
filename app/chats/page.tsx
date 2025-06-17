@@ -103,7 +103,7 @@ const ChatsPage = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="container w-screen sm:max-w-[calc(100vw-1rem)] sm:py-0 mx-auto overflow-hidden">
+    <div className="container w-screen h-screen sm:max-w-[calc(100vw-1rem)] py-0 mx-auto overflow-hidden">
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <Icon
@@ -128,7 +128,7 @@ const ChatsPage = () => {
 
 const Hero = () => {
   return (
-    <div className="flex flex-col w-full max-w-screen-2xl h-screen max-h-full justify-center items-center overflow-hidden">
+    <div className="flex flex-col w-full max-w-screen h-screen max-h-screen justify-center items-center overflow-hidden">
       <Greeting />
       <Link href="/chats/new" className="welcome-button">
         Chat with AI Agents

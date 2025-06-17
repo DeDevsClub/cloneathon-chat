@@ -55,7 +55,7 @@ export const Greeting = () => {
   return (
     <div
       key="overview"
-      className="flex w-vw h-dvh max-h-full max-w-screen flex-col justify-center items-center overflow-hidden"
+      className="flex flex-col w-vw h-dvh max-h-full max-w-screen justify-center items-center overflow-hidden"
     >
       {/* Synthwave grid background */}
       <div className="absolute inset-0 z-0 opacity-10 dark:opacity-20 overflow-hidden">

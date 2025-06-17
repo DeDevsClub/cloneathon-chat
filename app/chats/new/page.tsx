@@ -39,7 +39,7 @@ export default function NewChatPage() {
 
       try {
         if (!session) {
-          toast.error('You must be logged in to create a chat');
+          toast.error('Must be logged in to create a chat.');
           router.push('/login');
           return;
         }
@@ -116,7 +116,9 @@ export default function NewChatPage() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center pt-16 md:pt-0">
         <div className="flex flex-col items-center justify-center gap-4">
           <Loader2 className="size-8 animate-spin text-primary" />
-          <p className="text-lg text-muted-foreground">Creating a new chat...</p>
+          <p className="text-lg text-muted-foreground">
+            Creating a new chat...
+          </p>
           {projectId && (
             <p className="text-sm text-muted-foreground">
               Creating chat in project...

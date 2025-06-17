@@ -102,7 +102,7 @@ const PureChatItem = ({
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-6 w-6 p-0"
+                className="size-6 p-0"
                 onClick={handleSaveTitle}
                 disabled={isLoading}
               >
@@ -111,7 +111,7 @@ const PureChatItem = ({
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-6 w-6 p-0"
+                className="size-6 p-0"
                 onClick={handleCancelEdit}
                 disabled={isLoading}
               >
@@ -121,7 +121,11 @@ const PureChatItem = ({
           </div>
         ) : (
           <Link href={`/chats/${chat.id}`} onClick={() => setOpenMobile(false)}>
-            <span className="truncate">{chat.title}</span>
+            <span className="truncate">
+              {chat.title.length > 20
+                ? `${chat.title.slice(0, 16)}...`
+                : chat.title}
+            </span>
           </Link>
         )}
       </SidebarMenuButton>

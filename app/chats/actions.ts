@@ -12,7 +12,7 @@ import {
   getChatsByUserId,
 } from '@/lib/db/queries';
 import type { VisibilityType } from '@/components/visibility-selector';
-import { myProvider } from '@/lib/ai/providers';
+import { getAppropriateModel } from '@/lib/ai/providers';
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
@@ -21,11 +21,21 @@ export async function saveChatModelAsCookie(model: string) {
 
 export async function generateTitleFromUserMessage({
   message,
+  forceArtifactModel = false,
 }: {
   message: UIMessage;
+  forceArtifactModel?: boolean;
 }) {
+  // Determine if we should use artifact model based on the message content or if forced
+  const messageContent =
+    typeof message.content === 'string' ? message.content : '';
+  const appropriateModel = getAppropriateModel(
+    messageContent,
+    forceArtifactModel,
+  );
+
   const { text: title } = await generateText({
-    model: myProvider.languageModel('title-model'),
+    model: appropriateModel, // Use the dynamically selected model
     system: `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long

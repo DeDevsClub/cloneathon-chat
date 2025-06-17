@@ -296,9 +296,7 @@ function PureMultimodalInput({
         data-testid="multimodal-input"
         ref={textareaRef}
         placeholder={
-          toolsEnabled
-            ? "Enter your 🌐 search here"
-            : "Enter your message here"
+          toolsEnabled ? 'Enter your 🌐 search here' : 'Enter your message here'
         }
         value={input}
         onChange={handleInput}
@@ -330,11 +328,11 @@ function PureMultimodalInput({
           />
         )}
 
-{/* tool — button - search - globe */}
+        {/* tool — button - search - globe */}
         <Button
           variant="ghost"
           size="sm"
-          className={`p-1.5 h-8 w-8 transition-colors ${
+          className={`p-1.5 size-8 transition-colors ${
             toolsEnabled
               ? 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'

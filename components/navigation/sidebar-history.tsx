@@ -92,7 +92,7 @@ const groupChatsByDate = (chats: Chat[]): GroupedChats => {
 
 const groupChatsByProject = (chats: ChatWithProject[]): ProjectGroupedChats => {
   return chats.reduce((groups, chat) => {
-    const projectName = chat.projectName || 'No Project';
+    const projectName = chat.projectName || 'None';
     if (!groups[projectName]) {
       groups[projectName] = [];
     }
@@ -110,7 +110,8 @@ export function getChatHistoryPaginationKey(
     return null;
   }
 
-  if (pageIndex === 0) return `/api/chats/history?limit=${PAGE_SIZE}&group_by=${groupBy}`;
+  if (pageIndex === 0)
+    return `/api/chats/history?limit=${PAGE_SIZE}&group_by=${groupBy}`;
 
   const firstChatFromPage = previousPageData.chats.at(-1);
 
@@ -131,11 +132,12 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     isLoading,
     mutate,
   } = useSWRInfinite<ChatHistory>(
-    (pageIndex, previousPageData) => getChatHistoryPaginationKey(pageIndex, previousPageData, groupBy), 
-    fetcher, 
+    (pageIndex, previousPageData) =>
+      getChatHistoryPaginationKey(pageIndex, previousPageData, groupBy),
+    fetcher,
     {
       fallbackData: [],
-    }
+    },
   );
 
   const router = useRouter();
@@ -186,7 +188,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
         return chatHistories.map((chatHistory) => ({
           ...chatHistory,
           chats: chatHistory.chats.map((chat) =>
-            chat.id === chatId ? { ...chat, title: newTitle } : chat
+            chat.id === chatId ? { ...chat, title: newTitle } : chat,
           ),
         }));
       }
@@ -217,7 +219,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
               className="flex-1 h-7 text-xs"
               onClick={() => setGroupBy('project')}
             >
-              <FolderOpen className="h-3 w-3 mr-1" />
+              <FolderOpen className="size-3 mr-1" />
               Projects
             </Button>
             <Button
@@ -226,7 +228,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
               className="flex-1 h-7 text-xs"
               onClick={() => setGroupBy('date')}
             >
-              <Calendar className="h-3 w-3 mr-1" />
+              <Calendar className="size-3 mr-1" />
               Date
             </Button>
           </div>
@@ -250,21 +252,24 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
             {!isLoading &&
               !hasEmptyChatHistory &&
               (() => {
-                const allChats = paginatedChatHistories?.reduce(
-                  (acc, page) => acc.concat(page.chats),
-                  [] as (Chat | ChatWithProject)[],
-                ) || [];
+                const allChats =
+                  paginatedChatHistories?.reduce(
+                    (acc, page) => acc.concat(page.chats),
+                    [] as (Chat | ChatWithProject)[],
+                  ) || [];
 
                 if (groupBy === 'project') {
-                  const projectGroupedChats = groupChatsByProject(allChats as ChatWithProject[]);
-                  
+                  const projectGroupedChats = groupChatsByProject(
+                    allChats as ChatWithProject[],
+                  );
+
                   return (
                     <div>
                       {Object.entries(projectGroupedChats)
                         .sort(([a], [b]) => {
-                          // Sort so "No Project" comes last
-                          if (a === 'No Project') return 1;
-                          if (b === 'No Project') return -1;
+                          // Sort so "None" comes last
+                          if (a === 'None') return 1;
+                          if (b === 'None') return -1;
                           return a.localeCompare(b);
                         })
                         .map(([projectName, projectChats]) => (
@@ -273,7 +278,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               {projectChats[0]?.projectIcon ? (
                                 <span>{projectChats[0].projectIcon}</span>
                               ) : (
-                                <FolderOpen className="h-3 w-3" />
+                                <FolderOpen className="size-3" />
                               )}
                               {projectName}
                               <span className="text-xs text-sidebar-foreground/30">
@@ -301,7 +306,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                   );
                 } else {
                   const groupedChats = groupChatsByDate(allChats as Chat[]);
-                  
+
                   return (
                     <div>
                       {groupedChats.today.length > 0 && (

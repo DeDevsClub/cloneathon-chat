@@ -250,7 +250,7 @@ export function ProjectTutorial({
                 {steps.map((_, index) => (
                   <motion.div
                     key={index}
-                    className={cn('w-2.5 h-2.5 rounded-full cursor-pointer')}
+                    className={cn('size-2.5 rounded-full cursor-pointer')}
                     variants={dotVariants}
                     animate={currentStep === index ? 'active' : 'inactive'}
                     onClick={() => {

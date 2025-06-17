@@ -132,6 +132,8 @@ export function Chat({
     toolsEnabled,
     currentModel,
     session,
+    append,
+    query,
   ]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);

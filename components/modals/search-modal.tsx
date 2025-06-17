@@ -201,7 +201,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
           {/* Loading state */}
           {isOpen && !chatHistories && !error && session?.user && (
             <div className="py-8 text-center">
-              <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+              <div className="mx-auto size-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
               <p className="mt-2 text-sm text-muted-foreground">
                 Loading chats...
               </p>

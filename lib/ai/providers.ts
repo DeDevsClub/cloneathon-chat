@@ -7,6 +7,7 @@ import { openai } from '@ai-sdk/openai';
 import { groq } from '@ai-sdk/groq';
 import { isTestEnvironment } from '../constants';
 import { artifactModel, reasoningModel } from './models.test';
+import { selectAppropriateModel } from './modelSelection';
 
 export const myProvider = isTestEnvironment
   ? customProvider({
@@ -31,3 +32,14 @@ export const myProvider = isTestEnvironment
         'small-model': openai.image('dall-e-3'),
       },
     });
+
+/**
+ * Get the appropriate AI model based on content or force a specific model
+ * @param content - The content to analyze for model selection
+ * @param forceArtifactModel - If true, always use the artifact model regardless of content
+ * @returns The selected language model
+ */
+export function getAppropriateModel(content: string, forceArtifactModel = false) {
+  const modelType = forceArtifactModel ? 'artifact-model' : selectAppropriateModel(content);
+  return myProvider.languageModel(modelType);
+}

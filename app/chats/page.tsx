@@ -5,11 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 
-import { ChatItem } from '@/components/chat/chat-item';
-import { CreateChatDialog } from '@/components/chat/create-chat-dialogue';
 import { useSession } from 'next-auth/react';
-import { cn } from '@/lib/utils';
 import { Greeting } from '@/components/chat/greeting';
+import { Chat } from '@/components/chat/chat';
+import { MobileHeader } from '@/components/chat/mobile-header';
+import { DEFAULT_CHAT_MODEL, DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
+import { UIMessage } from 'ai';
+import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatsPage = () => {
   const [loading, setLoading] = useState(true);
@@ -20,12 +24,62 @@ const ChatsPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const handleChatCreated = (chat: any) => {
-    // Refresh the project list after a new project is created
-    fetchChats();
-    setOpen(false);
-    toast.success('Chat created successfully');
-  };
+  const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
+  const [selectedModel, setSelectedModel] = useState(DEFAULT_CHAT_MODEL);
+
+  if (!session) {
+    console.error('No session found');
+    redirect('/login');
+  }
+
+  useEffect(() => {
+    async function loadMessages() {
+      try {
+        setLoading(true);
+        const messages = [] as UIMessage[];
+        console.log('Raw messages from database:', messages);
+        if (messages) {
+          // Convert database messages to UI messages format
+          const uiMessages: UIMessage[] = messages.map((msg) => {
+            // Extract content from either textContent or parts
+            let content = msg.content || '';
+
+            // If no textContent, try to extract from parts
+            if (!content && Array.isArray(msg.parts)) {
+              const textParts = msg.parts
+                .filter((part: any) => part.type === 'text')
+                .map((part: any) => part.text)
+                .join(' ');
+              content = textParts;
+            }
+
+            console.log(
+              `Message ${msg.id}: role=${msg.role}, content="${content}", parts=`,
+              msg.parts,
+            );
+
+            return {
+              id: msg.id,
+              role: msg.role as 'user' | 'assistant' | 'system',
+              content: content,
+              parts: Array.isArray(msg.parts) ? msg.parts : [],
+              createdAt: msg.createdAt,
+            };
+          });
+          console.log('Converted UI messages:', uiMessages);
+          setInitialMessages(uiMessages);
+        }
+      } catch (error) {
+        console.error('Failed to load messages:', error);
+        // Continue with empty messages if loading fails
+        setInitialMessages([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMessages();
+  }, []);
 
   const fetchChats = async () => {
     console.log('Fetching chats...');
@@ -112,16 +166,22 @@ const ChatsPage = () => {
           />
         </div>
       ) : (
-        <div className="flex">
-          <Hero />
-        </div>
+        <>
+          <MobileHeader chatId={uuidv4()} />
+          <div className="pt-4 md:pt-0">
+            <Chat
+              projectId={null}
+              chatId={uuidv4()}
+              initialMessages={initialMessages || []}
+              initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
+              initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
+              isReadonly={false}
+              session={session as Session}
+              autoResume={true}
+            />
+          </div>
+        </>
       )}
-
-      <CreateChatDialog
-        open={open}
-        onOpenChange={setOpen}
-        onChatCreated={handleChatCreated}
-      />
     </div>
   );
 };

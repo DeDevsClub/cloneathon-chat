@@ -37,17 +37,33 @@ export default function ChatPage(props: PageProps) {
       try {
         setLoading(true);
         const messages = await getMessagesForChat({ chatId });
-        console.log({ messages });
+        console.log('Raw messages from database:', messages);
         if (messages) {
           // Convert database messages to UI messages format
-          const uiMessages: UIMessage[] = messages.map((msg) => ({
-            id: msg.id,
-            role: msg.role as 'user' | 'assistant' | 'system',
-            content: msg.textContent || '',
-            parts: Array.isArray(msg.parts) ? msg.parts : [],
-            createdAt: msg.createdAt,
-          }));
-          console.log({ uiMessages });
+          const uiMessages: UIMessage[] = messages.map((msg) => {
+            // Extract content from either textContent or parts
+            let content = msg.textContent || '';
+            
+            // If no textContent, try to extract from parts
+            if (!content && Array.isArray(msg.parts)) {
+              const textParts = msg.parts
+                .filter((part: any) => part.type === 'text')
+                .map((part: any) => part.text)
+                .join(' ');
+              content = textParts;
+            }
+            
+            console.log(`Message ${msg.id}: role=${msg.role}, textContent="${msg.textContent}", content="${content}", parts=`, msg.parts);
+            
+            return {
+              id: msg.id,
+              role: msg.role as 'user' | 'assistant' | 'system',
+              content: content,
+              parts: Array.isArray(msg.parts) ? msg.parts : [],
+              createdAt: msg.createdAt,
+            };
+          });
+          console.log('Converted UI messages:', uiMessages);
           setInitialMessages(uiMessages);
         }
       } catch (error) {

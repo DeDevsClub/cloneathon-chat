@@ -121,7 +121,7 @@ export function getChatHistoryPaginationKey(
 
 export function SidebarHistory({ user }: { user: User | undefined }) {
   const { setOpenMobile } = useSidebar();
-  const { id } = useParams();
+  const { chatId } = useParams();
   const [groupBy, setGroupBy] = useState<'date' | 'project'>('project');
 
   const {
@@ -175,7 +175,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
 
     setShowDeleteDialog(false);
 
-    if (deleteId === id) {
+    if (deleteId === chatId) {
       router.push('/');
     }
   };
@@ -284,7 +284,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               <ChatItem
                                 key={chat.id}
                                 chat={chat}
-                                isActive={chat.id === id}
+                                isActive={chat.id === chatId}
                                 onDelete={(chatId) => {
                                   setDeleteId(chatId);
                                   setShowDeleteDialog(true);
@@ -313,7 +313,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                             <ChatItem
                               key={chat.id}
                               chat={chat}
-                              isActive={chat.id === id}
+                              isActive={chat.id === chatId}
                               onDelete={(chatId) => {
                                 setDeleteId(chatId);
                                 setShowDeleteDialog(true);
@@ -336,7 +336,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                             <ChatItem
                               key={chat.id}
                               chat={chat}
-                              isActive={chat.id === id}
+                              isActive={chat.id === chatId}
                               onDelete={(chatId) => {
                                 setDeleteId(chatId);
                                 setShowDeleteDialog(true);
@@ -359,7 +359,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                             <ChatItem
                               key={chat.id}
                               chat={chat}
-                              isActive={chat.id === id}
+                              isActive={chat.id === chatId}
                               onDelete={(chatId) => {
                                 setDeleteId(chatId);
                                 setShowDeleteDialog(true);
@@ -382,7 +382,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                             <ChatItem
                               key={chat.id}
                               chat={chat}
-                              isActive={chat.id === id}
+                              isActive={chat.id === chatId}
                               onDelete={(chatId) => {
                                 setDeleteId(chatId);
                                 setShowDeleteDialog(true);
@@ -405,7 +405,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                             <ChatItem
                               key={chat.id}
                               chat={chat}
-                              isActive={chat.id === id}
+                              isActive={chat.id === chatId}
                               onDelete={(chatId) => {
                                 setDeleteId(chatId);
                                 setShowDeleteDialog(true);

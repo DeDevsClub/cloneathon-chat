@@ -72,14 +72,14 @@ export const PAGINATION = {
 
 // Chat limits per user
 export const CHAT_LIMITS = {
-  MAX_CHATS_PER_USER: 50, // Maximum number of chats per user
-  MAX_CHATS_PER_PROJECT: 25, // Maximum chats per project
+  MAX_CHATS_PER_USER: 30, // Maximum number of chats per user
+  MAX_CHATS_PER_PROJECT: 15, // Maximum chats per project
 };
 
 // Error messages for chat limits
 export const CHAT_LIMIT_ERRORS = {
   MAX_CHATS_EXCEEDED:
-    'You have reached the maximum number of chats allowed (50). Please delete some chats before creating new ones.',
+    'You have reached the maximum number of chats allowed (30). Please delete some chats before creating new ones.',
   MAX_PROJECT_CHATS_EXCEEDED:
-    'This project has reached the maximum number of chats allowed (25). Please delete some chats before creating new ones.',
+    'This project has reached the maximum number of chats allowed (15). Please delete some chats before creating new ones.',
 };

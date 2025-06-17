@@ -273,7 +273,7 @@ export default function ProjectPage(props: PageProps) {
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Chats in this Project</h2>
+        <h2 className="text-xl font-semibold">Project Chats</h2>
         <Button
           onClick={() =>
             projectId &&
@@ -287,10 +287,10 @@ export default function ProjectPage(props: PageProps) {
 
       {chats.length === 0 ? (
         <div className="py-10 text-center bg-muted/40 rounded-lg">
-          <p className="text-muted-foreground mt-2">
+          {/* <p className="text-muted-foreground mt-2">
             It looks like you don&apos;t have any chats in this project yet.
             Click the &apos;New Chat&apos; button to create your first chat!
-          </p>
+          </p> */}
           <Button
             className="mt-4"
             onClick={() =>
@@ -299,7 +299,7 @@ export default function ProjectPage(props: PageProps) {
             }
           >
             <MessageSquare className="mr-2 size-4" />
-            Create your first chat
+            Create Chat
           </Button>
         </div>
       ) : (

@@ -83,7 +83,7 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     fetch: fetchWithErrorHandlers,
-    api: `/api/chats`, // Use the correct AI chat endpoint
+    api: `/api/chats`,
 
     onFinish(message, { usage, finishReason }) {
       mutate(unstable_serialize(getChatHistoryPaginationKey));

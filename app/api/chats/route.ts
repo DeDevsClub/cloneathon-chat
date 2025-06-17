@@ -45,6 +45,11 @@ export async function POST(req: Request) {
       toolsEnabled,
     } = await req.json();
 
+    console.log('POST /api/chats - Incoming request:');
+    console.log('- chatId:', id);
+    console.log('- messages:', JSON.stringify(messages, null, 2));
+    console.log('- messages length:', messages?.length);
+
     // Validate required fields
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new ChatSDKError(
@@ -155,7 +160,7 @@ export async function POST(req: Request) {
     // Extract and validate message content properly
     const extractMessageContent = (message: any) => {
       const parts: MessagePart[] = [];
-      let textContent = message.content;
+      let textContent = '';
 
       if (typeof message.content === 'string') {
         // Simple string content
@@ -193,7 +198,7 @@ export async function POST(req: Request) {
       const { parts, textContent } = extractMessageContent(m);
 
       return {
-        id: m.id?.toString() || uuidv4(),
+        id: uuidv4(), // Always generate new UUID for database storage
         chatId: chatId,
         projectId: chatProjectId,
         role: m.role || 'user',
@@ -208,13 +213,22 @@ export async function POST(req: Request) {
     // Save initial messages (with proper await)
     if (initialDbMessages.length > 0) {
       try {
-        await saveMessages({ messages: initialDbMessages });
-        console.log('Initial messages saved successfully');
+        console.log('Attempting to save initial messages:', initialDbMessages.length, 'messages');
+        const result = await saveMessages({ messages: initialDbMessages });
+        console.log('Initial messages saved successfully:', result);
       } catch (error) {
         console.error('Failed to save initial messages:', error);
+        // Log the specific error details
+        if (error instanceof Error) {
+          console.error('Error message:', error.message);
+          console.error('Error stack:', error.stack);
+        }
+        console.error('Messages that failed to save:', JSON.stringify(initialDbMessages, null, 2));
         // If messages fail to save but chat was created, continue with streaming
         // The chat is already created and can be used
       }
+    } else {
+      console.log('No initial messages to save');
     }
 
     console.log('Initial messages:', initialDbMessages);

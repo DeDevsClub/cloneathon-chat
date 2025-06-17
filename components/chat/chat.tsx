@@ -121,7 +121,18 @@ export function Chat({
       setHasAppendedQuery(true);
       window.history.replaceState({}, '', `/chats/${chatId}`);
     }
-  }, [hasAppendedQuery, status, input, messages, chatId]);
+  }, [
+    hasAppendedQuery,
+    status,
+    input,
+    messages,
+    chatId,
+    projectId,
+    visibilityType,
+    toolsEnabled,
+    currentModel,
+    session,
+  ]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isArtifactVisible = useArtifactSelector(

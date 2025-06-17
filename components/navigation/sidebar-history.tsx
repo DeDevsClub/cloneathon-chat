@@ -29,6 +29,7 @@ import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Calendar, FolderOpen } from 'lucide-react';
+import { ChatUsageIndicator } from '@/components/navigation/chat-usage-indicator';
 
 type GroupedChats = {
   today: Chat[];
@@ -445,6 +446,8 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
           )}
         </SidebarGroupContent>
       </SidebarGroup>
+
+      <ChatUsageIndicator />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>

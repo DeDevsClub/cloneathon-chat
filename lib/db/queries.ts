@@ -12,6 +12,7 @@ import {
   lt,
   not,
   or,
+  sql,
   type SQL,
 } from 'drizzle-orm';
 import { db } from './index';
@@ -103,8 +104,8 @@ export async function saveChat({
   projectId,
   systemPrompt,
   model,
-  contentType,
-  textContent,
+  // contentType,
+  // textContent,
 }: {
   id: string;
   userId: string;
@@ -113,8 +114,8 @@ export async function saveChat({
   projectId: string | null;
   systemPrompt: string;
   model: string;
-  contentType: string;
-  textContent: string;
+  // contentType: string;
+  // textContent: string;
 }) {
   try {
     return await db.insert(chat).values({
@@ -132,12 +133,15 @@ export async function saveChat({
     });
   } catch (error) {
     console.error('Error saving chat:', error);
-    
+
     // Check if this is a duplicate key error (chat already exists)
     if (error instanceof Error && error.message.includes('duplicate key')) {
-      throw new ChatSDKError('bad_request:chat', 'Chat with this ID already exists');
+      throw new ChatSDKError(
+        'bad_request:chat',
+        'Chat with this ID already exists',
+      );
     }
-    
+
     throw new ChatSDKError('bad_request:database', 'Failed to save chat');
   }
 }
@@ -324,18 +328,12 @@ export async function getChatsWithProjectsByUserId({
                 whereCondition,
                 or(
                   eq(chat.userId, id),
-                  and(
-                    not(isNull(chat.projectId)),
-                    eq(project.userId, id),
-                  ),
+                  and(not(isNull(chat.projectId)), eq(project.userId, id)),
                 ),
               )
             : or(
                 eq(chat.userId, id),
-                and(
-                  not(isNull(chat.projectId)),
-                  eq(project.userId, id),
-                ),
+                and(not(isNull(chat.projectId)), eq(project.userId, id)),
               ),
         )
         .orderBy(desc(chat.lastActivityAt)) // Order by last activity instead of creation date
@@ -359,7 +357,9 @@ export async function getChatsWithProjectsByUserId({
         );
       }
 
-      filteredChats = await query(gt(chat.lastActivityAt, selectedChat.lastActivityAt));
+      filteredChats = await query(
+        gt(chat.lastActivityAt, selectedChat.lastActivityAt),
+      );
     } else if (endingBefore) {
       const [selectedChat] = await db
         .select()
@@ -374,7 +374,9 @@ export async function getChatsWithProjectsByUserId({
         );
       }
 
-      filteredChats = await query(lt(chat.lastActivityAt, selectedChat.lastActivityAt));
+      filteredChats = await query(
+        lt(chat.lastActivityAt, selectedChat.lastActivityAt),
+      );
     } else {
       filteredChats = await query();
     }
@@ -633,6 +635,40 @@ export async function updateChatTitleById({
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to update chat title by id',
+    );
+  }
+}
+
+export async function getChatCountByUserId(userId: string): Promise<number> {
+  try {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(chat)
+      .where(eq(chat.userId, userId));
+
+    return result[0]?.count || 0;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get chat count by user id',
+    );
+  }
+}
+
+export async function getChatCountByProjectId(
+  projectId: string,
+): Promise<number> {
+  try {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(chat)
+      .where(eq(chat.projectId, projectId));
+
+    return result[0]?.count || 0;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get chat count by project id',
     );
   }
 }

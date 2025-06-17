@@ -5,6 +5,8 @@ import {
   getChatById,
   saveChat,
   saveMessages,
+  getChatCountByUserId,
+  getChatCountByProjectId,
 } from '@/lib/db/queries';
 import { ChatSDKError } from '@/lib/errors';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +14,8 @@ import {
   DEFAULT_CHAT_MODEL,
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_VISIBILITY_TYPE,
+  CHAT_LIMITS,
+  CHAT_LIMIT_ERRORS,
 } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getEnabledTools } from '@/lib/tools';
@@ -91,6 +95,26 @@ export async function POST(req: Request) {
     // Save chat metadata first (with proper await) - only if chat doesn't exist
     if (!existingChat) {
       try {
+        // Check user's total chat count before creating new chat
+        const userChatCount = await getChatCountByUserId(user.id);
+        if (userChatCount >= CHAT_LIMITS.MAX_CHATS_PER_USER) {
+          return new ChatSDKError(
+            'bad_request:chat',
+            CHAT_LIMIT_ERRORS.MAX_CHATS_EXCEEDED,
+          ).toResponse();
+        }
+
+        // Check project chat count if chat is associated with a project
+        if (chatProjectId) {
+          const projectChatCount = await getChatCountByProjectId(chatProjectId);
+          if (projectChatCount >= CHAT_LIMITS.MAX_CHATS_PER_PROJECT) {
+            return new ChatSDKError(
+              'bad_request:chat',
+              CHAT_LIMIT_ERRORS.MAX_PROJECT_CHATS_EXCEEDED,
+            ).toResponse();
+          }
+        }
+
         await saveChat({
           id: chatId,
           userId: user.id,
@@ -133,7 +157,7 @@ export async function POST(req: Request) {
     // Extract and validate message content properly
     const extractMessageContent = (message: any) => {
       const parts: MessagePart[] = [];
-      let textContent = '';
+      let textContent = message.content;
 
       if (typeof message.content === 'string') {
         // Simple string content
@@ -195,13 +219,17 @@ export async function POST(req: Request) {
       }
     }
 
+    console.log('Initial messages:', initialDbMessages);
+
     // Call the language model after initial chat and messages are saved
     console.log('About to call streamText...');
-    const modelId = model || 'chat-model';
+    const modelId = model || DEFAULT_CHAT_MODEL;
     console.log('Model ID:', modelId);
     console.log('Model:', myProvider.languageModel(modelId));
     console.log('Messages length:', messages.length);
     console.log('System prompt:', prompt);
+    console.log('Tools enabled:', toolsEnabled);
+    console.log('Tool call streaming:', toolCallStreaming);
 
     const result = streamText({
       model: myProvider.languageModel(modelId),
@@ -263,6 +291,7 @@ export async function POST(req: Request) {
           }
 
           if (assistantMessageParts.length > 0) {
+            console.log('Assistant message parts:', assistantMessageParts);
             const assistantMessageToSave = {
               id: uuidv4(),
               chatId: chatId,

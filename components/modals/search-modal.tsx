@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -88,13 +89,42 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
     onOpenChange(false);
   };
 
-  const handleStartNewChat = () => {
-    // Navigate to new chat page with optional title
-    const queryParams = searchTerm.trim()
-      ? `?title=${encodeURIComponent(searchTerm.trim())}`
-      : '';
-    router.push(`/chats/new${queryParams}`);
-    onOpenChange(false);
+  const handleStartNewChat = async () => {
+    try {
+      // Check chat count before creating new chat
+      const countResponse = await fetch('/api/chats/count');
+      if (countResponse.ok) {
+        const countData = await countResponse.json();
+        if (countData.count >= countData.maxCount) {
+          toast.error(`You have reached the maximum number of chats allowed (${countData.maxCount}). Please delete some chats before creating new ones.`, {
+            duration: 6000,
+            action: {
+              label: 'Manage Chats',
+              onClick: () => {
+                router.push('/chats');
+                onOpenChange(false);
+              },
+            },
+          });
+          return;
+        }
+      }
+      
+      // Navigate to new chat page with optional title
+      const queryParams = searchTerm.trim()
+        ? `?title=${encodeURIComponent(searchTerm.trim())}`
+        : '';
+      router.push(`/chats/new${queryParams}`);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error checking chat limits:', error);
+      // If we can't check limits, still allow creation (will be caught by backend)
+      const queryParams = searchTerm.trim()
+        ? `?title=${encodeURIComponent(searchTerm.trim())}`
+        : '';
+      router.push(`/chats/new${queryParams}`);
+      onOpenChange(false);
+    }
   };
 
   const formatDate = (dateString: string) => {

@@ -9,7 +9,11 @@ import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
 import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
-import { DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
+import {
+  DEFAULT_CHAT_MESSAGE,
+  DEFAULT_CHAT_MODEL,
+  DEFAULT_SYSTEM_PROMPT,
+} from '@/lib/constants';
 import { MobileHeader } from '@/components/chat/mobile-header';
 
 type ErrorMessage = {
@@ -31,6 +35,7 @@ export default function NewChatPage() {
   // Get projectId from search parameters
   const projectId = searchParams.get('projectId');
   const systemPrompt = DEFAULT_SYSTEM_PROMPT;
+  const chatModel = 'chat-model';
 
   useEffect(() => {
     async function createNewChat() {
@@ -48,34 +53,33 @@ export default function NewChatPage() {
         const chatId = uuidv4();
 
         const messageId = uuidv4();
-        const messageContent = 'Hello';
         const message = {
           id: messageId,
-          content: messageContent,
+          content: DEFAULT_CHAT_MESSAGE,
           parts: [
             {
-              text: messageContent,
+              text: DEFAULT_CHAT_MESSAGE,
               type: 'text',
             },
           ],
           role: 'user',
           createdAt: new Date().toISOString(),
           experimental_attachments: [],
-          model: 'chat-model',
+          model: chatModel || DEFAULT_CHAT_MODEL,
           projectId: projectId || null,
           contentType: 'application/vnd.ai.content.v1+json',
-          textContent: messageContent,
+          textContent: DEFAULT_CHAT_MESSAGE,
         };
 
         const payload = {
           id: chatId,
           system: systemPrompt,
           visibility: 'private',
-          selectedChatModel: 'chat-model',
+          selectedChatModel: chatModel || DEFAULT_CHAT_MODEL,
           messages: [message],
           project: projectId ? { id: projectId } : null,
           contentType: 'application/vnd.ai.content.v1+json',
-          textContent: messageContent,
+          textContent: message.textContent || DEFAULT_CHAT_MESSAGE,
         };
 
         console.log('Creating chat with payload:', payload);
@@ -89,7 +93,28 @@ export default function NewChatPage() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create chat');
+          const errorData = await response.json().catch(() => null);
+          let errorMessage = 'Failed to create chat';
+
+          // Handle specific chat limit errors
+          if (errorData?.message) {
+            if (errorData.message.includes('maximum number of chats allowed')) {
+              errorMessage = errorData.message;
+              toast.error(errorMessage, {
+                duration: 6000,
+                action: {
+                  label: 'Manage Chats',
+                  onClick: () => router.push(AppRoutes.chats.list()),
+                },
+              });
+              router.push(AppRoutes.chats.list());
+              return;
+            } else {
+              errorMessage = errorData.message;
+            }
+          }
+
+          throw new Error(errorMessage);
         }
 
         // Redirect to the new chat

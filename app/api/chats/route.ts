@@ -123,8 +123,6 @@ export async function POST(req: Request) {
           projectId: chatProjectId,
           systemPrompt: prompt,
           model: model || DEFAULT_CHAT_MODEL,
-          contentType: 'application/vnd.ai.content.v1+json',
-          textContent: textContent || '',
         });
         console.log('Chat saved successfully');
       } catch (error) {

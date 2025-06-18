@@ -208,7 +208,7 @@ export default function LoginPage() {
                     className={`pl-10 ${focusedField === 'password' ? 'border-primary ring-1 ring-primary' : ''} transition-all`}
                     disabled={loading}
                     value={formData.password}
-                    placeholder="••••••••"
+                    placeholder=""
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         emailAndPasswordSignIn();

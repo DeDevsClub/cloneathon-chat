@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Project Creation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .form-group { margin: 15px 0; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .logs { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Project Creation Test</h1>
+        <div class="info">
+            <strong>Test Status:</strong> This page tests the fixed project creation API.
+        </div>
+        
+        <div class="form-group">
+            <h3>Authentication Check</h3>
+            <button onclick="checkAuth()">Check Authentication Status</button>
+            <div id="auth-status"></div>
+        </div>
+        
+        <div class="form-group">
+            <h3>Create Test Project</h3>
+            <input type="text" id="project-name" placeholder="Project Name" value="Test Project Fix">
+            <textarea id="project-description" placeholder="Project Description">Testing the authentication fix for project creation</textarea>
+            <button onclick="createProject()">Create Project</button>
+            <div id="create-status"></div>
+        </div>
+        
+        <div class="form-group">
+            <h3>Fetch Projects</h3>
+            <button onclick="fetchProjects()">Fetch All Projects</button>
+            <div id="projects-list"></div>
+        </div>
+        
+        <div class="logs" id="logs">
+            <h4>Logs:</h4>
+            <div id="log-content">Click buttons above to test...</div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logContent = document.getElementById('log-content');
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        }
+        
+        async function checkAuth() {
+            const statusDiv = document.getElementById('auth-status');
+            log('Checking authentication status...');
+            
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.status === 200) {
+                    statusDiv.innerHTML = '<div class="success">✅ Authentication successful!</div>';
+                    log('✅ Authentication working correctly');
+                } else if (response.status === 401) {
+                    statusDiv.innerHTML = '<div class="error">❌ Authentication failed - please login first</div>';
+                    log('❌ Authentication failed - 401 Unauthorized');
+                } else {
+                    statusDiv.innerHTML = `<div class="error">⚠️ Unexpected response: ${response.status}</div>`;
+                    log(`⚠️ Unexpected response: ${response.status}`);
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+                log(`❌ Network error: ${error.message}`);
+            }
+        }
+        
+        async function createProject() {
+            const statusDiv = document.getElementById('create-status');
+            const name = document.getElementById('project-name').value;
+            const description = document.getElementById('project-description').value;
+            
+            log(`Creating project: ${name}`);
+            
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        icon: '🧪',
+                        color: '#28a745'
+                    })
+                });
+                
+                const responseData = await response.text();
+                log(`API Response: ${response.status} - ${responseData}`);
+                
+                if (response.status === 201) {
+                    statusDiv.innerHTML = '<div class="success">✅ Project created successfully!</div>';
+                    log('✅ Project creation successful!');
+                } else if (response.status === 401) {
+                    statusDiv.innerHTML = '<div class="error">❌ Authentication required - please login first</div>';
+                    log('❌ Project creation failed - authentication required');
+                } else {
+                    statusDiv.innerHTML = `<div class="error">❌ Creation failed: ${responseData}</div>`;
+                    log(`❌ Project creation failed: ${response.status} - ${responseData}`);
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+                log(`❌ Network error: ${error.message}`);
+            }
+        }
+        
+        async function fetchProjects() {
+            const listDiv = document.getElementById('projects-list');
+            log('Fetching projects...');
+            
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const responseData = await response.text();
+                log(`Fetch Response: ${response.status} - ${responseData.substring(0, 100)}...`);
+                
+                if (response.status === 200) {
+                    const data = JSON.parse(responseData);
+                    listDiv.innerHTML = `<div class="success">✅ Found ${data.projects.length} projects</div>`;
+                    log(`✅ Successfully fetched ${data.projects.length} projects`);
+                } else if (response.status === 401) {
+                    listDiv.innerHTML = '<div class="error">❌ Authentication required - please login first</div>';
+                    log('❌ Fetch failed - authentication required');
+                } else {
+                    listDiv.innerHTML = `<div class="error">❌ Fetch failed: ${responseData}</div>`;
+                    log(`❌ Fetch failed: ${response.status} - ${responseData}`);
+                }
+            } catch (error) {
+                listDiv.innerHTML = `<div class="error">❌ Network error: ${error.message}</div>`;
+                log(`❌ Network error: ${error.message}`);
+            }
+        }
+        
+        // Auto-run authentication check on page load
+        window.addEventListener('load', function() {
+            log('Page loaded - ready for testing');
+            setTimeout(checkAuth, 1000);
+        });
+    </script>
+</body>
+</html>

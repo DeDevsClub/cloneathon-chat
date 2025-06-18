@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cookie Debug Test</title>
+</head>
+<body>
+    <h1>Cookie Debug Test</h1>
+    <button onclick="testCookies()">Test Cookies</button>
+    <button onclick="testAPICall()">Test API Call</button>
+    <div id="results"></div>
+
+    <script>
+        function testCookies() {
+            const results = document.getElementById('results');
+            const cookies = document.cookie.split(';').map(c => c.trim());
+            
+            results.innerHTML = '<h2>Available Cookies:</h2>';
+            cookies.forEach(cookie => {
+                const [name, value] = cookie.split('=');
+                results.innerHTML += `<p><strong>${name}:</strong> ${value ? value.substring(0, 50) + '...' : 'empty'}</p>`;
+            });
+            
+            console.log('All cookies:', document.cookie);
+        }
+        
+        async function testAPICall() {
+            const results = document.getElementById('results');
+            
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test Project from Browser',
+                        description: 'Testing from browser with cookies',
+                        icon: '🌐',
+                        color: '#4CAF50'
+                    })
+                });
+                
+                const responseText = await response.text();
+                results.innerHTML += `<h2>API Response:</h2>`;
+                results.innerHTML += `<p><strong>Status:</strong> ${response.status}</p>`;
+                results.innerHTML += `<p><strong>Response:</strong> ${responseText}</p>`;
+                
+                console.log('API Response:', { status: response.status, body: responseText });
+            } catch (error) {
+                console.error('API Error:', error);
+                results.innerHTML += `<h2>API Error:</h2><p>${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

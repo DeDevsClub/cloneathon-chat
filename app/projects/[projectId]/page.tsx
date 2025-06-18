@@ -199,7 +199,7 @@ export default function ProjectPage(props: PageProps) {
       const debugResponse = await fetch(`/api/debug?projectId=${projectId}`);
       const debugData = await debugResponse.json();
       const chatIds = debugData.chatIds;
-      // console.log('Debug data:', debugData);
+      console.log('Debug data:', debugData);
       toast.success('Debug data logged to console');
     } catch (error) {
       console.error('Debug error:', error);

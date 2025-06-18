@@ -5,6 +5,7 @@ import { getProject, getProjectChats } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
 import { createChat } from '@/lib/db/chat';
 import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
+import { chat } from '@/lib/db';
 
 // Helper to validate user ownership of project
 async function validateUserOwnership(projectId: string, userEmail: string) {
@@ -105,10 +106,11 @@ export async function GET(request: NextRequest) {
 
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
 export async function POST(request: NextRequest) {
-  const url = new URL(request.url);
-  const pathParts = url.pathname.split('/');
-  const projectId = pathParts[pathParts.indexOf('projects') + 1];
   try {
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const projectId = pathParts[pathParts.indexOf('projects') + 1];
+
     console.log(
       `DEBUG - POST project/${projectId}/chats - Starting chat creation`,
     );
@@ -194,6 +196,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ chat: newChat }, { status: 201 });
   } catch (error) {
+    const projectId = chat.projectId;
+
     console.error(
       `DEBUG - POST project/${projectId}/chats - Error creating chat:`,
       error,

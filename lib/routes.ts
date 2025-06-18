@@ -12,6 +12,9 @@ export const AppRoutes = {
     list: '/projects',
     detail: (projectId: string) => `/projects/${projectId}`,
     edit: (projectId: string) => `/projects/${projectId}/edit`,
+    chats: (projectId: string) => `/projects/${projectId}/chats`,
+    chat: (projectId: string, chatId: string) =>
+      `/projects/${projectId}/chats/${chatId}`,
     new: '/projects/new',
   },
 
@@ -34,6 +37,7 @@ export const AppRoutes = {
       base: '/api/projects',
       byId: (projectId: string) => `/api/projects/${projectId}`,
       chats: (projectId: string) => `/api/projects/${projectId}/chats`,
+      new: '/api/projects/new',
     },
     test: {
       endpoints: '/api/test-endpoints',

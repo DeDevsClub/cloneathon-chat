@@ -31,7 +31,7 @@ export function MobileHeader({
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 ">
+    <div className="fixed top-0 inset-x-0 z-50 ">
       {/*  bg-transparent/10 backdrop-blur-xs border-b border-border */}
       <div className="flex items-center justify-between p-2 ">
         {/* Left section */}

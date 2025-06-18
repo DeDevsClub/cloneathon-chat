@@ -55,15 +55,14 @@ interface PageProps {
 }
 
 export default function ProjectPage(props: PageProps) {
-  // Properly unwrap params using React.use()
-  const unwrappedParams = use(props.params);
-  const _projectId = unwrappedParams.projectId; // Safe to access directly since we've properly typed it
-
+  const unwrappedParams = use(props?.params);
+  const projectId = unwrappedParams?.projectId;
+  console.log('Project ID (from api/projects/[projectId]):', props?.params);
+  console.log('Project ID (from api/projects/[projectId]):', projectId);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
   const [chats, setChats] = useState<Chat[]>([]);
-  const [projectId, setProjectId] = useState<string>(_projectId);
   const [chatIds, setChatIds] = useState<string[] | null>(null);
 
   async function fetchProjectDetails() {
@@ -76,10 +75,9 @@ export default function ProjectPage(props: PageProps) {
     try {
       setLoading(true);
       // Use the project ID from the component state
-      const currentPid = projectId;
 
       // Fetch project data
-      const projectResponse = await fetch(`/api/projects/${currentPid}`);
+      const projectResponse = await fetch(`/api/projects/${projectId}`);
       // console.log('Project fetch status:', projectResponse.status);
 
       if (!projectResponse.ok) {
@@ -94,11 +92,11 @@ export default function ProjectPage(props: PageProps) {
       // console.log('Project data received:', projectData);
       const projectDetails = projectData.project;
       setProject(projectDetails);
-
+      console.log('Project details:', projectDetails);
       // Fetch project chats
-      const chatsResponse = await fetch(`/api/projects/${currentPid}/chats`);
+      const chatsResponse = await fetch(`/api/projects/${projectId}/chats`);
       // console.log('Chats fetch status:', chatsResponse.status);
-
+      console.log('Chats fetch status:', chatsResponse.status);
       if (!chatsResponse.ok) {
         if (chatsResponse.status === 401) {
           toast.error('Authentication required for chat access');
@@ -117,9 +115,10 @@ export default function ProjectPage(props: PageProps) {
       // console.log('Project chats to display:', projectChats);
 
       if (projectChats.length > 0) {
+        router.push(AppRoutes.projects.chat(projectId, projectChats[0].id));
         // console.log('First chat details:', projectChats[0]);
       } else {
-        // console.log('No chats found for this project');
+        console.log('No chats found for this project');
       }
 
       setChats(projectChats);
@@ -162,7 +161,6 @@ export default function ProjectPage(props: PageProps) {
 
   useEffect(() => {
     if (projectId) {
-      setProjectId(projectId);
       fetchProjectDetails();
     }
     // console.log('Project ID:', projectId);

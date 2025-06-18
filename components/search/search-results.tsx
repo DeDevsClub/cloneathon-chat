@@ -104,14 +104,14 @@ function SearchResultCarouselCard({
                 (result.type === 'image' ? result.url : '')
               }
               alt={result.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
               onError={(e) => setImageError(true)}
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
             {/* Overlay Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-3">
+            <div className="absolute bottom-0 inset-x-0 p-3">
               <div className="flex items-center justify-between mb-2">
                 <Badge className={`text-xs px-2 py-1 ${getTypeColor()}`}>
                   {getTypeIcon()}{' '}
@@ -137,7 +137,7 @@ function SearchResultCarouselCard({
             <Button
               variant="secondary"
               size="sm"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 h-8 w-8 bg-white/90 hover:bg-white"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 size-8 bg-white/90 hover:bg-white"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(result.url, '_blank');

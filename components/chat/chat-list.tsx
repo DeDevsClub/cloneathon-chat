@@ -62,7 +62,7 @@ export default async function ChatList() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40%]">Title</TableHead>
+              <TableHead className="w-2/5">Title</TableHead>
               <TableHead>Last Updated</TableHead>
               <TableHead>Visibility</TableHead>
               <TableHead className="text-right">Chat</TableHead>

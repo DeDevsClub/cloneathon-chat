@@ -57,7 +57,7 @@ export function SearchModal({ isOpen, onOpenChange }: SearchModalProps) {
   // Flatten all chats from all date groups
   const allChats = useMemo(() => {
     if (!chatHistories) return [];
-    return chatHistories.flatMap((history) => history.chats);
+    return chatHistories?.flatMap((history) => history.chats);
   }, [chatHistories]);
 
   // Filter chats based on search term

@@ -5,7 +5,9 @@ export interface SlashCommand {
   aliases?: string[];
   category?: 'chat' | 'navigation' | 'tools' | 'ai';
   action: (args?: string) => void | Promise<void>;
-  suggestions?: () => Promise<{ id: string; name: string; description?: string }[]>;
+  suggestions?: () => Promise<
+    { id: string; name: string; description?: string }[]
+  >;
 }
 
 export interface SlashCommandConfig {
@@ -21,7 +23,9 @@ export const defaultConfig: SlashCommandConfig = {
 };
 
 // Fetch projects for suggestions
-const fetchProjectSuggestions = async (): Promise<{ id: string; name: string; description?: string }[]> => {
+const fetchProjectSuggestions = async (): Promise<
+  { id: string; name: string; description?: string }[]
+> => {
   try {
     const response = await fetch('/api/projects');
     if (!response.ok) {
@@ -40,7 +44,9 @@ const fetchProjectSuggestions = async (): Promise<{ id: string; name: string; de
 };
 
 // Fetch available models for suggestions
-const fetchModelSuggestions = async (): Promise<{ id: string; name: string; description?: string }[]> => {
+const fetchModelSuggestions = async (): Promise<
+  { id: string; name: string; description?: string }[]
+> => {
   try {
     // Import chatModels from the models file
     const { chatModels } = await import('@/lib/ai/models');
@@ -61,9 +67,56 @@ const fetchModelSuggestions = async (): Promise<{ id: string; name: string; desc
       {
         id: 'chat-model-reasoning',
         name: 'Reasoning',
-        description: 'Uses Groq Llama for advanced reasoning (llama-3.1-70b-versatile)',
+        description:
+          'Uses Groq Llama for advanced reasoning (llama-3.1-70b-versatile)',
       },
     ];
+  }
+};
+
+// Fetch available tools for suggestions
+const fetchToolSuggestions = async (): Promise<
+  { id: string; name: string; description?: string }[]
+> => {
+  try {
+    // Define available tools with descriptions
+    const tools = [
+      {
+        id: 'web-search',
+        name: 'Web Search',
+        description: 'Toggle web search functionality for enhanced responses',
+      },
+      {
+        id: 'code-interpreter',
+        name: 'Code Interpreter',
+        description: 'Enable code execution and analysis capabilities',
+      },
+      {
+        id: 'image-generator',
+        name: 'Image Generator',
+        description: 'Generate images from text descriptions',
+      },
+      {
+        id: 'file-upload',
+        name: 'File Upload',
+        description: 'Upload and analyze files (images, documents, code)',
+      },
+      {
+        id: 'canvas-mode',
+        name: 'Canvas Mode',
+        description: 'Interactive canvas for visual editing and creation',
+      },
+      {
+        id: 'artifacts',
+        name: 'Artifacts',
+        description: 'Generate and manage code artifacts and components',
+      },
+    ];
+
+    return tools;
+  } catch (error) {
+    console.error('Error fetching tool suggestions:', error);
+    return [];
   }
 };
 
@@ -77,6 +130,7 @@ export const createSlashCommands = (handlers: {
   onCreateProject: () => void;
   onSelectProject: (projectId: string) => void;
   onHelp: () => void;
+  onToggleTool: (toolId?: string) => void;
 }): SlashCommand[] => [
   {
     name: 'new',
@@ -103,7 +157,7 @@ export const createSlashCommands = (handlers: {
   },
   {
     name: 'model',
-    description: 'Switch AI model',
+    description: 'Switch AI model for chat',
     icon: '🤖',
     aliases: ['ai', 'switch'],
     category: 'ai',
@@ -119,12 +173,32 @@ export const createSlashCommands = (handlers: {
     suggestions: fetchModelSuggestions,
   },
   {
+    name: 'models',
+    description: 'Show available AI models',
+    icon: '🤖',
+    aliases: ['ai', 'models'],
+    category: 'ai',
+    action: () => {
+      handlers.onSwitchModel();
+    },
+    suggestions: fetchModelSuggestions,
+  },
+  {
     name: 'projects',
     description: 'Go to projects',
     icon: '📁',
     aliases: ['proj'],
     category: 'navigation',
-    action: handlers.onNavigateToProjects,
+    action: (args) => {
+      if (args) {
+        // If args provided (project selected from suggestions), navigate to specific project
+        handlers.onSelectProject(args);
+      } else {
+        // If no args, go to projects page
+        handlers.onNavigateToProjects();
+      }
+    },
+    suggestions: fetchProjectSuggestions,
   },
   {
     name: 'project',
@@ -144,12 +218,50 @@ export const createSlashCommands = (handlers: {
     suggestions: fetchProjectSuggestions,
   },
   {
+    name: 'projects-list',
+    description: 'Show available projects',
+    icon: '📁',
+    aliases: ['proj', 'list'],
+    category: 'navigation',
+    action: () => {
+      handlers.onNavigateToProjects();
+    },
+    suggestions: fetchProjectSuggestions,
+  },
+  {
     name: 'help',
     description: 'Show available commands',
     icon: '❓',
     aliases: ['?', 'commands'],
     category: 'chat',
     action: handlers.onHelp,
+  },
+  {
+    name: 'tools',
+    description: 'Show available tools',
+    icon: '🧰',
+    aliases: ['t'],
+    category: 'tools',
+    action: () => {
+      handlers.onToggleTool();
+    },
+    suggestions: fetchToolSuggestions,
+  },
+  {
+    name: 'tool',
+    description: 'Select and activate a specific tool',
+    icon: '🛠️',
+    category: 'tools',
+    action: (args) => {
+      if (args) {
+        // If args provided, try to select tool by name
+        handlers.onToggleTool(args);
+      } else {
+        // If no args, show tool selection dialog
+        handlers.onToggleTool();
+      }
+    },
+    suggestions: fetchToolSuggestions,
   },
 ];
 

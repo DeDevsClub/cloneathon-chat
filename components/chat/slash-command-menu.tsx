@@ -71,11 +71,17 @@ export function SlashCommandMenu({
         onClose();
       }
     };
+    
     if (isVisible) {
       document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
     }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isVisible, onClose]);
 
+  useEffect(() => {
     const loadSuggestions = async () => {
       if (activeCommand?.suggestions) {
         setLoadingSuggestions(true);
@@ -95,8 +101,9 @@ export function SlashCommandMenu({
         onSuggestionCountChange?.(0);
       }
     };
+    
     loadSuggestions();
-  }, [isVisible, onClose, activeCommand]);
+  }, [activeCommand, onSuggestionCountChange]);
 
   if (!isVisible) return null;
 

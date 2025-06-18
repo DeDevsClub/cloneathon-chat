@@ -14,12 +14,14 @@ interface UseSlashCommandsProps {
   onClearChat?: () => void;
   onToggleWebSearch?: () => void;
   onSwitchModel?: (modelId?: string) => void;
+  onToggleTool?: (toolId?: string) => void;
 }
 
 export function useSlashCommands({
   onClearChat,
   onToggleWebSearch,
   onSwitchModel,
+  onToggleTool,
 }: UseSlashCommandsProps) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
@@ -68,6 +70,9 @@ export function useSlashCommands({
       toast.info(
         'Available commands: /new, /clear, /search, /model, /projects, /project, /help',
       );
+    },
+    onToggleTool: (toolId?: string) => {
+      onToggleTool?.(toolId);
     },
   });
 
@@ -129,7 +134,9 @@ export function useSlashCommands({
       case 'ArrowUp':
         event.preventDefault();
         if (activeCommand?.suggestions) {
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestionCount - 1));
+          setSelectedIndex((prev) =>
+            prev > 0 ? prev - 1 : suggestionCount - 1,
+          );
         } else {
           setSelectedIndex((prev) =>
             prev === 0

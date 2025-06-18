@@ -152,6 +152,32 @@ function PureMultimodalInput({
         );
       }
     },
+    onToggleTool: (toolId) => {
+      if (toolId) {
+        // Handle specific tool selection
+        switch (toolId) {
+          case 'web-search':
+            onToolsToggle?.(!toolsEnabled);
+            toast.success(`Web search ${toolsEnabled ? 'disabled' : 'enabled'}`);
+            break;
+          case 'canvas-mode':
+            onCanvasToggle?.(!canvasEnabled);
+            toast.success(`Canvas mode ${canvasEnabled ? 'disabled' : 'enabled'}`);
+            break;
+          case 'file-upload': {
+            // Trigger file upload dialog
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            fileInput?.click();
+            break;
+          }
+          default:
+            toast.info(`Tool '${toolId}' functionality coming soon!`);
+        }
+      } else {
+        // Show available tools
+        toast.info('Available tools: web-search, canvas-mode, file-upload, code-interpreter, image-generator, artifacts');
+      }
+    },
   });
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

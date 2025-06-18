@@ -78,24 +78,29 @@ export function useSlashCommands({
 
   const handleInputChange = (input: string): { shouldClear: boolean } => {
     const parsed = parseSlashCommand(input, config.trigger);
+    console.log('Parsed command:', parsed);
 
     if (parsed.isCommand) {
       setQuery(parsed.command || '');
       setIsVisible(true);
       setSelectedIndex(0);
 
-      // Check if this is a complete command match for suggestions
+      // Check if this is a command match for suggestions
       const exactCommand = commands.find(
         (cmd) =>
           cmd.name === parsed.command ||
           cmd.aliases?.includes(parsed.command || ''),
       );
+      
+      console.log('Exact command found:', exactCommand?.name, 'Has suggestions:', !!exactCommand?.suggestions, 'Args:', parsed.args);
 
       if (exactCommand && exactCommand.suggestions && !parsed.args) {
-        // Show suggestions for this command
+        // Show suggestions for this command when no args are provided
         setActiveCommand(exactCommand);
+        console.log('Setting active command:', exactCommand.name);
       } else {
         setActiveCommand(undefined);
+        console.log('No active command set');
       }
     } else {
       setIsVisible(false);

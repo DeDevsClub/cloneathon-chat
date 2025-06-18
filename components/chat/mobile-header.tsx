@@ -30,10 +30,6 @@ export function MobileHeader({
     return null;
   }
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const handleNewChat = () => {
     router.push('/chats/new');
   };

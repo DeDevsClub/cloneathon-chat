@@ -7,6 +7,7 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
 import { cn } from '@/lib/utils';
+import type { TokenUsageData } from '@/hooks/use-token-usage';
 
 interface MessagesProps {
   chatId: string;
@@ -17,6 +18,7 @@ interface MessagesProps {
   isReadonly: boolean;
   isArtifactVisible: boolean;
   className?: string;
+  getUsage: (messageId: string) => TokenUsageData | undefined;
 }
 
 function PureMessages({
@@ -27,6 +29,7 @@ function PureMessages({
   reload,
   isReadonly,
   className,
+  getUsage,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -58,6 +61,7 @@ function PureMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
+          getUsage={getUsage}
           requiresScrollPadding={
             hasSentMessage && index === messages.length - 1
           }

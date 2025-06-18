@@ -24,6 +24,8 @@ import { MessageReasoning } from '@/components/chat/message-reasoning';
 import { SearchResults } from '@/components/search/search-results';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { Globe } from 'lucide-react';
+import { TokenUsage } from '@/components/chat/token-usage';
+import type { TokenUsageData } from '@/hooks/use-token-usage';
 
 const PurePreviewMessage = ({
   chatId,
@@ -33,6 +35,7 @@ const PurePreviewMessage = ({
   reload,
   isReadonly,
   requiresScrollPadding,
+  getUsage,
 }: {
   chatId: string;
   message: UIMessage;
@@ -41,6 +44,7 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   requiresScrollPadding: boolean;
+  getUsage: (messageId: string) => TokenUsageData | undefined;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
@@ -238,14 +242,18 @@ const PurePreviewMessage = ({
               }
             })}
 
-            {/* {!isReadonly && (
-              <MessageActions
-                key={`action-${message.id}`}
-                chatId={chatId}
-                message={message}
-                isLoading={isLoading}
-              />
-            )} */}
+            {/* Show token usage for assistant messages */}
+            {message.role === 'assistant' && !isLoading && (
+              (() => {
+                const usage = getUsage(message.id);
+                return usage ? (
+                  <TokenUsage 
+                    usage={usage} 
+                    className="mt-2 justify-end" 
+                  />
+                ) : null;
+              })()
+            )}
           </div>
         </div>
       </motion.div>

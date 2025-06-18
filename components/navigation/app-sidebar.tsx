@@ -69,16 +69,16 @@ export function AppSidebar({ user }: AppSidebarProps) {
               onClick={() => {
                 router.push('/');
               }}
-              className="flex flex-cols justify-center items-center gap-2 bg-muted rounded-md p-2 cursor-pointer"
+              className="flex flex-cols justify-center items-center gap-2 bg-muted-background hover:bg-muted/50 rounded-md p-2 cursor-pointer"
             >
               <Icon icon="mdi:chat" className="size-6" />
-              <span className="flex text-lg font-semibold hover:bg-muted rounded-md cursor-pointer flex-row max-w-full gap-2 items-center">
+              <span className="flex text-lg font-semibold rounded-md cursor-pointer flex-row max-w-full gap-2 items-center">
                 th3.chat
               </span>
             </Link>
           </SidebarMenu>
         </SidebarHeader>
-        <Tooltip>
+        {/* <Tooltip>
           <Button
             variant="outline"
             type="button"
@@ -98,7 +98,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
             </TooltipTrigger>
             <TooltipContent align="end">New Chat</TooltipContent>
           </Button>
-        </Tooltip>
+        </Tooltip> */}
         <SidebarContent>
           <SidebarHistory user={user} />
         </SidebarContent>

@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { MultimodalInput } from '@/components/chat/multimodal-input';
+import { useTokenUsage } from '@/hooks/use-token-usage';
 
 export function Chat({
   chatId,
@@ -70,6 +71,8 @@ export function Chat({
     initialVisibilityType,
   });
 
+  const { storeUsage, getUsage } = useTokenUsage();
+
   const {
     input,
     status,
@@ -96,6 +99,15 @@ export function Chat({
       console.log('Usage', usage);
       console.log('FinishReason', finishReason);
       console.log('Status', status);
+
+      // Store usage data for the message
+      if (usage && message.id) {
+        storeUsage(message.id, {
+          promptTokens: usage.promptTokens || 0,
+          completionTokens: usage.completionTokens || 0,
+          totalTokens: usage.totalTokens || 0,
+        });
+      }
     },
     experimental_prepareRequestBody: (body) => {
       // console.log('Preparing request body with projectId:', projectId);
@@ -170,6 +182,7 @@ export function Chat({
         reload={reload}
         isReadonly={isReadonly}
         isArtifactVisible={isArtifactVisible}
+        getUsage={getUsage}
       />
 
       <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">

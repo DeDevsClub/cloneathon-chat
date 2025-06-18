@@ -82,7 +82,8 @@
       },
       "suspicious": {
         "noExplicitAny": "off", // We trust Vercelians to use any only when necessary
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noSelfCompare": "off"
       },
       "nursery": {
         "noStaticElementInteractions": "warn",

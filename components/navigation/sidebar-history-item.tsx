@@ -1,14 +1,14 @@
 import type { Chat } from '@/lib/db/schema';
 import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { GlobeIcon, LockIcon, TrashIcon } from '@/components/icons';
 import { memo, useState, useRef, useEffect } from 'react';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { updateChatTitle } from '@/app/chats/actions';
 import { toast } from 'sonner';
-import { Edit3Icon, CheckIcon, XIcon } from 'lucide-react';
+import { CheckIcon, XIcon } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 const PureChatItem = ({
   chat,
@@ -123,7 +123,7 @@ const PureChatItem = ({
           <Link href={`/chats/${chat.id}`} onClick={() => setOpenMobile(false)}>
             <span className="truncate">
               {chat.title.length > 20
-                ? `${chat.title.slice(0, 16)}...`
+                ? `${chat.title.slice(0, 20)}...`
                 : chat.title}
             </span>
           </Link>
@@ -136,18 +136,18 @@ const PureChatItem = ({
           <Button
             variant="ghost"
             size="sm"
-            className="absolute top-0 right-20 z-10 size-6 m-2 p-0 opacity-0 group-hover:opacity-100 bg-transparent hover:bg-blue-500/20"
+            className="absolute top-0 right-12 z-10 size-6 m-2 p-0 sm:opacity-0 group-hover:opacity-100 bg-transparent hover:bg-blue-500/20"
             onClick={() => setIsEditing(true)}
             title="Rename chat"
           >
-            <Edit3Icon size={12} />
+            <Icon icon="mingcute:pencil-fill" width={6} height={6} />
           </Button>
 
           {/* Sidebar - Change visibility */}
           <Button
             variant="ghost"
             size="sm"
-            className="absolute top-0 right-10 z-10 size-6 m-2 p-0 opacity-0 group-hover:opacity-100 bg-transparent hover:bg-gray-500/20"
+            className="absolute top-0 right-6 z-10 size-6 m-2 p-0 sm:opacity-0 group-hover:opacity-100 bg-transparent hover:bg-gray-500/20"
             onClick={() => {
               setVisibilityType(
                 visibilityType === 'private' ? 'public' : 'private',
@@ -156,9 +156,9 @@ const PureChatItem = ({
             title="Change visibility"
           >
             {visibilityType === 'private' ? (
-              <LockIcon size={12} />
+              <Icon icon="basil:eye-closed-solid" width={6} height={6} />
             ) : (
-              <GlobeIcon size={12} />
+              <Icon icon="basil:eye-solid" width={6} height={6} />
             )}
           </Button>
 
@@ -166,11 +166,11 @@ const PureChatItem = ({
           <Button
             variant="ghost"
             size="sm"
-            className="absolute top-0 right-0 z-10 size-6 m-2 p-0 opacity-0 group-hover:opacity-100 bg-transparent hover:bg-red-500/20"
+            className="absolute top-0 right-0 z-10 size-6 m-2 p-0 sm:opacity-0 group-hover:opacity-100 bg-transparent hover:bg-red-500/20"
             onClick={() => onDelete(chat.id)}
             title="Delete chat"
           >
-            <TrashIcon />
+            <Icon icon="basil:trash-solid" width={6} height={6} />
           </Button>
         </>
       )}

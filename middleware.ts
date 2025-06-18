@@ -5,6 +5,8 @@ import { guestRegex, isDevelopmentEnvironment } from './lib/constants';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  console.log(`Middleware: Processing ${request.method} ${pathname}`);
+
   // Fetch token once at the beginning
   const token = await getToken({
     req: request,
@@ -50,6 +52,7 @@ export async function middleware(request: NextRequest) {
 
   // 3. Handle API routes that should bypass authentication
   if (pathname.startsWith('/api/chats') || pathname.startsWith('/api/auth')) {
+    console.log(`Middleware: Bypassing ${pathname}`);
     return NextResponse.next();
   }
 

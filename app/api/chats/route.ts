@@ -29,11 +29,11 @@ type MessagePart =
   | { type: 'reasoning'; reasoning: string };
 
 export async function POST(req: Request) {
-  console.log('POST /api/chats - Request received');
-
   try {
     // Extract and validate the request body
-
+    const body = await req.json();
+    console.log('Server received body:', JSON.stringify(body, null, 2));
+    
     const {
       messages,
       id,
@@ -44,22 +44,15 @@ export async function POST(req: Request) {
       model,
       toolCallStreaming,
       toolsEnabled,
-    } = await req.json();
+    } = body;
 
-    console.log('POST /api/chats - Incoming request:');
-    console.log('- chatId:', id);
-    console.log('- messages:', JSON.stringify(messages, null, 2));
-    console.log('- messages length:', messages?.length);
-    console.log('- messages type:', typeof messages);
-    console.log('- messages is array:', Array.isArray(messages));
+    console.log('Extracted messages:', messages);
+    console.log('Messages is array:', Array.isArray(messages));
+    console.log('Messages length:', messages?.length);
 
     // Validate required fields
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      console.error('Messages validation failed:', {
-        messages: messages,
-        isArray: Array.isArray(messages),
-        length: messages?.length,
-      });
+      console.error('Messages validation failed - returning 400');
       return new ChatSDKError(
         'bad_request:api',
         'Messages array is required and cannot be empty',
@@ -81,12 +74,10 @@ export async function POST(req: Request) {
       try {
         existingChat = await getChatById({ id: chatId });
         if (existingChat && existingChat.userId === user.id) {
-          console.log(`Chat ${chatId} already exists, continuing conversation`);
           // Don't return early - continue to process new messages and AI response
         }
       } catch (error) {
         // Chat doesn't exist, which is what we want for new creation
-        console.log(`Chat ${chatId} does not exist, proceeding with creation`);
       }
     }
 
@@ -100,10 +91,6 @@ export async function POST(req: Request) {
         ? messages[0].content.substring(0, 100)
         : null) ||
       'New Chat';
-
-    console.log(
-      `Creating chat with: ${JSON.stringify({ chatId, chatTitle, userId: user.id, chatProjectId })}`,
-    );
 
     // Save chat metadata first (with proper await) - only if chat doesn't exist
     if (!existingChat) {
@@ -137,19 +124,13 @@ export async function POST(req: Request) {
           systemPrompt: prompt,
           model: model || DEFAULT_CHAT_MODEL,
         });
-        console.log('Chat saved successfully');
       } catch (error) {
-        console.error('Failed to save chat:', error);
-
         // Check if this is a duplicate key error
         if (
           error instanceof ChatSDKError &&
           error.type === 'bad_request' &&
           error.surface === 'chat'
         ) {
-          console.log(
-            `Duplicate chat ID ${chatId} detected, returning existing chat`,
-          );
           return Response.json(
             { id: chatId, message: 'Chat already exists' },
             { status: 200 },
@@ -162,7 +143,7 @@ export async function POST(req: Request) {
         ).toResponse();
       }
     } else {
-      console.log('Chat already exists, skipping chat creation');
+      // Chat already exists, skipping chat creation
     }
 
     // Extract and validate message content properly
@@ -221,43 +202,17 @@ export async function POST(req: Request) {
     // Save initial messages (with proper await)
     if (initialDbMessages.length > 0) {
       try {
-        console.log(
-          'Attempting to save initial messages:',
-          initialDbMessages.length,
-          'messages',
-        );
-        const result = await saveMessages({ messages: initialDbMessages });
-        console.log('Initial messages saved successfully:', result);
+        await saveMessages({ messages: initialDbMessages });
       } catch (error) {
-        console.error('Failed to save initial messages:', error);
-        // Log the specific error details
-        if (error instanceof Error) {
-          console.error('Error message:', error.message);
-          console.error('Error stack:', error.stack);
-        }
-        console.error(
-          'Messages that failed to save:',
-          JSON.stringify(initialDbMessages, null, 2),
-        );
         // If messages fail to save but chat was created, continue with streaming
         // The chat is already created and can be used
       }
     } else {
-      console.log('No initial messages to save');
+      // No initial messages to save
     }
 
-    console.log('Initial messages:', initialDbMessages);
-
     // Call the language model after initial chat and messages are saved
-    console.log('About to call streamText...');
     const modelId = model || DEFAULT_CHAT_MODEL;
-    console.log('Model ID:', modelId);
-    console.log('Model:', myProvider.languageModel(modelId));
-    console.log('Messages length:', messages.length);
-    console.log('System prompt:', prompt);
-    console.log('Tools enabled:', toolsEnabled);
-    console.log('Tool call streaming:', toolCallStreaming);
-
     const result = streamText({
       model: myProvider.languageModel(modelId),
       toolCallStreaming: toolCallStreaming || false,
@@ -276,29 +231,18 @@ export async function POST(req: Request) {
       }) {
         try {
           const { text, toolCalls, toolResults, reasoning } = result;
-          console.log('onFinish called with:', {
-            hasText: !!text,
-            hasToolCalls: !!toolCalls,
-            hasToolResults: !!toolResults,
-            hasReasoning: !!reasoning,
-            reasoningLength: reasoning?.length,
-            reasoning: reasoning
-              ? `${reasoning.substring(0, 200)}...`
-              : undefined, // First 200 chars
-          });
 
           const assistantMessageParts: MessagePart[] = [];
           let assistantTextContent = '';
 
           // Add reasoning steps if available (when using reasoning model)
           if (reasoning) {
-            console.log('Adding reasoning part to message');
             assistantMessageParts.push({
               type: 'reasoning',
               reasoning: reasoning,
             } as any);
           } else {
-            console.log('No reasoning found in result');
+            // No reasoning found in result
           }
 
           if (text) {
@@ -318,7 +262,6 @@ export async function POST(req: Request) {
           }
 
           if (assistantMessageParts.length > 0) {
-            console.log('Assistant message parts:', assistantMessageParts);
             const assistantMessageToSave = {
               id: uuidv4(),
               chatId: chatId,
@@ -330,23 +273,17 @@ export async function POST(req: Request) {
               contentType: 'application/vnd.ai.content.v1+json',
               createdAt: new Date(),
             };
-            console.log('Assistant message to save:', assistantMessageToSave);
             await saveMessages({ messages: [assistantMessageToSave] });
-            console.log('Assistant message saved successfully');
           }
         } catch (error) {
-          console.error('Failed to save assistant message:', error);
           // Don't throw here as it would interrupt the stream
         }
       },
     });
 
     // Respond with the stream
-    console.log('Streaming response...');
-    console.log(result);
     return result.toDataStreamResponse();
   } catch (error) {
-    console.error('Error in POST /api/chats:', error);
     return new ChatSDKError(
       'bad_request:api',
       'An unexpected error occurred',

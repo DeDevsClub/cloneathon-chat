@@ -25,6 +25,9 @@ const ChatsPage = () => {
   const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
   const [selectedModel, setSelectedModel] = useState(DEFAULT_CHAT_MODEL);
 
+  // Generate stable chatId that doesn't change on re-renders
+  const [chatId] = useState(() => uuidv4());
+
   if (!session) {
     console.error('No session found');
     redirect('/login');
@@ -34,43 +37,13 @@ const ChatsPage = () => {
     async function loadMessages() {
       try {
         setLoading(true);
-        const messages = [] as UIMessage[];
-        // console.log('Raw messages from database:', messages);
-        if (messages) {
-          // Convert database messages to UI messages format
-          const uiMessages: UIMessage[] = messages.map((msg) => {
-            // Extract content from either textContent or parts
-            let content = msg.content || '';
-
-            // If no textContent, try to extract from parts
-            if (!content && Array.isArray(msg.parts)) {
-              const textParts = msg.parts
-                .filter((part: any) => part.type === 'text')
-                .map((part: any) => part.text)
-                .join(' ');
-              content = textParts;
-            }
-
-            console.log(
-              `Message ${msg.id}: role=${msg.role}, content="${content}", parts=`,
-              msg.parts,
-            );
-
-            return {
-              id: msg.id,
-              role: msg.role as 'user' | 'assistant' | 'system',
-              content: content,
-              parts: Array.isArray(msg.parts) ? msg.parts : [],
-              createdAt: msg.createdAt,
-            };
-          });
-          console.log('Converted UI messages:', uiMessages);
-          setInitialMessages(uiMessages);
-        }
+        // For new chats on the main /chats page, we start with empty messages
+        console.log('Converted UI messages:', []);
+        setInitialMessages([]);
       } catch (error) {
         console.error('Failed to load messages:', error);
         // Continue with empty messages if loading fails
-        setInitialMessages(initialMessages);
+        setInitialMessages([]);
       } finally {
         setLoading(false);
       }
@@ -165,11 +138,11 @@ const ChatsPage = () => {
         </div>
       ) : (
         <>
-          <MobileHeader chatId={uuidv4()} />
+          <MobileHeader chatId={chatId} />
           <div className="pt-4 md:pt-0">
             <Chat
               projectId={null}
-              chatId={uuidv4()}
+              chatId={chatId}
               initialMessages={initialMessages}
               initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
               initialVisibilityType={DEFAULT_VISIBILITY_TYPE}

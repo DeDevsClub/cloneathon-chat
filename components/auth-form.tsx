@@ -53,7 +53,7 @@ export function AuthForm({
           name="password"
           className="bg-muted text-md md:text-sm"
           type="password"
-          placeholder="•••••••••••"
+          placeholder=""
           required
         />
       </div>

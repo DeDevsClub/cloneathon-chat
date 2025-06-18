@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getToken } from 'next-auth/jwt';
 
 import { getProject, updateProject, deleteProject } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
@@ -13,44 +12,6 @@ const updateProjectSchema = z.object({
   icon: z.string().optional().nullable(),
   color: z.string().optional().nullable(),
 });
-
-// Helper function to extract email from different cookie formats
-async function extractEmailFromCookie(
-  request: NextRequest,
-  cookieName: string,
-) {
-  const cookie = request.cookies.get(cookieName);
-  if (!cookie?.value) return null;
-
-  try {
-    if (cookieName.includes('auth')) {
-      // Handle JWT token from NextAuth
-      const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
-      if (!secret) return null;
-
-      try {
-        // Use getToken to decode the JWT token
-        const token = await getToken({
-          req: request,
-          secret,
-          cookieName,
-        });
-
-        return (token?.email as string) || null;
-      } catch (jwtError) {
-        console.error(`Failed to decode JWT token: ${jwtError}`);
-        return null;
-      }
-    } else {
-      // Handle JSON formatted cookies
-      const data = JSON.parse(decodeURIComponent(cookie.value));
-      return data.email;
-    }
-  } catch (error) {
-    console.error(`Error extracting email from ${cookieName}:`, error);
-    return null;
-  }
-}
 
 // Helper to validate user ownership of project
 async function validateUserOwnership(projectId: string, userEmail: string) {
@@ -83,66 +44,50 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const pathParts = url.pathname.split('/');
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
+
   try {
-    console.error(
-      `DEBUG - GET project/${projectId} - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
+    console.log(
+      `DEBUG - GET project/${projectId} - Starting authentication check`,
     );
 
-    // NEW: Direct NextAuth session
+    // Use NextAuth session for authentication
     const session = await auth();
+    console.log(
+      `DEBUG - GET project/${projectId} - Session:`,
+      session ? 'exists' : 'null',
+    );
+
     if (!session || !session.user || !session.user.email) {
+      console.log(`DEBUG - GET project/${projectId} - No valid session found`);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Try extracting email from different possible session cookie names
-    let email = null;
+    const email = session.user.email;
+    console.log(`DEBUG - GET project/${projectId} - User email: ${email}`);
 
-    // Try each possible cookie name
-    const cookieNames = [
-      'user-session',
-      'next-auth.session-token',
-      '__Secure-next-auth.session-token',
-      'authjs.session-token',
-    ];
-
-    for (const cookieName of cookieNames) {
-      if (request.cookies.has(cookieName)) {
-        console.error(
-          `DEBUG - GET project/${projectId} - Trying cookie: ${cookieName}`,
-        );
-        email = await extractEmailFromCookie(request, cookieName);
-        if (email) {
-          console.error(
-            `DEBUG - GET project/${projectId} - Found valid email in cookie ${cookieName}: ${email}`,
-          );
-          break;
-        }
-      }
-    }
-
-    if (!email) {
-      console.error(
-        'DEBUG - GET project details - No valid session found or could not extract email',
-      );
-      // For debugging purposes, allow access even without a valid session
-      // In production, you would want to return an unauthorized response
-      // TODO : Remove this in production
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+    // Validate user ownership
     const validation = await validateUserOwnership(projectId, email);
-    if ('error' in validation) {
+    if (validation.error) {
+      console.log(
+        `DEBUG - GET project/${projectId} - Validation error: ${validation.error}`,
+      );
       return NextResponse.json(
         { error: validation.error },
         { status: validation.status },
       );
     }
 
-    return NextResponse.json({ project: validation.project });
+    console.log(
+      `DEBUG - GET project/${projectId} - Project found and user authorized`,
+    );
+    return NextResponse.json({
+      project: validation.project,
+      success: true,
+    });
   } catch (error) {
-    console.error('Error fetching project:', error);
+    console.error(`DEBUG - GET project/${projectId} - Error:`, error);
     return NextResponse.json(
-      { error: 'Failed to fetch project' },
+      { error: 'Internal server error' },
       { status: 500 },
     );
   }
@@ -156,37 +101,13 @@ export async function PATCH(request: NextRequest) {
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
   console.log('Project ID (from api/projects/[projectId]):', projectId);
   try {
-    // Try extracting email from different possible session cookie names
-    let email = null;
-
-    // Try each possible cookie name
-    const cookieNames = [
-      'user-session',
-      'next-auth.session-token',
-      '__Secure-next-auth.session-token',
-      'authjs.session-token',
-    ];
-
-    // NEW: Direct NextAuth session
+    // Use NextAuth session for authentication
     const session = await auth();
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    for (const cookieName of cookieNames) {
-      if (request.cookies.has(cookieName)) {
-        email = await extractEmailFromCookie(request, cookieName);
-        if (email) break;
-      }
-    }
-
-    if (!email) {
-      // console.log('No session found');
-      // For debugging purposes, allow access even without a valid session
-      // In production, you would want to return an unauthorized response
-      // TODO : Remove this in production
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const email = session.user.email;
 
     const validation = await validateUserOwnership(projectId, email);
     if ('error' in validation) {
@@ -230,37 +151,13 @@ export async function DELETE(request: NextRequest) {
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
   try {
     console.log('Deleting project:', projectId);
-    // Try extracting email from different possible session cookie names
-    let email = null;
-
-    // NEW: Direct NextAuth session
+    // Use NextAuth session for authentication
     const session = await auth();
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Try each possible cookie name
-    const cookieNames = [
-      'user-session',
-      'next-auth.session-token',
-      '__Secure-next-auth.session-token',
-      'authjs.session-token',
-    ];
-
-    for (const cookieName of cookieNames) {
-      if (request.cookies.has(cookieName)) {
-        email = await extractEmailFromCookie(request, cookieName);
-        if (email) break;
-      }
-    }
-
-    if (!email) {
-      // console.log('No session found');
-      // For debugging purposes, allow access even without a valid session
-      // In production, you would want to return an unauthorized response
-      // TODO : Remove this in production
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const email = session.user.email;
 
     const validation = await validateUserOwnership(projectId, email);
     if ('error' in validation) {

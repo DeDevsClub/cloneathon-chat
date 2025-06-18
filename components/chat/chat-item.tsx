@@ -1,15 +1,16 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn, fetcher } from '@/lib/utils';
 import { Chat } from '@/lib/db/schema';
 import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import useSWRInfinite from 'swr/infinite';
-import { ChatHistory } from '../navigation/sidebar-history';
-import { getChatHistoryPaginationKey } from '../navigation/sidebar-history';
-import { fetcher } from '@/lib/utils';
+import {
+  ChatHistory,
+  getChatHistoryPaginationKey,
+} from '@/components/navigation/sidebar-history';
 import {
   AlertDialog,
   AlertDialogAction,

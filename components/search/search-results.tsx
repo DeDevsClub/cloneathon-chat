@@ -311,7 +311,7 @@ export function SearchResults({ data }: SearchResultsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white dark:bg-gray-900 shadow-lg border-2"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 size-10 rounded-full bg-white dark:bg-gray-900 shadow-lg border-2"
             onClick={scrollLeft}
           >
             <ChevronLeft size={16} />
@@ -322,7 +322,7 @@ export function SearchResults({ data }: SearchResultsProps) {
           <Button
             variant="outline"
             size="sm"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white dark:bg-gray-900 shadow-lg border-2"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 size-10 rounded-full bg-white dark:bg-gray-900 shadow-lg border-2"
             onClick={scrollRight}
           >
             <ChevronRight size={16} />

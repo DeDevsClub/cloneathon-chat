@@ -21,19 +21,19 @@ export default function Home() {
       <section className="relative w-full h-dvh flex flex-col items-center justify-center text-center p-4 overflow-hidden rounded-xl bg-slate-950">
         {/* Subtle Animated Gradient Background - Placeholder for actual animation */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-violet-600/80 opacity-30 animate-pulse-medium blur-3xl" />
-          <div className="absolute top-0 right-0 w-full h-full bg-violet-800/80 opacity-30 animate-pulse-slow blur-3xl" />
-          <div className="absolute middle-0 w-full h-full bg-violet-600/80 opacity-30 animate-pulse-medium blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-full h-full bg-slate-400 opacity-30 animate-pulse-fast blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-slate-800/80 opacity-20 animate-pulse-medium blur-3xl" />
+          <div className="absolute top-0 left-0 size-full bg-violet-600/80 opacity-30 animate-pulse-medium blur-3xl" />
+          <div className="absolute top-0 right-0 size-full bg-violet-800/80 opacity-30 animate-pulse-slow blur-3xl" />
+          <div className="absolute middle-0 size-full bg-violet-600/80 opacity-30 animate-pulse-medium blur-3xl" />
+          <div className="absolute bottom-0 right-0 size-full bg-slate-400 opacity-30 animate-pulse-fast blur-3xl" />
+          <div className="absolute bottom-0 right-0 size-1/2 bg-slate-800/80 opacity-20 animate-pulse-medium blur-3xl" />
         </div>
-        <div className="z-10 grid grid-cols-1 items-center justify-between w-fit h-fit bg-slate-950/60 font-bold text-slate-100 rounded-xl border-2 border-slate-100">
+        <div className="z-10 grid grid-cols-1 items-center justify-between size-fit bg-slate-950/60 font-bold text-slate-100 rounded-xl border-2 border-slate-100">
           <div className="flex flex-row items-center justify-center gap-3 md:gap-4 text-xl md:text-2xl text-slate-100 w-full rounded-t-lg bg-slate-950/80 p-6">
             <MessageCircle className="size-6 md:size-8 text-slate-100 animate-bounce-slow" />
             Chat. Reimagined.
           </div>
 
-          <div className="w-full flex bg-slate-950 px-2 py-2 rounded-b-lg">
+          <div className="w-full flex bg-slate-950 p-2 rounded-b-lg">
             <Button
               variant="default"
               size="lg"
@@ -84,7 +84,7 @@ export default function Home() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="bg-slate-950 backdrop-blur-md p-8 rounded-xl shadow-lg border border-white/10 transform hover:scale-105 transition-transform duration-300"
+                className="bg-slate-950 backdrop-blur-md p-8 rounded-xl shadow-lg border border-white/10 hover:scale-105 transition-transform duration-300"
               >
                 <div className="mb-4 flex justify-center">{feature.icon}</div>
                 <h3 className="text-2xl font-semibold mb-3 text-white">
@@ -103,16 +103,12 @@ export default function Home() {
 
       {/* Basic Footer Placeholder */}
       <footer
-        className="w-full text-center border-t-2 q
-          transition-transform duration-300 hover:-translate-y-2 transform hover:text-slate-800 dark:hover:text-slate-200
+        className="w-full text-center border-t-2 transition-transform duration-300 hover:-translate-y-2 
+        hover:text-slate-800 dark:hover:text-slate-200
         border-slate-100 dark:border-slate-700 bg-slate-950 dark:bg-slate-900 rounded-t-xl
-        dark:text-slate-950 text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-950
-        "
+        dark:text-slate-950 text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-950"
       >
-        <p
-          className="
-            text-xs hover:text-xs font-semibold p-4 shadow-lg bg-clip-text"
-        >
+        <p className="text-xs hover:text-xs font-semibold p-4 shadow-lg bg-clip-text">
           pown3d by DeDevsClub
         </p>
       </footer>

@@ -20,7 +20,6 @@ import {
 import { signup, type RegisterActionState } from '../actions';
 import { toast } from '@/components/toast';
 import { useSession } from 'next-auth/react';
-import router from 'next/router';
 
 export default function Page() {
   const router = useRouter();
@@ -89,7 +88,6 @@ export default function Page() {
     updateSession,
     isSuccessful,
     setIsSuccessful,
-    setTimeout,
   ]);
 
   const handleSubmit = (formData: FormData) => {

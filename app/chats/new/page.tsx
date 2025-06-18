@@ -133,7 +133,7 @@ export default function NewChatPage() {
     }
 
     createNewChat();
-  }, [router, session, status, projectId, systemPrompt]);
+  }, [router, session, status, projectId, systemPrompt, chatModel]);
 
   return (
     <>

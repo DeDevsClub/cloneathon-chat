@@ -144,14 +144,7 @@ function PureMultimodalInput({
     if (width && width > 768) {
       textareaRef.current?.focus();
     }
-  }, [
-    attachments,
-    handleSubmit,
-    setAttachments,
-    setLocalStorageInput,
-    width,
-    chatId,
-  ]);
+  }, [attachments, handleSubmit, setAttachments, setLocalStorageInput, width]);
 
   const uploadFile = async (file: File) => {
     const formData = new FormData();
@@ -347,7 +340,7 @@ function PureMultimodalInput({
         >
           <Globe size={16} />
         </Button>
-        
+
         {/* Canvas button for markdown/code rendering */}
         <Button
           variant="ghost"
@@ -359,11 +352,15 @@ function PureMultimodalInput({
           }`}
           onClick={() => onCanvasToggle?.(!canvasEnabled)}
           disabled={status === 'submitted'}
-          title={canvasEnabled ? 'Disable canvas mode' : 'Enable canvas for code/markdown'}
+          title={
+            canvasEnabled
+              ? 'Disable canvas mode'
+              : 'Enable canvas for code/markdown'
+          }
         >
           <LayoutPanelTop size={16} />
         </Button>
-        
+
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 

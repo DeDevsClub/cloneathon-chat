@@ -114,7 +114,7 @@ const ChatsPage = () => {
     } else {
       fetchChats();
     }
-  }, [session]);
+  }, [session, fetchChats]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

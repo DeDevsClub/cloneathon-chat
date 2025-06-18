@@ -83,3 +83,5 @@ export const CHAT_LIMIT_ERRORS = {
   MAX_PROJECT_CHATS_EXCEEDED:
     'This project has reached the maximum number of chats allowed (15). Please delete some chats before creating new ones.',
 };
+
+export const AVAILABLE_MODELS_NAMES = ['chat-model', 'chat-model-reasoning'];

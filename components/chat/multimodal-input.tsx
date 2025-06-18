@@ -24,7 +24,6 @@ import { SuggestedActions } from '@/components/chat/suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowDown, Globe, LayoutPanelTop } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ModelSelector } from './model-selector';
@@ -34,6 +33,8 @@ import { saveChatModelAsCookie } from '@/app/chats/actions';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SlashCommandMenu } from './slash-command-menu';
 import { useSlashCommands } from '@/hooks/use-slash-commands';
+import { Icon } from '@iconify/react';
+import { AVAILABLE_MODELS_NAMES } from '@/lib/constants';
 
 function PureMultimodalInput({
   chatId,
@@ -148,9 +149,7 @@ function PureMultimodalInput({
         onModelChange?.(modelId);
       } else {
         // Show available models
-        toast.info(
-          'Available models: chat-model (GPT-4o), chat-model-reasoning (Groq Llama)',
-        );
+        toast.info(`Available models: ${AVAILABLE_MODELS_NAMES.join(', ')}`);
       }
     },
     onToggleTool: (toolId) => {
@@ -161,6 +160,12 @@ function PureMultimodalInput({
             onToolsToggle?.(!toolsEnabled);
             toast.success(
               `Web search ${toolsEnabled ? 'disabled' : 'enabled'}`,
+            );
+            break;
+          case 'image-generation':
+            onToolsToggle?.(!toolsEnabled);
+            toast.success(
+              `Image generation ${toolsEnabled ? 'disabled' : 'enabled'}`,
             );
             break;
           case 'canvas-mode':
@@ -183,7 +188,7 @@ function PureMultimodalInput({
       } else {
         // Show available tools
         toast.info(
-          'Available tools: web-search, canvas-mode, file-upload, code-interpreter, image-generator, artifacts',
+          'Available tools: web-search, image-generation, canvas-mode, file-upload, code-interpreter, artifacts',
         );
       }
     },
@@ -336,7 +341,7 @@ function PureMultimodalInput({
                 scrollToBottom();
               }}
             >
-              <ArrowDown />
+              <Icon icon="mdi:arrow-down" />
             </Button>
           </motion.div>
         )}
@@ -402,7 +407,7 @@ function PureMultimodalInput({
         ref={textareaRef}
         placeholder={
           toolsEnabled
-            ? 'Enter your 🌐 search here or type / for commands'
+            ? 'Enter your message here or type /t for tools'
             : 'Enter your message here or type / for commands'
         }
         value={input}
@@ -436,13 +441,13 @@ function PureMultimodalInput({
           }`}
           onClick={() => onToolsToggle?.(!toolsEnabled)}
           disabled={status === 'submitted'}
-          title={toolsEnabled ? 'Disable web search' : 'Enable web search'}
+          title={toolsEnabled ? 'Disable tools' : 'Enable tools'}
         >
-          <Globe size={16} />
+          <Icon icon="mdi:tools" width={16} height={16} />
         </Button>
 
         {/* Canvas button for markdown/code rendering */}
-        <Button
+        {/* <Button
           variant="ghost"
           size="sm"
           className={`p-1.5 size-8 transition-colors ${
@@ -458,8 +463,8 @@ function PureMultimodalInput({
               : 'Enable canvas for code/markdown'
           }
         >
-          <LayoutPanelTop size={16} />
-        </Button>
+          <Icon icon="mdi:notebook-outline" width={16} height={16} />
+        </Button> */}
 
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>

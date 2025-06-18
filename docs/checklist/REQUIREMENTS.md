@@ -14,14 +14,14 @@
 
 ## API Management
 
-- [ ] Secure API keys handling using environment variables.
-- [ ] Implementation of rate limiting and usage tracking.
-- [ ] Fallback mechanisms when specific models are unavailable.
+- [x] Secure API keys handling using environment variables.
+- [x] Implementation of rate limiting and usage tracking.
+- [] Fallback mechanisms when specific models are unavailable.
 
 ## Model Selection
 
-- [ ] User interface for selecting preferred model.
-- [ ] Model switching without losing conversation context.
+- [x] User interface for selecting preferred model.
+- [x] Model switching without losing conversation context.
 - [ ] Displaying model capabilities and limitations.
 
 ## Response Handling
@@ -30,10 +30,10 @@
 - [ ] Proper error handling for failed requests.
 - [ ] Content filtering options based on model capabilities.
 
-## User Experience (UX)
+### User Experience (UX)
 
-- [ ] **Model Selection UI**: Clean dropdown or card-based interface for choosing models.
-- [ ] **Transparent Indicators**: Visual feedback showing which model is currently active.
+- [x] **Model Selection UI**: Clean dropdown or card-based interface for choosing models.
+- [x] **Transparent Indicators**: Visual feedback showing which model is currently active.
 - [ ] **Performance Metrics**: Optional display of response times and token usage.
 - [ ] **Model Comparison**: Ability to ask the same question to different models side by side.
 
@@ -45,8 +45,8 @@
 
 - [x] Email/password authentication.
 - [ ] OAuth integration with popular providers (`Google`, `GitHub`, etc.).
-- [ ] Session management and secure token handling.
-- [ ] Secure password storage using bcrypt.
+- [x] Session management and secure token handling.
+- [x] Secure password storage using bcrypt.
 
 ## User Management
 
@@ -56,23 +56,23 @@
 
 ## Chat Synchronization
 
-- [ ] Real-time **synchronization** across devices.
+- [x] Real-time **synchronization** across devices.
 - [ ] Conflict resolution for simultaneous edits.
 - [ ] Offline support with **local storage** fallback.
 
 ## Data Storage
 
-- [ ] Secure database for user data and chat history.
-- [ ] Encryption for sensitive information.
-- [ ] Regular **backups** and **data recovery options**.
+- [x] Secure database for user data and chat history.
+- [x] Encryption for sensitive information.
+- [x] Regular **backups** and **data recovery options**.
 
-## User Experience (UX)
+### User Experience (UX)
 
-- [ ] Seamless Login: Straightforward authentication flow with minimal friction.
-- [ ] Cross-device Access: Consistent experience across multiple devices.
-- [ ] Persistent Sessions: Maintaining logged-in state appropriately.
-- [ ] History Access: Intuitive interface for accessing and searching past conversations.
-- [ ] Privacy Controls: Options for users to manage or delete their data (EU GDPR — iykyk).
+- [x] **Seamless Login**: Straightforward authentication flow with minimal friction.
+- [x] **Cross-device Access**: Consistent experience across multiple devices.
+- [x] **Persistent Sessions**: Maintaining logged-in state appropriately.
+- [x] **History Access**: Intuitive interface for accessing and searching past conversations.
+- [ ] **Privacy Controls**: Options for users to manage or delete their data.
 
 # 3. Chat Interface
 
@@ -80,22 +80,22 @@
 
 ## Message Components
 
-- [ ] User and AI message bubbles with clear visual distinction.
-- [ ] Support for markdown formatting in messages.
-- [ ] Timestamps and read receipts (`cha-ching`).
+- [x] User and AI message bubbles with clear visual distinction.
+- [x] Support for markdown formatting in messages.
+- [x] Timestamps and read receipts (`cha-ching`).
 
 ## Input Features
 
 - [ ] Text input with **auto-complete** and **suggestions**.
-- [ ] Support for keyboard shortcuts (`ctrl + enter`).
+- [x] Support for keyboard shortcuts (`ctrl + enter`).
 - [ ] Character/token count indicators.
 
 ## User Experience (UX)
 
-- [ ] **Clean Design**: Minimalist interface with focus on the conversation.
-- [ ] **Responsive Layout**: Adapts to different screen sizes and orientations.
-- [ ] **Accessibility**: Keyboard navigation and screen reader support.
-- [ ] **Theme Support**: Light and dark mode options.
+- [x] **Clean Design**: Minimalist interface with focus on the conversation.
+- [x] **Responsive Layout**: Adapts to different screen sizes and orientations.
+- [x] **Accessibility**: Keyboard navigation and screen reader support.
+- [x] **Theme Support**: Light and dark mode options.
 
 # 4. Message History
 
@@ -103,21 +103,21 @@
 
 ## Storage Solution
 
-- [ ] Efficient database schema for conversation storage.
-- [ ] Pagination for long conversations.
+- [x] Efficient database schema for conversation storage.
+- [x] Pagination for long conversations.
 - [ ] Message threading capabilities.
 
 ## Context Management
 
-- [ ] Maintaining conversation context across sessions.
+- [x] Maintaining conversation context across sessions.
 - [ ] Context window optimization for token limitations.
 - [ ] Support for conversation summarization.
 
 ## User Experience (UX)
 
-- [ ] **Conversation List**: Easy-to-navigate list of past conversations.
+- [x] **Conversation List**: Easy-to-navigate list of past conversations.
 - [ ] **Search Functionality**: Find specific messages or conversations quickly.
-- [ ] **History Organization**: Options to categorize or tag conversations.
+- [x] **History Organization**: Options to categorize or tag conversations.
 - [ ] **Export Options**: Ability to export conversations in common formats.
 
 # 5. Real-time Updates
@@ -126,9 +126,8 @@
 
 ## Websocket Integration
 
-- [ ] Real-time message delivery.
+- [x] Real-time message delivery.
 - [x] Typing indicators.
-- [ ] Online status indicators.
 
 ## Notification System
 
@@ -148,21 +147,21 @@
 
 ## Mobile-First Approach
 
-- [ ] Touch-friendly interface elements.
+- [x] Touch-friendly interface elements.
 - [x] Efficient use of screen real estate.
-- [ ] Consideration for network constraints.
+- [x] Consideration for network constraints.
 
 ## Cross-Browser Compatibility
 
-- [ ] Testing across major browsers (Chrome, Firefox, Safari, Edge, etc.).
-- [ ] Progressive enhancement for newer features.
-- [ ] Fallbacks for older browsers (IE 11, etc.).
+- [x] Testing across major browsers (Chrome, Firefox, Safari, Edge, etc.).
+- [x] Progressive enhancement for newer features.
+- [x] Fallbacks for older browsers (IE 11, etc.).
 
 ## User Experience (UX)
 
-- [ ] **Consistent Experience**: Similar functionality across devices.
-- [ ] **Adaptive Layout**: UI elements that reposition based on screen size.
-- [ ] **Touch Optimization**: Appropriately sized touch targets for mobile.
+- [x] **Consistent Experience**: Similar functionality across devices.
+- [x] **Adaptive Layout**: UI elements that reposition based on screen size.
+- [x] **Touch Optimization**: Appropriately sized touch targets for mobile.
 - [ ] **Offline Support**: Basic functionality when network connectivity is limited.
 
 ---
@@ -173,5 +172,5 @@
 - [x] Use Shadcn UI components styled with Tailwind CSS for consistent design.
 - [x] Follow Prisma schema design best practices for the database layer.
 - [x] Implement proper state management using React Context.
-- [ ] Ensure all code follows the Airbnb Style Guide with named exports for components.
+- [x] Ensure all code follows the Airbnb Style Guide with named exports for components.
 - [x] Add comprehensive error handling and logging throughout the application.

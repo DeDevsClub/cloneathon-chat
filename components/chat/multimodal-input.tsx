@@ -129,11 +129,11 @@ function PureMultimodalInput({
     isVisible,
     selectedIndex,
     activeCommand,
-    config,
     handleInputChange: handleSlashCommandInputChange,
     handleKeyDown: handleSlashCommandKeyDown,
     selectCommand,
     close: closeSlashCommands,
+    setSuggestionCount,
   } = useSlashCommands({
     onClearChat: () => {
       setMessages([]);
@@ -314,9 +314,9 @@ function PureMultimodalInput({
         isVisible={isVisible}
         selectedIndex={selectedIndex}
         activeCommand={activeCommand}
-        config={config}
         onSelectCommand={selectCommand}
         onClose={closeSlashCommands}
+        onSuggestionCountChange={setSuggestionCount}
       />
 
       {messages.length === 0 &&

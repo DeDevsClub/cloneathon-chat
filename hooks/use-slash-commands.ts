@@ -28,6 +28,7 @@ export function useSlashCommands({
   const [activeCommand, setActiveCommand] = useState<
     SlashCommand | undefined
   >();
+  const [suggestionCount, setSuggestionCount] = useState(0);
   const config: SlashCommandConfig = defaultConfig;
 
   const commands = createSlashCommands({
@@ -109,17 +110,26 @@ export function useSlashCommands({
 
     switch (event.key) {
       case 'ArrowDown':
-        // Close slash menu and allow normal scroll down behavior
-        setIsVisible(false);
-        setQuery('');
-        setSelectedIndex(0);
-        setActiveCommand(undefined);
-        return false; // Allow default scroll behavior
+        event.preventDefault();
+        if (activeCommand?.suggestions) {
+          // Navigate down through suggestions
+          setSelectedIndex((prev) =>
+            prev >= suggestionCount - 1 ? 0 : prev + 1,
+          );
+        } else {
+          // Navigate down through commands
+          setSelectedIndex((prev) =>
+            prev >= Math.min(filteredCommands.length, config.maxSuggestions) - 1
+              ? 0
+              : prev + 1,
+          );
+        }
+        return true;
 
       case 'ArrowUp':
         event.preventDefault();
         if (activeCommand?.suggestions) {
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestionCount - 1));
         } else {
           setSelectedIndex((prev) =>
             prev === 0
@@ -154,8 +164,16 @@ export function useSlashCommands({
   };
 
   const selectCommand = useCallback((command: SlashCommand, args?: string) => {
-    command.action(args);
-    close();
+    setIsVisible(false);
+    setQuery('');
+    setSelectedIndex(0);
+    setActiveCommand(undefined);
+    setSuggestionCount(0);
+
+    if (command.action) {
+      const result = command.action(args);
+      console.log(`Executed slash command: /${command.name}`, result);
+    }
   }, []);
 
   const close = useCallback(() => {
@@ -163,18 +181,19 @@ export function useSlashCommands({
     setQuery('');
     setSelectedIndex(0);
     setActiveCommand(undefined);
+    setSuggestionCount(0);
   }, []);
 
   return {
-    commands,
-    query,
     isVisible,
+    query,
     selectedIndex,
     activeCommand,
-    config,
+    commands,
     handleInputChange,
     handleKeyDown,
     selectCommand,
     close,
+    setSuggestionCount,
   };
 }

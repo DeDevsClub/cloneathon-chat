@@ -28,6 +28,7 @@ interface SlashCommandMenuProps {
   config?: Partial<SlashCommandConfig>;
   className?: string;
   activeCommand?: SlashCommand; // For showing suggestions
+  onSuggestionCountChange?: (count: number) => void;
 }
 
 const categoryLabels = {
@@ -56,6 +57,7 @@ export function SlashCommandMenu({
   config,
   className,
   activeCommand,
+  onSuggestionCountChange,
 }: SlashCommandMenuProps) {
   const [suggestions, setSuggestions] = useState<
     { id: string; name: string; description?: string }[]
@@ -64,25 +66,37 @@ export function SlashCommandMenu({
 
   // Load suggestions when activeCommand has suggestions function
   useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (isVisible) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+
     const loadSuggestions = async () => {
       if (activeCommand?.suggestions) {
         setLoadingSuggestions(true);
         try {
           const projectSuggestions = await activeCommand.suggestions();
           setSuggestions(projectSuggestions);
+          onSuggestionCountChange?.(projectSuggestions.length);
         } catch (error) {
           console.error('Error loading suggestions:', error);
           setSuggestions([]);
+          onSuggestionCountChange?.(0);
         } finally {
           setLoadingSuggestions(false);
         }
       } else {
         setSuggestions([]);
+        onSuggestionCountChange?.(0);
       }
     };
-
     loadSuggestions();
-  }, [activeCommand]);
+  }, [isVisible, onClose, activeCommand]);
 
   if (!isVisible) return null;
 

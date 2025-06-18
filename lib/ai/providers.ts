@@ -1,6 +1,5 @@
 import { customProvider } from 'ai';
 import { openai } from '@ai-sdk/openai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { xai } from '@ai-sdk/xai';
 import { groq } from '@ai-sdk/groq';
 import { isTestEnvironment } from '../constants';
@@ -11,7 +10,6 @@ import { chatModels, modelIdMap } from './models';
 // Create a mapping of models to their appropriate providers
 const modelProviders = {
   openai,
-  anthropic,
   xai,
   groq,
 };
@@ -32,8 +30,6 @@ function getModelProvider(modelId: string) {
   switch (modelConfig.provider) {
     case 'openai':
       return openai.chat(modelConfig.model);
-    case 'anthropic':
-      return anthropic.chat(modelConfig.model);
     case 'xai':
       return xai.chat(modelConfig.model);
     case 'groq':

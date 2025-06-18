@@ -11,7 +11,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    * For users without an account - Basic models
    */
   guest: {
-    maxMessagesPerDay: 200,
+    maxMessagesPerDay: 100,
     availableChatModelIds: [
       // Legacy support
       'chat-model',
@@ -29,7 +29,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
    * For users with an account - All models
    */
   regular: {
-    maxMessagesPerDay: 500,
+    maxMessagesPerDay: 250,
     availableChatModelIds: [
       // Legacy support
       'chat-model',
@@ -39,9 +39,6 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
       'gpt-4o',
       'o1-preview',
       'o1-mini',
-      // Anthropic models
-      'claude-3-5-haiku-20241022',
-      'claude-3-5-sonnet-20241022',
       // xAI models
       'grok-2-1212',
       'grok-2-vision-1212',

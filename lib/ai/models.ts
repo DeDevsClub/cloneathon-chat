@@ -5,7 +5,7 @@ export interface ChatModel {
   name: string;
   description: string;
   model: string;
-  provider: 'openai' | 'anthropic' | 'xai' | 'groq';
+  provider: 'openai' | 'xai' | 'groq';
   contextWindow?: number;
   capabilities?: string[];
 }
@@ -47,26 +47,6 @@ export const chatModels: Array<ChatModel> = [
     provider: 'openai',
     contextWindow: 65536,
     capabilities: ['reasoning', 'code', 'math'],
-  },
-
-  // Anthropic Models
-  {
-    id: 'claude-3-5-sonnet-20241022',
-    name: 'Claude 3.5 Sonnet',
-    description: 'Most intelligent Claude model with strong reasoning',
-    model: 'claude-3-5-sonnet-20241022',
-    provider: 'anthropic',
-    contextWindow: 200000,
-    capabilities: ['text', 'vision', 'code', 'analysis'],
-  },
-  {
-    id: 'claude-3-5-haiku-20241022',
-    name: 'Claude 3.5 Haiku',
-    description: 'Fast and efficient Claude model',
-    model: 'claude-3-5-haiku-20241022',
-    provider: 'anthropic',
-    contextWindow: 200000,
-    capabilities: ['text', 'code'],
   },
 
   // xAI Models

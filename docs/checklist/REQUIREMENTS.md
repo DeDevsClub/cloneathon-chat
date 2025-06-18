@@ -8,7 +8,7 @@
 
 ## Model Integration
 
-- [ ] Connect multiple AI providers (`OpenAI`, `Anthropic`, `Mistral`, `Gemini`, etc.).
+- [x] Connect multiple AI providers (`OpenAI`, `Mistral`, `Gemini`, etc.).
 - [ ] Support various model versions from each provider.
 - [ ] Create abstraction layer to handle different API formats and requirements.
 

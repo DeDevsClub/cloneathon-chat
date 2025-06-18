@@ -5,7 +5,7 @@ import { Slot } from '@radix-ui/react-slot';
 
 // biome-ignore lint/style/useImportType: excessive
 import { cva, VariantProps } from 'class-variance-authority';
-import { PanelLeft } from 'lucide-react';
+import { Icon } from '@iconify/react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -366,7 +366,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
+      <Icon icon="tabler:menu" width={18} height={18} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

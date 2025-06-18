@@ -5,6 +5,7 @@ export interface SlashCommand {
   aliases?: string[];
   category?: 'chat' | 'navigation' | 'tools' | 'ai';
   action: (args?: string) => void | Promise<void>;
+  suggestions?: () => Promise<{ id: string; name: string; description?: string }[]>;
 }
 
 export interface SlashCommandConfig {
@@ -19,6 +20,25 @@ export const defaultConfig: SlashCommandConfig = {
   showCategories: true,
 };
 
+// Fetch projects for suggestions
+const fetchProjectSuggestions = async (): Promise<{ id: string; name: string; description?: string }[]> => {
+  try {
+    const response = await fetch('/api/projects');
+    if (!response.ok) {
+      throw new Error('Failed to fetch projects');
+    }
+    const data = await response.json();
+    return (data.projects || []).map((project: any) => ({
+      id: project.id,
+      name: project.name,
+      description: project.description || `Project ${project.name}`,
+    }));
+  } catch (error) {
+    console.error('Error fetching project suggestions:', error);
+    return [];
+  }
+};
+
 // Available slash commands
 export const createSlashCommands = (handlers: {
   onNewChat: () => void;
@@ -27,6 +47,7 @@ export const createSlashCommands = (handlers: {
   onSwitchModel: (modelId?: string) => void;
   onNavigateToProjects: () => void;
   onCreateProject: () => void;
+  onSelectProject: (projectId: string) => void;
   onHelp: () => void;
 }): SlashCommand[] => [
   {
@@ -70,11 +91,20 @@ export const createSlashCommands = (handlers: {
   },
   {
     name: 'project',
-    description: 'Create new project',
-    icon: '➕',
-    aliases: ['newproj'],
+    description: 'Select or create project',
+    icon: '📂',
+    aliases: ['p'],
     category: 'navigation',
-    action: handlers.onCreateProject,
+    action: (args) => {
+      if (args) {
+        // If args provided, try to select project by name or create new one
+        handlers.onSelectProject(args);
+      } else {
+        // If no args, show project creation dialog
+        handlers.onCreateProject();
+      }
+    },
+    suggestions: fetchProjectSuggestions,
   },
   {
     name: 'help',

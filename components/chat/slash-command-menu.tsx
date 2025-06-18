@@ -27,6 +27,7 @@ interface SlashCommandMenuProps {
   onClose: () => void;
   config?: Partial<SlashCommandConfig>;
   className?: string;
+  activeCommand?: SlashCommand; // For showing suggestions
 }
 
 const categoryLabels = {
@@ -52,47 +53,108 @@ export function SlashCommandMenu({
   selectedIndex,
   onSelectCommand,
   onClose,
-  config = {},
+  config,
   className,
+  activeCommand,
 }: SlashCommandMenuProps) {
-  const [filteredCommands, setFilteredCommands] = useState<SlashCommand[]>([]);
-  const [groupedCommands, setGroupedCommands] = useState<
-    Record<string, SlashCommand[]>
-  >({});
+  const [suggestions, setSuggestions] = useState<{ id: string; name: string; description?: string }[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
-  const maxSuggestions = config.maxSuggestions ?? 8;
-  const showCategories = config.showCategories ?? true;
-
+  // Load suggestions when activeCommand has suggestions function
   useEffect(() => {
-    const filtered = filterCommands(commands, query).slice(0, maxSuggestions);
-    setFilteredCommands(filtered);
-
-    if (showCategories) {
-      setGroupedCommands(groupCommandsByCategory(filtered));
-    }
-  }, [commands, query, maxSuggestions, showCategories]);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
+    const loadSuggestions = async () => {
+      if (activeCommand?.suggestions) {
+        setLoadingSuggestions(true);
+        try {
+          const projectSuggestions = await activeCommand.suggestions();
+          setSuggestions(projectSuggestions);
+        } catch (error) {
+          console.error('Error loading suggestions:', error);
+          setSuggestions([]);
+        } finally {
+          setLoadingSuggestions(false);
+        }
+      } else {
+        setSuggestions([]);
       }
     };
 
-    if (isVisible) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
-  }, [isVisible, onClose]);
+    loadSuggestions();
+  }, [activeCommand]);
 
-  const handleSelectCommand = (command: SlashCommand, args?: string) => {
-    onSelectCommand(command, args);
-    onClose();
-  };
+  if (!isVisible) return null;
 
-  if (!isVisible || filteredCommands.length === 0) {
-    return null;
+  // If we have an active command with suggestions, show those
+  if (activeCommand?.suggestions) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2 }}
+          className={cn(
+            'absolute bottom-full left-0 mb-2 w-full max-w-md z-50',
+            className,
+          )}
+        >
+          <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">
+            <Command className="max-h-96">
+              <CommandList>
+                {loadingSuggestions ? (
+                  <CommandItem disabled>
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                      <span>Loading projects...</span>
+                    </div>
+                  </CommandItem>
+                ) : suggestions.length > 0 ? (
+                  <CommandGroup heading={`Projects (${suggestions.length})`}>
+                    {suggestions.map((suggestion, index) => (
+                      <CommandItem
+                        key={suggestion.id}
+                        onSelect={() => onSelectCommand(activeCommand, suggestion.id)}
+                        className={cn(
+                          'flex items-center gap-3 p-3 cursor-pointer',
+                          selectedIndex === index &&
+                            'bg-accent text-accent-foreground',
+                        )}
+                      >
+                        <span className="text-lg">📂</span>
+                        <div className="flex-1">
+                          <div className="font-medium">{suggestion.name}</div>
+                          {suggestion.description && (
+                            <div className="text-sm text-muted-foreground">
+                              {suggestion.description}
+                            </div>
+                          )}
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                ) : (
+                  <CommandEmpty>No projects found</CommandEmpty>
+                )}
+              </CommandList>
+            </Command>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
   }
+
+  // Default command list view
+  const filteredCommands = filterCommands(commands, query);
+  const groupedCommands = config?.showCategories
+    ? groupCommandsByCategory(filteredCommands)
+    : { all: filteredCommands };
+
+  const maxSuggestions = config?.maxSuggestions || 8;
+  const commandsToShow = Object.values(groupedCommands)
+    .flat()
+    .slice(0, maxSuggestions);
+
+  let currentIndex = 0;
 
   return (
     <AnimatePresence>
@@ -100,143 +162,119 @@ export function SlashCommandMenu({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
-        transition={{ duration: 0.15 }}
+        transition={{ duration: 0.2 }}
         className={cn(
-          'absolute bottom-full left-0 right-0 mb-2 z-50',
-          'bg-background border border-border rounded-lg shadow-lg',
-          'max-h-80 overflow-hidden',
+          'absolute bottom-full left-0 mb-2 w-full max-w-md z-50',
           className,
         )}
       >
-        <Command className="w-full">
-          <CommandList>
-            {filteredCommands.length === 0 ? (
-              <CommandEmpty>No commands found.</CommandEmpty>
-            ) : showCategories ? (
-              Object.entries(groupedCommands).map(
-                ([category, categoryCommands]) => (
-                  <CommandGroup
-                    key={category}
-                    heading={
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {categoryLabels[
-                            category as keyof typeof categoryLabels
-                          ] || category}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className={cn(
-                            'text-xs px-1.5 py-0.5',
-                            categoryColors[
-                              category as keyof typeof categoryColors
-                            ],
-                          )}
-                        >
-                          {categoryCommands.length}
-                        </Badge>
-                      </div>
-                    }
-                  >
-                    {categoryCommands.map((command, index) => {
-                      const globalIndex = filteredCommands.indexOf(command);
-                      return (
-                        <CommandItem
-                          key={`${category}-${command.name}`}
-                          value={command.name}
-                          onSelect={() => handleSelectCommand(command)}
-                          className={cn(
-                            'flex items-center gap-3 px-3 py-2 cursor-pointer',
-                            'hover:bg-accent hover:text-accent-foreground',
-                            globalIndex === selectedIndex &&
-                              'bg-accent text-accent-foreground',
-                          )}
-                        >
-                          {command.icon && (
-                            <span className="text-lg shrink-0">
-                              {command.icon}
+        <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden">
+          <Command className="max-h-96">
+            <CommandList>
+              {commandsToShow.length === 0 ? (
+                <CommandEmpty>No commands found for "{query}"</CommandEmpty>
+              ) : config?.showCategories ? (
+                Object.entries(groupedCommands).map(([category, categoryCommands]) => {
+                  if (categoryCommands.length === 0) return null;
+                  
+                  const categoryLabel = categoryLabels[category as keyof typeof categoryLabels] || category;
+                  const startIndex = currentIndex;
+                  const endIndex = currentIndex + categoryCommands.length;
+                  currentIndex = endIndex;
+
+                  return (
+                    <CommandGroup key={category} heading={categoryLabel}>
+                      {categoryCommands.slice(0, maxSuggestions).map((command, index) => {
+                        const globalIndex = startIndex + index;
+                        return (
+                          <CommandItem
+                            key={command.name}
+                            onSelect={() => onSelectCommand(command)}
+                            className={cn(
+                              'flex items-center gap-3 p-3 cursor-pointer',
+                              selectedIndex === globalIndex &&
+                                'bg-accent text-accent-foreground',
+                            )}
+                          >
+                            <span className="text-lg">
+                              {command.icon || '⚡'}
                             </span>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                /{command.name}
-                              </span>
-                              {command.aliases &&
-                                command.aliases.length > 0 && (
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">/{command.name}</span>
+                                {command.aliases && command.aliases.length > 0 && (
                                   <div className="flex gap-1">
-                                    {command.aliases
-                                      .slice(0, 2)
-                                      .map((alias) => (
-                                        <Badge
-                                          key={alias}
-                                          variant="outline"
-                                          className="text-xs px-1.5 py-0"
-                                        >
-                                          /{alias}
-                                        </Badge>
-                                      ))}
+                                    {command.aliases.slice(0, 2).map((alias) => (
+                                      <Badge
+                                        key={alias}
+                                        variant="secondary"
+                                        className="text-xs px-1 py-0"
+                                      >
+                                        /{alias}
+                                      </Badge>
+                                    ))}
                                   </div>
                                 )}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {command.description}
+                              </div>
                             </div>
-                            <p className="text-sm text-muted-foreground truncate">
-                              {command.description}
-                            </p>
-                          </div>
-                          <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground opacity-100">
-                            <span className="text-xs">↵</span>
-                          </kbd>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                ),
-              )
-            ) : (
-              filteredCommands.map((command, index) => (
-                <CommandItem
-                  key={command.name}
-                  value={command.name}
-                  onSelect={() => handleSelectCommand(command)}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2 cursor-pointer',
-                    'hover:bg-accent hover:text-accent-foreground',
-                    index === selectedIndex &&
-                      'bg-accent text-accent-foreground',
-                  )}
-                >
-                  {command.icon && (
-                    <span className="text-lg shrink-0">{command.icon}</span>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">/{command.name}</span>
-                      {command.aliases && command.aliases.length > 0 && (
-                        <div className="flex gap-1">
-                          {command.aliases.slice(0, 2).map((alias) => (
                             <Badge
-                              key={alias}
-                              variant="outline"
-                              className="text-xs px-1.5 py-0"
+                              className={cn(
+                                'text-xs',
+                                categoryColors[command.category as keyof typeof categoryColors],
+                              )}
                             >
-                              /{alias}
+                              {categoryLabels[command.category as keyof typeof categoryLabels] || command.category}
                             </Badge>
-                          ))}
-                        </div>
+                          </CommandItem>
+                        );
+                      })}
+                    </CommandGroup>
+                  );
+                })
+              ) : (
+                <CommandGroup>
+                  {commandsToShow.map((command, index) => (
+                    <CommandItem
+                      key={command.name}
+                      onSelect={() => onSelectCommand(command)}
+                      className={cn(
+                        'flex items-center gap-3 p-3 cursor-pointer',
+                        selectedIndex === index &&
+                          'bg-accent text-accent-foreground',
                       )}
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {command.description}
-                    </p>
-                  </div>
-                  <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs font-medium text-muted-foreground opacity-100">
-                    <span className="text-xs">↵</span>
-                  </kbd>
-                </CommandItem>
-              ))
-            )}
-          </CommandList>
-        </Command>
+                    >
+                      <span className="text-lg">{command.icon || '⚡'}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">/{command.name}</span>
+                          {command.aliases && command.aliases.length > 0 && (
+                            <div className="flex gap-1">
+                              {command.aliases.slice(0, 2).map((alias) => (
+                                <Badge
+                                  key={alias}
+                                  variant="secondary"
+                                  className="text-xs px-1 py-0"
+                                >
+                                  /{alias}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {command.description}
+                        </div>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </div>
       </motion.div>
     </AnimatePresence>
   );

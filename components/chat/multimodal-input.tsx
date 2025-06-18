@@ -123,14 +123,45 @@ function PureMultimodalInput({
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
 
+  const {
+    commands,
+    query,
+    isVisible,
+    selectedIndex,
+    activeCommand,
+    config,
+    handleInputChange: handleSlashCommandInputChange,
+    handleKeyDown: handleSlashCommandKeyDown,
+    selectCommand,
+    close: closeSlashCommands,
+  } = useSlashCommands({
+    onClearChat: () => {
+      setMessages([]);
+      setInput('');
+      resetHeight();
+      setLocalStorageInput('');
+    },
+    onToggleWebSearch: () => onToolsToggle?.(!toolsEnabled),
+    onSwitchModel: (modelId) => {
+      if (modelId) {
+        onModelChange?.(modelId);
+      } else {
+        // Show available models
+        toast.info(
+          'Available models: chat-model (GPT-4o), chat-model-reasoning (Groq Llama)',
+        );
+      }
+    },
+  });
+
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.target.value;
     setInput(newValue);
     adjustHeight();
 
     // Handle slash commands
-    const commandResult = slashCommands.handleInputChange(newValue);
-    if (commandResult.shouldClear) {
+    const result = handleSlashCommandInputChange(newValue);
+    if (result.shouldClear) {
       setInput('');
       resetHeight();
     }
@@ -231,26 +262,23 @@ function PureMultimodalInput({
     }
   }, [status, scrollToBottom]);
 
-  // Initialize slash commands
-  const slashCommands = useSlashCommands({
-    onClearChat: () => {
-      setMessages([]);
-      setInput('');
-      resetHeight();
-      setLocalStorageInput('');
-    },
-    onToggleWebSearch: () => onToolsToggle?.(!toolsEnabled),
-    onSwitchModel: (modelId) => {
-      if (modelId) {
-        onModelChange?.(modelId);
-      } else {
-        // Show available models
-        toast.info(
-          'Available models: chat-model (GPT-4o), chat-model-reasoning (Groq Llama)',
-        );
-      }
-    },
-  });
+  const handleKeyDown = (event: any) => {
+    // Handle slash command navigation first
+    const commandHandled = handleSlashCommandKeyDown(event);
+    if (commandHandled) {
+      return;
+    }
+
+    if (
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing
+    ) {
+      event.preventDefault();
+      // Allow submission regardless of status to fix streaming issues
+      submitForm();
+    }
+  };
 
   return (
     <div className="relative w-full flex flex-col gap-4">
@@ -278,6 +306,18 @@ function PureMultimodalInput({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Slash Command Menu */}
+      <SlashCommandMenu
+        commands={commands}
+        query={query}
+        isVisible={isVisible}
+        selectedIndex={selectedIndex}
+        activeCommand={activeCommand}
+        config={config}
+        onSelectCommand={selectCommand}
+        onClose={closeSlashCommands}
+      />
 
       {messages.length === 0 &&
         attachments.length === 0 &&
@@ -337,34 +377,7 @@ function PureMultimodalInput({
         )}
         rows={2}
         autoFocus
-        onKeyDown={(event: any) => {
-          // Handle slash command navigation first
-          const commandHandled = slashCommands.handleKeyDown(event);
-          if (commandHandled) {
-            return;
-          }
-
-          if (
-            event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.nativeEvent.isComposing
-          ) {
-            event.preventDefault();
-            // Allow submission regardless of status to fix streaming issues
-            submitForm();
-          }
-        }}
-      />
-
-      {/* Slash Command Menu */}
-      <SlashCommandMenu
-        commands={slashCommands.commands}
-        query={slashCommands.query}
-        isVisible={slashCommands.isVisible}
-        selectedIndex={slashCommands.selectedIndex}
-        onSelectCommand={slashCommands.selectCommand}
-        onClose={slashCommands.close}
-        config={slashCommands.config}
+        onKeyDown={handleKeyDown}
       />
 
       <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-lg">

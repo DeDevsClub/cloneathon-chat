@@ -28,8 +28,8 @@ import { ChatItem } from '@/components/navigation/sidebar-history-item';
 import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { Calendar, FolderOpen } from 'lucide-react';
 import { ChatUsageIndicator } from '@/components/navigation/chat-usage-indicator';
+import { Icon } from '@iconify/react';
 
 type GroupedChats = {
   today: Chat[];
@@ -219,7 +219,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
               className="flex-1 h-7 text-xs"
               onClick={() => setGroupBy('project')}
             >
-              <FolderOpen className="size-3 mr-1" />
+              <Icon icon="tabler:folder-filled" width={18} height={18} />
               Projects
             </Button>
             <Button
@@ -228,7 +228,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
               className="flex-1 h-7 text-xs"
               onClick={() => setGroupBy('date')}
             >
-              <Calendar className="size-3 mr-1" />
+              <Icon icon="tabler:calendar" width={18} height={18} />
               Date
             </Button>
           </div>
@@ -278,7 +278,11 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                               {projectChats[0]?.projectIcon ? (
                                 <span>{projectChats[0].projectIcon}</span>
                               ) : (
-                                <FolderOpen className="size-3" />
+                                <Icon
+                                  icon="tabler:folder-filled"
+                                  width={18}
+                                  height={18}
+                                />
                               )}
                               {projectName}
                               <span className="text-xs text-sidebar-foreground/30">
@@ -439,7 +443,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
 
           {hasReachedEnd ? (
             <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2 mt-8">
-              You have reached the end of your chat history.
+              End of chat history.
             </div>
           ) : (
             <div className="p-2 text-zinc-500 dark:text-zinc-400 flex flex-row gap-2 items-center mt-8">

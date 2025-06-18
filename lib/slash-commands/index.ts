@@ -92,8 +92,8 @@ const fetchToolSuggestions = async (): Promise<
         description: 'Enable code execution and analysis capabilities',
       },
       {
-        id: 'image-generator',
-        name: 'Image Generator',
+        id: 'image-generation',
+        name: 'Image Generation',
         description: 'Generate images from text descriptions',
       },
       {
@@ -125,6 +125,7 @@ export const createSlashCommands = (handlers: {
   onNewChat: () => void;
   onClearChat: () => void;
   onToggleWebSearch: () => void;
+  onToggleImageGeneration: () => void;
   onSwitchModel: (modelId?: string) => void;
   onNavigateToProjects: () => void;
   onCreateProject: () => void;
@@ -132,13 +133,13 @@ export const createSlashCommands = (handlers: {
   onHelp: () => void;
   onToggleTool: (toolId?: string) => void;
 }): SlashCommand[] => [
-  {
-    name: 'new',
-    description: 'Create a new chat',
-    icon: '💬',
-    category: 'chat',
-    action: handlers.onNewChat,
-  },
+  // {
+  //   name: 'new',
+  //   description: 'Create a new chat',
+  //   icon: '💬',
+  //   category: 'chat',
+  //   action: handlers.onNewChat,
+  // },
   // {
   //   name: 'clear',
   //   description: 'Clear current chat',
@@ -156,10 +157,18 @@ export const createSlashCommands = (handlers: {
     action: handlers.onToggleWebSearch,
   },
   {
+    name: 'image',
+    description: 'Toggle image generation',
+    icon: '🖼️',
+    aliases: ['image'],
+    category: 'tools',
+    action: handlers.onToggleImageGeneration,
+  },
+  {
     name: 'models',
     description: 'Switch AI model for chat',
     icon: '🤖',
-    aliases: ['ai', 'switch'],
+    aliases: ['m'],
     category: 'ai',
     action: (args) => {
       if (args) {

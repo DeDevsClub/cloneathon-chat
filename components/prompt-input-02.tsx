@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import {
   CloudUploadIcon,
   CornerLeftUpIcon,
-  GlobeIcon,
   LightbulbIcon,
   PaperclipIcon,
 } from 'lucide-react';
@@ -33,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Icon } from '@iconify/react';
 
 const models = [
   'GPT-4.5',
@@ -113,12 +113,12 @@ export default function PromptInput02({ quickPrompts }: PromptInput02Props) {
                   className="cursor-pointer"
                 >
                   <TooltipTrigger>
-                    <GlobeIcon />
-                    <span className="hidden sm:block">Search</span>
+                    <Icon icon="mdi:tools" />
+                    <span className="hidden sm:block">Tools</span>
                   </TooltipTrigger>
                 </Toggle>
                 <TooltipContent>
-                  <p>Search the web</p>
+                  <p>Use tools to generate images, search the web, and more.</p>
                 </TooltipContent>
               </Tooltip>
 

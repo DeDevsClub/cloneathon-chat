@@ -90,11 +90,6 @@ const fetchModelSuggestions = async (): Promise<
         description: 'Claude 3.5 Sonnet',
       },
       {
-        id: 'claude-3-opus-20240229',
-        name: 'Claude 3 Opus',
-        description: 'Claude 3 Opus',
-      },
-      {
         id: 'grok-2-1212',
         name: 'Grok 2',
         description: 'Grok 2',

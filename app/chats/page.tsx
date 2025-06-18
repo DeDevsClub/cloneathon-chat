@@ -10,6 +10,7 @@ import { Chat } from '@/components/chat/chat';
 import { MobileHeader } from '@/components/chat/mobile-header';
 import { ModelSelector } from '@/components/chat/model-selector';
 import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
+import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { UIMessage } from 'ai';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -33,6 +34,20 @@ const ChatsPage = () => {
     console.error('No session found');
     redirect('/login');
   }
+
+  // Load saved model from cookies on component mount
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const cookies = document.cookie.split(';');
+      const modelCookie = cookies.find((cookie) =>
+        cookie.trim().startsWith('model='),
+      );
+      if (modelCookie) {
+        const savedModel = modelCookie.split('=')[1];
+        setSelectedModel(savedModel);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function loadMessages() {
@@ -178,7 +193,7 @@ const ModelSelectionScreen = ({
   session: Session; 
   onModelSelect: (modelId: string) => void; 
 }) => {
-  const [tempSelectedModel, setTempSelectedModel] = useState<string>('gpt-4o');
+  const [tempSelectedModel, setTempSelectedModel] = useState<string>(DEFAULT_CHAT_MODEL);
 
   const handleConfirmSelection = () => {
     if (tempSelectedModel) {

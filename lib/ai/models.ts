@@ -68,15 +68,6 @@ export const chatModels: Array<ChatModel> = [
     contextWindow: 200000,
     capabilities: ['text', 'code'],
   },
-  {
-    id: 'claude-3-opus-20240229',
-    name: 'Claude 3 Opus',
-    description: 'Most capable Claude model for complex tasks',
-    model: 'claude-3-opus-20240229',
-    provider: 'anthropic',
-    contextWindow: 200000,
-    capabilities: ['text', 'vision', 'analysis', 'creative'],
-  },
 
   // xAI Models
   {

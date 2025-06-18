@@ -11,7 +11,6 @@ import {
 import { ChatSDKError } from '@/lib/errors';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  DEFAULT_CHAT_MODEL,
   DEFAULT_SYSTEM_PROMPT,
   DEFAULT_VISIBILITY_TYPE,
   CHAT_LIMITS,
@@ -42,6 +41,7 @@ export async function POST(req: Request) {
       title,
       visibility,
       model,
+      selectedChatModel,
       toolCallStreaming,
       toolsEnabled,
     } = body;
@@ -49,6 +49,8 @@ export async function POST(req: Request) {
     console.log('Extracted messages:', messages);
     console.log('Messages is array:', Array.isArray(messages));
     console.log('Messages length:', messages?.length);
+    console.log('selectedChatModel:', selectedChatModel);
+    console.log('model:', model);
 
     // Validate required fields
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -122,7 +124,7 @@ export async function POST(req: Request) {
           visibility: visibility || DEFAULT_VISIBILITY_TYPE,
           projectId: chatProjectId,
           systemPrompt: prompt,
-          model: model || DEFAULT_CHAT_MODEL,
+          model: selectedChatModel,
         });
       } catch (error) {
         // Check if this is a duplicate key error
@@ -212,81 +214,108 @@ export async function POST(req: Request) {
     }
 
     // Call the language model after initial chat and messages are saved
-    const modelId = model || DEFAULT_CHAT_MODEL;
-    const result = streamText({
-      model: myProvider.languageModel(modelId),
-      toolCallStreaming: toolCallStreaming || false,
-      messages: messages,
-      system: prompt,
-      tools: getEnabledTools(toolsEnabled),
-      async onFinish(result: {
-        text: string;
-        toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
-        toolResults?: Array<{
-          toolCallId: string;
-          toolName: string;
-          result: any;
-        }>;
-        reasoning?: string;
-      }) {
-        try {
-          const { text, toolCalls, toolResults, reasoning } = result;
+    const modelId = selectedChatModel || model;
+    console.log('Using modelId for AI call:', modelId);
+    
+    if (!modelId) {
+      console.error('No model specified - returning 400');
+      return new ChatSDKError(
+        'bad_request:api',
+        'Model selection is required',
+      ).toResponse();
+    }
+    
+    try {
+      console.log('Attempting to get language model for:', modelId);
+      const languageModel = myProvider.languageModel(modelId);
+      console.log('Language model obtained:', !!languageModel);
+      
+      const result = streamText({
+        model: languageModel,
+        toolCallStreaming: toolCallStreaming || false,
+        messages: messages,
+        system: prompt,
+        tools: getEnabledTools(toolsEnabled),
+        async onFinish(result: {
+          text: string;
+          toolCalls?: Array<{ toolCallId: string; toolName: string; args: any }>;
+          toolResults?: Array<{
+            toolCallId: string;
+            toolName: string;
+            result: any;
+          }>;
+          reasoning?: string;
+        }) {
+          try {
+            const { text, toolCalls, toolResults, reasoning } = result;
 
-          const assistantMessageParts: MessagePart[] = [];
-          let assistantTextContent = '';
+            const assistantMessageParts: MessagePart[] = [];
+            let assistantTextContent = '';
 
-          // Add reasoning steps if available (when using reasoning model)
-          if (reasoning) {
-            assistantMessageParts.push({
-              type: 'reasoning',
-              reasoning: reasoning,
-            } as any);
-          } else {
-            // No reasoning found in result
-          }
-
-          if (text) {
-            assistantMessageParts.push({ type: 'text', text });
-            assistantTextContent = text;
-          }
-
-          if (Array.isArray(toolCalls)) {
-            toolCalls.forEach((tc) => {
+            // Add reasoning steps if available (when using reasoning model)
+            if (reasoning) {
               assistantMessageParts.push({
-                type: 'tool-call',
-                toolCallId: tc.toolCallId,
-                toolName: tc.toolName,
-                args: tc.args,
+                type: 'reasoning',
+                reasoning: reasoning,
+              } as any);
+            } else {
+              // No reasoning found in result
+            }
+
+            if (text) {
+              assistantMessageParts.push({ type: 'text', text });
+              assistantTextContent = text;
+            }
+
+            if (Array.isArray(toolCalls)) {
+              toolCalls.forEach((tc) => {
+                assistantMessageParts.push({
+                  type: 'tool-call',
+                  toolCallId: tc.toolCallId,
+                  toolName: tc.toolName,
+                  args: tc.args,
+                });
               });
-            });
-          }
+            }
 
-          if (assistantMessageParts.length > 0) {
-            const assistantMessageToSave = {
-              id: uuidv4(),
-              chatId: chatId,
-              projectId: chatProjectId,
-              role: 'assistant' as const,
-              parts: assistantMessageParts,
-              textContent: assistantTextContent,
-              attachments: [],
-              contentType: 'application/vnd.ai.content.v1+json',
-              createdAt: new Date(),
-            };
-            await saveMessages({ messages: [assistantMessageToSave] });
+            if (assistantMessageParts.length > 0) {
+              const assistantMessageToSave = {
+                id: uuidv4(),
+                chatId: chatId,
+                projectId: chatProjectId,
+                role: 'assistant' as const,
+                parts: assistantMessageParts,
+                textContent: assistantTextContent,
+                attachments: [],
+                contentType: 'application/vnd.ai.content.v1+json',
+                createdAt: new Date(),
+              };
+              await saveMessages({ messages: [assistantMessageToSave] });
+            }
+          } catch (error) {
+            // Don't throw here as it would interrupt the stream
           }
-        } catch (error) {
-          // Don't throw here as it would interrupt the stream
-        }
-      },
-    });
+        },
+      });
 
-    // Respond with the stream
-    return result.toDataStreamResponse();
+      // Respond with the stream
+      return result.toDataStreamResponse();
+    } catch (error) {
+      console.error('Error calling streamText:', error);
+      return new ChatSDKError(
+        'bad_request:api',
+        `An unexpected error occurred: ${error instanceof Error ? error.message : String(error)}`,
+      ).toResponse();
+    }
   } catch (error) {
+    console.error('Chat API Error:', error);
+    console.error('Error type:', typeof error);
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack available');
+    
     return new ChatSDKError(
       'bad_request:api',
-      'An unexpected error occurred',
+      `An unexpected error occurred: ${error instanceof Error ? error.message : String(error)}`,
     ).toResponse();
   }
 }

@@ -9,12 +9,9 @@ import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { AppRoutes } from '@/lib/routes';
 import { PAGE_SIZE } from '@/components/navigation/sidebar-history';
-import {
-  DEFAULT_CHAT_MESSAGE,
-  DEFAULT_CHAT_MODEL,
-  DEFAULT_SYSTEM_PROMPT,
-} from '@/lib/constants';
+import { DEFAULT_CHAT_MESSAGE, DEFAULT_SYSTEM_PROMPT } from '@/lib/constants';
 import { MobileHeader } from '@/components/chat/mobile-header';
+import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 
 type ErrorMessage = {
   message: string;
@@ -65,7 +62,7 @@ export default function NewChatPage() {
           role: 'user',
           createdAt: new Date().toISOString(),
           experimental_attachments: [],
-          model: chatModel || DEFAULT_CHAT_MODEL,
+          model: chatModel,
           projectId: projectId || null,
           contentType: 'application/vnd.ai.content.v1+json',
           textContent: DEFAULT_CHAT_MESSAGE,
@@ -75,7 +72,7 @@ export default function NewChatPage() {
           id: chatId,
           system: systemPrompt,
           visibility: 'private',
-          selectedChatModel: chatModel || DEFAULT_CHAT_MODEL,
+          selectedChatModel: chatModel,
           messages: [message],
           project: projectId ? { id: projectId } : null,
           contentType: 'application/vnd.ai.content.v1+json',

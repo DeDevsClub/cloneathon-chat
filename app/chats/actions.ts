@@ -16,7 +16,7 @@ import { getAppropriateModel } from '@/lib/ai/providers';
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
-  cookieStore.set('chat-model', model);
+  cookieStore.set('model', model);
 }
 
 export async function generateTitleFromUserMessage({

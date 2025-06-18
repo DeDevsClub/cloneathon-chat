@@ -7,13 +7,13 @@ import type { Session } from 'next-auth';
 import { Chat } from '@/components/chat/chat';
 import type { UIMessage } from 'ai';
 import { getMessagesForChat } from '@/app/chats/actions';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { MobileHeader } from '@/components/chat/mobile-header';
 import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 
 type PageProps = {
   params: Promise<{
     chatId: string;
+    selectedChatModel: string;
     projectId?: string;
   }>;
 };
@@ -21,11 +21,12 @@ type PageProps = {
 export default function ChatPage(props: PageProps) {
   const unwrappedParams = use(props.params);
   const chatId = unwrappedParams.chatId;
+  const selectedChatModel = unwrappedParams.selectedChatModel;
   const projectId = unwrappedParams.projectId;
   const { data: session } = useSession();
   const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedModel, setSelectedModel] = useState(DEFAULT_CHAT_MODEL);
+  const [selectedModel, setSelectedModel] = useState(selectedChatModel);
 
   if (!session) {
     console.error('No session found');
@@ -87,11 +88,11 @@ export default function ChatPage(props: PageProps) {
       if (typeof document !== 'undefined') {
         const cookies = document.cookie.split(';');
         const modelCookie = cookies.find((cookie) =>
-          cookie.trim().startsWith('chat-model='),
+          cookie.trim().startsWith('model='),
         );
         if (modelCookie) {
           const model = modelCookie.split('=')[1];
-          setSelectedModel(model || DEFAULT_CHAT_MODEL);
+          setSelectedModel(model);
         }
       }
     };
@@ -118,7 +119,7 @@ export default function ChatPage(props: PageProps) {
           projectId={projectId || null}
           chatId={chatId}
           initialMessages={initialMessages || []}
-          initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
+          initialChatModel={selectedModel}
           initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
           isReadonly={false}
           session={session as Session}

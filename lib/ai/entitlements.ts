@@ -14,7 +14,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
     maxMessagesPerDay: 200,
     availableChatModelIds: [
       // Legacy support
-      'chat-model', 
+      'chat-model',
       'chat-model-reasoning',
       // OpenAI models
       'gpt-4o-mini',
@@ -32,7 +32,7 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
     maxMessagesPerDay: 500,
     availableChatModelIds: [
       // Legacy support
-      'chat-model', 
+      'chat-model',
       'chat-model-reasoning',
       // OpenAI models
       'gpt-4o-mini',
@@ -42,7 +42,6 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
       // Anthropic models
       'claude-3-5-haiku-20241022',
       'claude-3-5-sonnet-20241022',
-      'claude-3-opus-20240229',
       // xAI models
       'grok-2-1212',
       'grok-2-vision-1212',

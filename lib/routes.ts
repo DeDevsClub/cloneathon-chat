@@ -12,9 +12,6 @@ export const AppRoutes = {
     list: '/projects',
     detail: (projectId: string) => `/projects/${projectId}`,
     edit: (projectId: string) => `/projects/${projectId}/edit`,
-    chats: (projectId: string) => `/projects/${projectId}/chats`,
-    chat: (projectId: string, chatId: string) =>
-      `/projects/${projectId}/chats/${chatId}`,
     new: '/projects/new',
   },
 

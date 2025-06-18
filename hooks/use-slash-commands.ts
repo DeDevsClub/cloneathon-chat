@@ -25,7 +25,9 @@ export function useSlashCommands({
   const [isVisible, setIsVisible] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [activeCommand, setActiveCommand] = useState<SlashCommand | undefined>();
+  const [activeCommand, setActiveCommand] = useState<
+    SlashCommand | undefined
+  >();
   const config: SlashCommandConfig = defaultConfig;
 
   const commands = createSlashCommands({
@@ -62,23 +64,27 @@ export function useSlashCommands({
       toast.success('Creating new chat in project...');
     },
     onHelp: () => {
-      toast.info('Available commands: /new, /clear, /search, /model, /projects, /project, /help');
+      toast.info(
+        'Available commands: /new, /clear, /search, /model, /projects, /project, /help',
+      );
     },
   });
 
   const handleInputChange = (input: string): { shouldClear: boolean } => {
     const parsed = parseSlashCommand(input, config.trigger);
-    
+
     if (parsed.isCommand) {
       setQuery(parsed.command || '');
       setIsVisible(true);
       setSelectedIndex(0);
-      
+
       // Check if this is a complete command match for suggestions
-      const exactCommand = commands.find(cmd => 
-        cmd.name === parsed.command || cmd.aliases?.includes(parsed.command || '')
+      const exactCommand = commands.find(
+        (cmd) =>
+          cmd.name === parsed.command ||
+          cmd.aliases?.includes(parsed.command || ''),
       );
-      
+
       if (exactCommand && exactCommand.suggestions && !parsed.args) {
         // Show suggestions for this command
         setActiveCommand(exactCommand);
@@ -97,28 +103,28 @@ export function useSlashCommands({
   const handleKeyDown = (event: React.KeyboardEvent): boolean => {
     if (!isVisible) return false;
 
-    const filteredCommands = activeCommand?.suggestions 
+    const filteredCommands = activeCommand?.suggestions
       ? [] // When showing suggestions, don't show regular commands
       : filterCommands(commands, query);
 
     switch (event.key) {
       case 'ArrowDown':
-        event.preventDefault();
-        if (activeCommand?.suggestions) {
-          // Handle suggestions navigation - we'll need to track suggestions count
-          setSelectedIndex(prev => prev + 1);
-        } else {
-          setSelectedIndex(prev => (prev + 1) % Math.min(filteredCommands.length, config.maxSuggestions));
-        }
-        return true;
+        // Close slash menu and allow normal scroll down behavior
+        setIsVisible(false);
+        setQuery('');
+        setSelectedIndex(0);
+        setActiveCommand(undefined);
+        return false; // Allow default scroll behavior
 
       case 'ArrowUp':
         event.preventDefault();
         if (activeCommand?.suggestions) {
-          setSelectedIndex(prev => prev > 0 ? prev - 1 : 0);
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
         } else {
-          setSelectedIndex(prev => 
-            prev === 0 ? Math.min(filteredCommands.length, config.maxSuggestions) - 1 : prev - 1
+          setSelectedIndex((prev) =>
+            prev === 0
+              ? Math.min(filteredCommands.length, config.maxSuggestions) - 1
+              : prev - 1,
           );
         }
         return true;

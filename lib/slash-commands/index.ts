@@ -39,6 +39,34 @@ const fetchProjectSuggestions = async (): Promise<{ id: string; name: string; de
   }
 };
 
+// Fetch available models for suggestions
+const fetchModelSuggestions = async (): Promise<{ id: string; name: string; description?: string }[]> => {
+  try {
+    // Import chatModels from the models file
+    const { chatModels } = await import('@/lib/ai/models');
+    return chatModels.map((model) => ({
+      id: model.id,
+      name: model.name,
+      description: `${model.description} (${model.model})`,
+    }));
+  } catch (error) {
+    console.error('Error fetching model suggestions:', error);
+    // Fallback to hardcoded models if import fails
+    return [
+      {
+        id: 'chat-model',
+        name: 'Chat',
+        description: 'Primary model for all-purpose chat (gpt-4o)',
+      },
+      {
+        id: 'chat-model-reasoning',
+        name: 'Reasoning',
+        description: 'Uses Groq Llama for advanced reasoning (llama-3.1-70b-versatile)',
+      },
+    ];
+  }
+};
+
 // Available slash commands
 export const createSlashCommands = (handlers: {
   onNewChat: () => void;
@@ -79,7 +107,16 @@ export const createSlashCommands = (handlers: {
     icon: '🤖',
     aliases: ['ai', 'switch'],
     category: 'ai',
-    action: (args) => handlers.onSwitchModel(args),
+    action: (args) => {
+      if (args) {
+        // If args provided, try to select model by name
+        handlers.onSwitchModel(args);
+      } else {
+        // If no args, show model selection dialog
+        handlers.onSwitchModel();
+      }
+    },
+    suggestions: fetchModelSuggestions,
   },
   {
     name: 'projects',

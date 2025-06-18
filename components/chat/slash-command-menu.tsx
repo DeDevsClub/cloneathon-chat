@@ -168,7 +168,7 @@ export function SlashCommandMenu({
         exit={{ opacity: 0, y: 10 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          'absolute bottom-full left-0 mb-2 w-full max-w-md z-50',
+          'absolute bottom-full left-0 mb-2 w-full max-w-full z-50',
           className,
         )}
       >

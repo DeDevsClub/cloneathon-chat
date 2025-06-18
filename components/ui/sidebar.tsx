@@ -114,6 +114,79 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener('keydown', handleKeyDown);
     }, [toggleSidebar]);
 
+    // Add click-outside functionality for desktop sidebar
+    React.useEffect(() => {
+      if (isMobile) return; // Only for desktop
+
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Element;
+
+        // Check if click is outside sidebar
+        const sidebarElement = document.querySelector(
+          '[data-sidebar="sidebar"]',
+        );
+        const sidebarTrigger = document.querySelector(
+          '[data-sidebar="trigger"]',
+        );
+
+        if (
+          open &&
+          sidebarElement &&
+          !sidebarElement.contains(target) &&
+          !sidebarTrigger?.contains(target) &&
+          !target.closest('[data-sidebar]') // Don't close if clicking on sidebar-related elements
+        ) {
+          setOpen(false);
+        }
+      };
+
+      if (open) {
+        // Add a small delay to prevent immediate closing when opening
+        const timer = setTimeout(() => {
+          document.addEventListener('mousedown', handleClickOutside);
+        }, 100);
+
+        return () => {
+          clearTimeout(timer);
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [open, isMobile, setOpen]);
+
+    // Add click-outside functionality for mobile sidebar
+    React.useEffect(() => {
+      if (!isMobile) return; // Only for mobile
+
+      const handleClickOutside = (event: TouchEvent) => {
+        const target = event.target as Element;
+
+        // Check if click is outside sidebar
+        const sidebarElement = document.querySelector(
+          '[data-sidebar="sidebar"]',
+        );
+
+        if (openMobile && sidebarElement && !sidebarElement.contains(target)) {
+          setOpenMobile(false);
+        }
+      };
+
+      if (openMobile) {
+        document.addEventListener('touchstart', handleClickOutside);
+
+        return () => {
+          document.removeEventListener('touchstart', handleClickOutside);
+        };
+      }
+
+      return () => {
+        document.removeEventListener('touchstart', handleClickOutside);
+      };
+    }, [openMobile, isMobile, setOpenMobile]);
+
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? 'expanded' : 'collapsed';
@@ -204,14 +277,14 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width-mobile] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
-                '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
+                '--sidebar-width-mobile': SIDEBAR_WIDTH_MOBILE,
               } as React.CSSProperties
             }
             side={side}
@@ -245,13 +318,18 @@ const Sidebar = React.forwardRef<
         <div
           className={cn(
             'duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex',
-            side === 'left'
-              ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-              : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
+            side === 'left' &&
+              'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]',
+            side === 'right' &&
+              'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
             // Adjust the padding for floating and inset variants.
-            variant === 'floating' || variant === 'inset'
-              ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]'
-              : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
+            variant === 'floating' &&
+              'p-2 group-data-[side=left]:border-r-0 group-data-[side=right]:border-l-0',
+            variant === 'inset' &&
+              'p-2 group-data-[side=left]:border-r-0 group-data-[side=right]:border-l-0',
+            variant === 'sidebar'
+              ? 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l'
+              : 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]',
             className,
           )}
           {...props}

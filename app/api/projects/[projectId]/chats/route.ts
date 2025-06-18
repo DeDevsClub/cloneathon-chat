@@ -139,13 +139,12 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { projectId: string } },
-) {
+export async function POST(request: NextRequest) {
   try {
-    const projectId = params.projectId;
-    // console.log('Creating chat for Project ID:', projectId);
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const projectId = pathParts[pathParts.indexOf('projects') + 1];
+    console.log('Creating chat for Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names
     let email = null;

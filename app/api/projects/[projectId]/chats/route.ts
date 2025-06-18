@@ -83,12 +83,12 @@ const createChatSchema = z.object({
 });
 
 // GET /api/projects/[projectId]/chats - Get all chats for a specific project
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { projectId: string } },
-) {
+export async function GET(request: NextRequest) {
+  // Extract projectId from URL
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split('/');
+  const projectId = pathParts[pathParts.indexOf('projects') + 1];
   try {
-    const projectId = params.projectId;
     console.log('Project ID:', projectId);
 
     // Try extracting email from different possible session cookie names

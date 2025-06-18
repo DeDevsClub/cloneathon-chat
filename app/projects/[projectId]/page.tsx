@@ -115,7 +115,7 @@ export default function ProjectPage(props: PageProps) {
       // console.log('Project chats to display:', projectChats);
 
       if (projectChats.length > 0) {
-        router.push(AppRoutes.projects.chat(projectId, projectChats[0].id));
+        router.push(AppRoutes.projects.chat(projectId));
         // console.log('First chat details:', projectChats[0]);
       } else {
         console.log('No chats found for this project');

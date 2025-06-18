@@ -43,7 +43,6 @@ Be polite and respectful in all your interactions.`;
 
 // Chat model defaults
 export const DEFAULT_CHAT_MESSAGE = 'Hello';
-export const DEFAULT_CHAT_MODEL = 'chat-model';
 
 // Default visibility
 export const DEFAULT_VISIBILITY_TYPE = 'private';

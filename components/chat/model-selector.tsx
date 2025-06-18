@@ -94,10 +94,37 @@ export function ModelSelector({
                 className="gap-4 group/item flex flex-row justify-between items-center w-full"
               >
                 <div className="flex flex-col gap-1 items-start">
-                  <div>{chatModel.name}</div>
+                  <div className="flex items-center gap-2">
+                    <span>{chatModel.name}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      chatModel.provider === 'openai' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                      chatModel.provider === 'anthropic' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' :
+                      chatModel.provider === 'xai' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                      chatModel.provider === 'groq' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' :
+                      'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300'
+                    }`}>
+                      {chatModel.provider === 'openai' ? 'OpenAI' :
+                       chatModel.provider === 'anthropic' ? 'Anthropic' :
+                       chatModel.provider === 'xai' ? 'xAI' :
+                       chatModel.provider === 'groq' ? 'Groq' :
+                       chatModel.provider}
+                    </span>
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {chatModel.description}
                   </div>
+                  {chatModel.capabilities && chatModel.capabilities.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {chatModel.capabilities.map((capability) => (
+                        <span
+                          key={capability}
+                          className="text-xs px-1.5 py-0.5 bg-accent text-accent-foreground rounded"
+                        >
+                          {capability}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">

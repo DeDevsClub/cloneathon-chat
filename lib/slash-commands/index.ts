@@ -60,15 +60,59 @@ const fetchModelSuggestions = async (): Promise<
     // Fallback to hardcoded models if import fails
     return [
       {
-        id: 'chat-model',
-        name: 'Chat',
-        description: 'Primary model for all-purpose chat (gpt-4o)',
+        id: 'gpt-4o',
+        name: 'GPT-4o',
+        description: 'Most capable OpenAI model with vision and reasoning',
       },
       {
-        id: 'chat-model-reasoning',
-        name: 'Reasoning',
-        description:
-          'Uses Groq Llama for advanced reasoning (llama-3.1-70b-versatile)',
+        id: 'gpt-4o-mini',
+        name: 'GPT-4o Mini',
+        description: 'Faster, cheaper version of GPT-4o',
+      },
+      {
+        id: 'o1-preview',
+        name: 'o1 Preview',
+        description: 'Advanced reasoning model for complex problems',
+      },
+      {
+        id: 'o1-mini',
+        name: 'o1 Mini',
+        description: 'Faster reasoning model for coding and math',
+      },
+      {
+        id: 'claude-3-5-haiku-20241022',
+        name: 'Claude 3.5 Haiku',
+        description: 'Claude 3.5 Haiku',
+      },
+      {
+        id: 'claude-3-5-sonnet-20241022',
+        name: 'Claude 3.5 Sonnet',
+        description: 'Claude 3.5 Sonnet',
+      },
+      {
+        id: 'claude-3-opus-20240229',
+        name: 'Claude 3 Opus',
+        description: 'Claude 3 Opus',
+      },
+      {
+        id: 'grok-2-1212',
+        name: 'Grok 2',
+        description: 'Grok 2',
+      },
+      {
+        id: 'grok-2-vision-1212',
+        name: 'Grok 2 Vision',
+        description: 'Grok 2 Vision',
+      },
+      {
+        id: 'llama-3.1-8b-instant',
+        name: 'Llama 3.1 Instant',
+        description: 'Llama 3.1 Instant',
+      },
+      {
+        id: 'llama-3.3-70b-versatile',
+        name: 'Llama 3.3 Versatile',
+        description: 'Llama 3.3 Versatile',
       },
     ];
   }

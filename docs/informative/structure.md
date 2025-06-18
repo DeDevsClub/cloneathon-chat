@@ -54,11 +54,13 @@ The application is organized into several core components and modules:
 ### Frontend Components
 
 1.  **Authentication Components** (`app/(auth)/*`, `components/auth/*`)
+
     - Login and signup pages.
     - UI elements for user sessions (e.g., user button).
     - Integration with NextAuth.js for client-side session management.
 
 2.  **Chat Interface** (`components/chat/*`, `app/chats/[chatId]/page.tsx`, `app/chats/new/page.tsx`)
+
     - Core chat UI using `useChat` hook for message streaming and input handling.
     - Display of messages, including markdown rendering (`ChatMessage`).
     - Multi-modal input capabilities (`MultimodalInput`).
@@ -66,17 +68,20 @@ The application is organized into several core components and modules:
     - Persistence of `systemPrompt` and `model` per chat, configurable by the user.
 
 3.  **Project Management** (`app/projects/*`, `components/project/*`)
+
     - Project creation dialog and page (`CreateProjectDialog`, `app/projects/new/page.tsx`) with guest user handling.
     - Listing and management of projects (foundational).
     - Chats are associated with projects at the data layer.
 
 4.  **UI Components** (`components/ui/*`)
+
     - Reusable UI elements (buttons, cards, inputs, dialogs, etc.) from Shadcn UI.
     - Layout components and styling utilities (`Tailwind CSS`).
     - Responsive design elements.
     - Toast notifications via `sonner`.
 
 5.  **Navigation and Structure** (`components/navigation/*`, `app/layout.tsx`)
+
     - Application sidebar (`AppSidebar`) for navigating chats and projects.
     - Header components (`HeaderIsland`).
     - Main application layout providing consistent structure.
@@ -87,20 +92,23 @@ The application is organized into several core components and modules:
 ### Backend Modules
 
 1.  **Authentication System** (`lib/auth/*`, `app/api/auth/[...nextauth]/route.ts`, `middleware.ts`)
+
     - NextAuth.js configuration for authentication providers.
     - Session management and token validation (`getToken`).
     - Middleware (`middleware.ts`) for route protection, enforcing authorization rules (e.g., `AUTHORIZED_EMAILS`), and handling guest user redirects.
 
 2.  **Database Layer** (`lib/db/*`)
+
     - Drizzle ORM schema definitions (`schema.ts`) for tables like `users`, `chats`, `messages`, `projects`. Includes `systemPrompt`, `model`, `lastActivityAt` in `chatsTable`.
     - Database query functions (`queries.ts`) for CRUD operations and complex lookups.
     - Migrations managed by Drizzle Kit.
 
 3.  **AI Integration & Chat API** (`lib/ai/*`, `app/api/chats/route.ts`)
+
     - Main chat API at `app/api/chats/route.ts`:
-        - `POST` handler: Manages new chat creation (saves chat metadata and initial messages, returns `newChatId`) and streams AI responses for existing chats using `streamText` from the `ai` SDK with OpenAI.
-        - `GET` handler: Retrieves chat history or resumes streams using `resumable-stream` context.
-        - `DELETE` handler: Deletes chats.
+      - `POST` handler: Manages new chat creation (saves chat metadata and initial messages, returns `newChatId`) and streams AI responses for existing chats using `streamText` from the `ai` SDK with OpenAI.
+      - `GET` handler: Retrieves chat history or resumes streams using `resumable-stream` context.
+      - `DELETE` handler: Deletes chats.
     - Helper functions for formatting message parts for DB (`formatPartsForDB`) and deriving text content (`deriveTextContent`).
     - `DEFAULT_SYSTEM_PROMPT` and selected model are used for AI interactions.
     - AI tools (like `getWeatherInformation`) are defined but their integration into the main chat flow is basic.
@@ -143,15 +151,18 @@ The application is organized into several core components and modules:
 ### Data Flow
 
 1.  **Client (React Components) -> Server (API Routes / Server Actions)**:
+
     - User interactions trigger API calls (e.g., `fetch` in `useChat` to `/api/chats`) or Server Actions.
     - Data is sent as JSON payloads or form data.
 
 2.  **Server (API / Actions) -> Database (Drizzle ORM)**:
+
     - API handlers and Server Actions use query functions from `lib/db/queries.ts`.
     - Drizzle ORM translates these calls into SQL queries for PostgreSQL.
     - Data is persisted or retrieved.
 
 3.  **Server (API / Actions) -> AI Services (OpenAI via AI SDK)**:
+
     - `app/api/chats/route.ts` sends messages, system prompts, and model choices to OpenAI using `streamText`.
     - AI responses are streamed back to the server.
 
@@ -210,24 +221,29 @@ The application is organized into several core components and modules:
 The Cloneathon-chat application is continuously evolving. Key areas planned for future development and enhancement include:
 
 1.  **Advanced AI Features**:
+
     - **Robust Tool Usage**: Fully integrate and expand AI tools beyond basic examples, with proper schema and execution logic.
     - **Fine-tuned Prompt Engineering**: Develop more sophisticated and context-aware prompt strategies.
     - **Enhanced Message Persistence**: Ensure all aspects of AI interaction (tool calls, rich content) are reliably saved.
 
 2.  **Collaboration & Sharing**:
+
     - Implement real-time collaboration features for documents and chats.
     - Refine sharing mechanisms and permissions for projects and chats.
 
 3.  **Multi-Modal Capabilities**:
+
     - Improve handling of image uploads and display within chats.
     - Explore support for other media types.
 
 4.  **Scalability & Performance**:
+
     - Optimize database queries, especially for large datasets (many chats/messages).
     - Improve real-time communication efficiency.
     - Performance tuning for frontend rendering, especially for long chat histories.
 
 5.  **Testing & CI/CD**:
+
     - Increase unit, integration, and E2E test coverage.
     - Mature CI/CD pipelines for automated builds, tests, and deployments.
 
@@ -236,3 +252,18 @@ The Cloneathon-chat application is continuously evolving. Key areas planned for 
     - Enhance onboarding and in-app guidance.
 
 This document provides a snapshot of the current architecture and is subject to change as the project evolves.
+
+---
+
+```mermaid
+graph TD
+A[Visit /chats] --> B[Model Selection Screen]
+B --> C[User Selects Model]
+C --> D[Save to Cookie]
+D --> E[Chat Interface Loads]
+E --> F[Model Used in API Calls]
+F --> G[In-Chat Model Switching Available]
+
+H[Page Refresh] --> I[Load Model from Cookie]
+I --> J[Restore Model Selection]
+```

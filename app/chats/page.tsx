@@ -8,7 +8,8 @@ import { useSession } from 'next-auth/react';
 import { Greeting } from '@/components/chat/greeting';
 import { Chat } from '@/components/chat/chat';
 import { MobileHeader } from '@/components/chat/mobile-header';
-import { DEFAULT_CHAT_MODEL, DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
+import { ModelSelector } from '@/components/chat/model-selector';
+import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
 import { UIMessage } from 'ai';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
@@ -23,7 +24,7 @@ const ChatsPage = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
-  const [selectedModel, setSelectedModel] = useState(DEFAULT_CHAT_MODEL);
+  const [selectedModel, setSelectedModel] = useState<string | undefined>();
 
   // Generate stable chatId that doesn't change on re-renders
   const [chatId] = useState(() => uuidv4());
@@ -127,6 +128,11 @@ const ChatsPage = () => {
     };
   }, [isSidebarOpen]);
 
+  const handleModelChange = (modelId: string) => {
+    setSelectedModel(modelId);
+    toast.success(`Selected ${modelId} model`);
+  };
+
   return (
     <div className="container w-screen h-screen sm:max-w-[calc(100vw-1rem)] py-0 mx-auto overflow-hidden">
       {loading ? (
@@ -140,19 +146,79 @@ const ChatsPage = () => {
         <>
           <MobileHeader chatId={chatId} />
           <div className="pt-16 md:pt-0">
-            <Chat
-              projectId={null}
-              chatId={chatId}
-              initialMessages={initialMessages}
-              initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
-              initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
-              isReadonly={false}
-              session={session as Session}
-              autoResume={true}
-            />
+            {!selectedModel ? (
+              <ModelSelectionScreen 
+                session={session as Session}
+                onModelSelect={handleModelChange}
+              />
+            ) : (
+              <Chat
+                projectId={null}
+                chatId={chatId}
+                initialMessages={initialMessages}
+                initialChatModel={selectedModel}
+                initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
+                isReadonly={false}
+                session={session as Session}
+                autoResume={true}
+              />
+            )}
           </div>
         </>
       )}
+    </div>
+  );
+};
+
+// Model selection screen component
+const ModelSelectionScreen = ({ 
+  session, 
+  onModelSelect 
+}: { 
+  session: Session; 
+  onModelSelect: (modelId: string) => void; 
+}) => {
+  const [tempSelectedModel, setTempSelectedModel] = useState<string>('gpt-4o');
+
+  const handleConfirmSelection = () => {
+    if (tempSelectedModel) {
+      onModelSelect(tempSelectedModel);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full min-h-[60vh] space-y-8 px-4">
+      <div className="text-center space-y-4 max-w-md">
+        <h1 className="text-3xl font-bold text-foreground">
+          Choose Your AI Model
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Select an AI model to start your conversation. Each model has different capabilities and strengths.
+        </p>
+      </div>
+
+      <div className="flex flex-col items-center space-y-6">
+        <div className="flex flex-col items-center space-y-3">
+          <span className="text-sm font-medium text-foreground">
+            Select Model:
+          </span>
+          <ModelSelector
+            session={session}
+            selectedModelId={tempSelectedModel}
+            onModelChange={setTempSelectedModel}
+            className="min-w-[200px]"
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleConfirmSelection}
+          disabled={!tempSelectedModel}
+          className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Start Chatting
+        </button>
+      </div>
     </div>
   );
 };

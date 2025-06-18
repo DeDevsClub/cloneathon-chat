@@ -24,7 +24,7 @@
 
 - [x] **Library**: Integrate `Prism.js` or `Highlight.js` with the Shadcn UI theme.
 - [x] **Language Support**: Include popular programming languages like TypeScript, Python, SQL, and more.
-- [ ] **Features**: Line numbers, copy-to-clipboard functionality, and language detection.
+- [x] **Features**: Line numbers, copy-to-clipboard functionality, and language detection.
 
 ### User Experience
 

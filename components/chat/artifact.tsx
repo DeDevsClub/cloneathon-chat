@@ -28,6 +28,7 @@ import { textArtifact } from '@/artifacts/text/client';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { VisibilityType } from '../visibility-selector';
+import { useTokenUsage } from '@/hooks/use-token-usage';
 
 export const artifactDefinitions = [
   textArtifact,
@@ -103,7 +104,7 @@ function PureArtifact({
   const [mode, setMode] = useState<'edit' | 'diff'>('edit');
   const [document, setDocument] = useState<Document | null>(null);
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
-
+  const { getUsage } = useTokenUsage();
   const { open: isSidebarOpen } = useSidebar();
 
   useEffect(() => {
@@ -323,6 +324,7 @@ function PureArtifact({
                   reload={reload}
                   isReadonly={isReadonly}
                   artifactStatus={artifact.status}
+                  getUsage={() => getUsage(messages[messages.length - 1].id)}
                 />
 
                 <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">

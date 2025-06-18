@@ -25,18 +25,28 @@ export async function fetchWithErrorHandlers(
 ) {
   try {
     const response = await fetch(input, init);
-    
+
     // For streaming responses, we need to return the response directly
     // Check if this is a streaming response (text/plain or text/event-stream)
     const contentType = response.headers.get('content-type');
-    if (contentType?.includes('text/plain') || contentType?.includes('text/event-stream')) {
+    if (
+      contentType?.includes('text/plain') ||
+      contentType?.includes('text/event-stream')
+    ) {
       if (!response.ok) {
-        console.error('Error in streaming response:', response.status, response.statusText);
-        throw new ChatSDKError('bad_request:api', `HTTP error ${response.status}`);
+        console.error(
+          'Error in streaming response:',
+          response.status,
+          response.statusText,
+        );
+        throw new ChatSDKError(
+          'bad_request:api',
+          `HTTP error ${response.status}`,
+        );
       }
       return response;
     }
-    
+
     // For non-streaming responses, we can check the response body
     if (!response.ok) {
       console.error('Error response:', response.status, response.statusText);
@@ -44,10 +54,16 @@ export async function fetchWithErrorHandlers(
         const errorData = await response.json();
         console.error('Error data:', errorData);
         const code = errorData.code || 'bad_request:api';
-        throw new ChatSDKError(code, errorData.cause || errorData.message || 'Unknown error');
+        throw new ChatSDKError(
+          code,
+          errorData.cause || errorData.message || 'Unknown error',
+        );
       } catch (jsonError) {
         // If we can't parse the error as JSON, just throw a generic error
-        throw new ChatSDKError('bad_request:api', `HTTP error ${response.status}`);
+        throw new ChatSDKError(
+          'bad_request:api',
+          `HTTP error ${response.status}`,
+        );
       }
     }
 

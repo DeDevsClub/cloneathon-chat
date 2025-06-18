@@ -182,7 +182,7 @@ export function Chat({
         reload={reload}
         isReadonly={isReadonly}
         isArtifactVisible={isArtifactVisible}
-        getUsage={getUsage}
+        getUsage={() => getUsage(messages[messages.length - 1].id)}
       />
 
       <div className="flex p-2 max-w-full justify-center dark:bg-slate-950/50 bg-slate-50">

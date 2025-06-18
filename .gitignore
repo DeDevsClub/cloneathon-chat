@@ -41,3 +41,4 @@ tsconfig.tsbuildinfo*
 
 # cookies
 cookies.txt
+.env*.local

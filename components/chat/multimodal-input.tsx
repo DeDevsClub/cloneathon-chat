@@ -142,6 +142,7 @@ function PureMultimodalInput({
       setLocalStorageInput('');
     },
     onToggleWebSearch: () => onToolsToggle?.(!toolsEnabled),
+    onToggleImageGeneration: () => onToolsToggle?.(!toolsEnabled),
     onSwitchModel: (modelId) => {
       if (modelId) {
         onModelChange?.(modelId);

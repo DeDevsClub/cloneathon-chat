@@ -125,6 +125,7 @@ export const createSlashCommands = (handlers: {
   onNewChat: () => void;
   onClearChat: () => void;
   onToggleWebSearch: () => void;
+  onToggleImageGeneration: () => void;
   onSwitchModel: (modelId?: string) => void;
   onNavigateToProjects: () => void;
   onCreateProject: () => void;
@@ -154,6 +155,14 @@ export const createSlashCommands = (handlers: {
     aliases: ['web'],
     category: 'tools',
     action: handlers.onToggleWebSearch,
+  },
+  {
+    name: 'image',
+    description: 'Toggle image generation',
+    icon: '🖼️',
+    aliases: ['img'],
+    category: 'tools',
+    action: handlers.onToggleImageGeneration,
   },
   {
     name: 'models',

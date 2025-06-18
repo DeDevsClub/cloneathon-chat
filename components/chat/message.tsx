@@ -10,6 +10,7 @@ import { Markdown } from '@/components/chat/markdown';
 // import { MessageActions } from '@/components/chat/message-actions';
 import { PreviewAttachment } from '@/components/chat/preview-attachment';
 import { Weather } from '@/components/weather';
+import { ImageGeneration } from '@/components/chat/image-generation';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -200,6 +201,8 @@ const PurePreviewMessage = ({
                             `Query: ${args.query}`
                           </p>
                         </div>
+                      ) : toolName === 'imageGeneration' ? (
+                        <ImageGeneration args={args} />
                       ) : null}
                     </div>
                   );
@@ -233,6 +236,8 @@ const PurePreviewMessage = ({
                         <SearchResults data={result} />
                       ) : toolName === 'webSearch' ? (
                         <SearchResults data={result} />
+                      ) : toolName === 'imageGeneration' ? (
+                        <ImageGeneration result={result} />
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
                       )}

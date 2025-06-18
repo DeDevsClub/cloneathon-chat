@@ -13,6 +13,7 @@ import {
 interface UseSlashCommandsProps {
   onClearChat?: () => void;
   onToggleWebSearch?: () => void;
+  onToggleImageGeneration?: () => void;
   onSwitchModel?: (modelId?: string) => void;
   onToggleTool?: (toolId?: string) => void;
 }
@@ -20,6 +21,7 @@ interface UseSlashCommandsProps {
 export function useSlashCommands({
   onClearChat,
   onToggleWebSearch,
+  onToggleImageGeneration,
   onSwitchModel,
   onToggleTool,
 }: UseSlashCommandsProps) {
@@ -44,6 +46,9 @@ export function useSlashCommands({
     },
     onToggleWebSearch: () => {
       onToggleWebSearch?.();
+    },
+    onToggleImageGeneration: () => {
+      onToggleImageGeneration?.();
     },
     onSwitchModel: (modelId?: string) => {
       if (modelId) {

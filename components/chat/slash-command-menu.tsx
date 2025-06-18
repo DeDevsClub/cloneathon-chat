@@ -57,7 +57,9 @@ export function SlashCommandMenu({
   className,
   activeCommand,
 }: SlashCommandMenuProps) {
-  const [suggestions, setSuggestions] = useState<{ id: string; name: string; description?: string }[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    { id: string; name: string; description?: string }[]
+  >([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   // Load suggestions when activeCommand has suggestions function
@@ -104,7 +106,7 @@ export function SlashCommandMenu({
                 {loadingSuggestions ? (
                   <CommandItem disabled>
                     <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                      <div className="animate-spin rounded-full size-4 border-b-2 border-primary" />
                       <span>Loading projects...</span>
                     </div>
                   </CommandItem>
@@ -113,7 +115,9 @@ export function SlashCommandMenu({
                     {suggestions.map((suggestion, index) => (
                       <CommandItem
                         key={suggestion.id}
-                        onSelect={() => onSelectCommand(activeCommand, suggestion.id)}
+                        onSelect={() =>
+                          onSelectCommand(activeCommand, suggestion.id)
+                        }
                         className={cn(
                           'flex items-center gap-3 p-3 cursor-pointer',
                           selectedIndex === index &&
@@ -172,68 +176,83 @@ export function SlashCommandMenu({
           <Command className="max-h-96">
             <CommandList>
               {commandsToShow.length === 0 ? (
-                <CommandEmpty>No commands found for "{query}"</CommandEmpty>
+                <CommandEmpty>{`No commands found for "${query}"`}</CommandEmpty>
               ) : config?.showCategories ? (
-                Object.entries(groupedCommands).map(([category, categoryCommands]) => {
-                  if (categoryCommands.length === 0) return null;
-                  
-                  const categoryLabel = categoryLabels[category as keyof typeof categoryLabels] || category;
-                  const startIndex = currentIndex;
-                  const endIndex = currentIndex + categoryCommands.length;
-                  currentIndex = endIndex;
+                Object.entries(groupedCommands).map(
+                  ([category, categoryCommands]) => {
+                    if (categoryCommands.length === 0) return null;
 
-                  return (
-                    <CommandGroup key={category} heading={categoryLabel}>
-                      {categoryCommands.slice(0, maxSuggestions).map((command, index) => {
-                        const globalIndex = startIndex + index;
-                        return (
-                          <CommandItem
-                            key={command.name}
-                            onSelect={() => onSelectCommand(command)}
-                            className={cn(
-                              'flex items-center gap-3 p-3 cursor-pointer',
-                              selectedIndex === globalIndex &&
-                                'bg-accent text-accent-foreground',
-                            )}
-                          >
-                            <span className="text-lg">
-                              {command.icon || '⚡'}
-                            </span>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">/{command.name}</span>
-                                {command.aliases && command.aliases.length > 0 && (
-                                  <div className="flex gap-1">
-                                    {command.aliases.slice(0, 2).map((alias) => (
-                                      <Badge
-                                        key={alias}
-                                        variant="secondary"
-                                        className="text-xs px-1 py-0"
-                                      >
-                                        /{alias}
-                                      </Badge>
-                                    ))}
-                                  </div>
+                    const categoryLabel =
+                      categoryLabels[category as keyof typeof categoryLabels] ||
+                      category;
+                    const startIndex = currentIndex;
+                    const endIndex = currentIndex + categoryCommands.length;
+                    currentIndex = endIndex;
+
+                    return (
+                      <CommandGroup key={category} heading={categoryLabel}>
+                        {categoryCommands
+                          .slice(0, maxSuggestions)
+                          .map((command, index) => {
+                            const globalIndex = startIndex + index;
+                            return (
+                              <CommandItem
+                                key={command.name}
+                                onSelect={() => onSelectCommand(command)}
+                                className={cn(
+                                  'flex items-center gap-3 p-3 cursor-pointer',
+                                  selectedIndex === globalIndex &&
+                                    'bg-accent text-accent-foreground',
                                 )}
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                {command.description}
-                              </div>
-                            </div>
-                            <Badge
-                              className={cn(
-                                'text-xs',
-                                categoryColors[command.category as keyof typeof categoryColors],
-                              )}
-                            >
-                              {categoryLabels[command.category as keyof typeof categoryLabels] || command.category}
-                            </Badge>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  );
-                })
+                              >
+                                <span className="text-lg">
+                                  {command.icon || '⚡'}
+                                </span>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      /{command.name}
+                                    </span>
+                                    {command.aliases &&
+                                      command.aliases.length > 0 && (
+                                        <div className="flex gap-1">
+                                          {command.aliases
+                                            .slice(0, 2)
+                                            .map((alias) => (
+                                              <Badge
+                                                key={alias}
+                                                variant="secondary"
+                                                className="text-xs px-1 py-0"
+                                              >
+                                                /{alias}
+                                              </Badge>
+                                            ))}
+                                        </div>
+                                      )}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {command.description}
+                                  </div>
+                                </div>
+                                <Badge
+                                  className={cn(
+                                    'text-xs',
+                                    categoryColors[
+                                      command.category as keyof typeof categoryColors
+                                    ],
+                                  )}
+                                >
+                                  {categoryLabels[
+                                    command.category as keyof typeof categoryLabels
+                                  ] || command.category}
+                                </Badge>
+                              </CommandItem>
+                            );
+                          })}
+                      </CommandGroup>
+                    );
+                  },
+                )
               ) : (
                 <CommandGroup>
                   {commandsToShow.map((command, index) => (

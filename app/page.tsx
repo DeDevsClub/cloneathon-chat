@@ -42,7 +42,7 @@ export default function Home() {
               )}
               onClick={() => router.push('/chats')}
             >
-              Launch App <ArrowRight className="ml-2 h-5 w-5" />
+              Launch App <ArrowRight className="ml-2 size-5" />
             </Button>
           </div>
         </div>

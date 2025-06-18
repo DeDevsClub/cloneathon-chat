@@ -85,7 +85,6 @@ export default function Page() {
     updateSession,
     router,
     startTransition,
-    updateSession,
     isSuccessful,
     setIsSuccessful,
   ]);

@@ -71,11 +71,8 @@ export function Chat({
   });
 
   const {
-    error,
     input,
     status,
-    handleInputChange,
-
     handleSubmit,
     messages,
     reload,
@@ -98,9 +95,10 @@ export function Chat({
       mutate(unstable_serialize(getChatHistoryPaginationKey));
       console.log('Usage', usage);
       console.log('FinishReason', finishReason);
+      console.log('Status', status);
     },
     experimental_prepareRequestBody: (body) => {
-      console.log('Preparing request body with projectId:', projectId);
+      // console.log('Preparing request body with projectId:', projectId);
       console.log('Using model:', currentModel);
       console.log('Tools enabled:', toolsEnabled);
       console.log('Canvas mode enabled:', canvasEnabled);
@@ -109,6 +107,8 @@ export function Chat({
       return {
         ...body, // Keep all original properties
         projectId: projectId || null,
+        chatId: chatId,
+        messages: messages,
         selectedChatModel: currentModel || 'chat-model',
         selectedVisibilityType: visibilityType,
         toolsEnabled: toolsEnabled,
@@ -161,7 +161,7 @@ export function Chat({
   });
 
   return (
-    <div className="flex flex-col w-full min-w-full h-dvh justify-center scrollbar-transparent">
+    <div className="flex flex-col w-full max-w-full h-[calc(100dvh-36px)] md:h-dvh max-h-dvh mt-4 md:mt-0 justify-center scrollbar-transparent">
       <Messages
         chatId={chatId}
         status={status}

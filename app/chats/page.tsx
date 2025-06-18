@@ -139,7 +139,7 @@ const ChatsPage = () => {
       ) : (
         <>
           <MobileHeader chatId={chatId} />
-          <div className="pt-4 md:pt-0">
+          <div className="pt-16 md:pt-0">
             <Chat
               projectId={null}
               chatId={chatId}

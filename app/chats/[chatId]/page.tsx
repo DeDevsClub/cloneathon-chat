@@ -113,7 +113,7 @@ export default function ChatPage(props: PageProps) {
   return (
     <>
       <MobileHeader chatId={chatId} />
-      <div className="pt-4 md:pt-0">
+      <div className="pt-16 md:pt-0">
         <Chat
           projectId={projectId || null}
           chatId={chatId}

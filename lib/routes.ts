@@ -13,6 +13,7 @@ export const AppRoutes = {
     detail: (projectId: string) => `/projects/${projectId}`,
     edit: (projectId: string) => `/projects/${projectId}/edit`,
     new: '/projects/new',
+    chat: (projectId: string) => `/projects/${projectId}`,
   },
 
   // Chats
@@ -33,8 +34,8 @@ export const AppRoutes = {
     projects: {
       base: '/api/projects',
       byId: (projectId: string) => `/api/projects/${projectId}`,
-      chats: (projectId: string) => `/api/projects/${projectId}/chats`,
       new: '/api/projects/new',
+      chats: (projectId: string) => `/api/projects/${projectId}/chats`,
     },
     test: {
       endpoints: '/api/test-endpoints',
@@ -45,8 +46,11 @@ export const AppRoutes = {
 /**
  * Helper function to navigate to a chat within a project context
  */
-export function navigateToProjectChat(chatId: string): string {
-  return AppRoutes.chats.detail(chatId);
+export function navigateToProjectChat(
+  projectId: string,
+  chatId: string,
+): string {
+  return AppRoutes.api.projects.chats(projectId);
 }
 
 /**

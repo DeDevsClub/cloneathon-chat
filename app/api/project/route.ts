@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getToken } from 'next-auth/jwt';
 import { getUser } from '@/lib/db/queries';
 import { updateProject } from '@/lib/db';
+import { auth } from '@/app/(auth)/auth';
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -55,6 +56,12 @@ export async function PATCH(request: NextRequest) {
 
     // Try extracting email from different possible session cookie names
     let email = null;
+
+    // NEW: Direct NextAuth session
+    const session = await auth();
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Try each possible cookie name
     const cookieNames = [

@@ -4,6 +4,15 @@ import { getToken } from 'next-auth/jwt';
 
 import { getProject, updateProject, deleteProject } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
+import { auth } from '@/app/(auth)/auth';
+
+// Schema for project updates
+const updateProjectSchema = z.object({
+  name: z.string().min(1, 'Project name is required').max(255).optional(),
+  description: z.string().optional().nullable(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+});
 
 // Helper function to extract email from different cookie formats
 async function extractEmailFromCookie(
@@ -43,14 +52,6 @@ async function extractEmailFromCookie(
   }
 }
 
-// Schema for project updates
-const updateProjectSchema = z.object({
-  name: z.string().min(1, 'Project name is required').max(255).optional(),
-  description: z.string().optional().nullable(),
-  icon: z.string().optional().nullable(),
-  color: z.string().optional().nullable(),
-});
-
 // Helper to validate user ownership of project
 async function validateUserOwnership(projectId: string, userEmail: string) {
   try {
@@ -86,6 +87,12 @@ export async function GET(request: NextRequest) {
     console.error(
       `DEBUG - GET project/${projectId} - ALL COOKIES: ${JSON.stringify([...request.cookies.getAll().map((c) => ({ name: c.name, value: `${c.value?.slice(0, 10)}...` }))])}`,
     );
+
+    // NEW: Direct NextAuth session
+    const session = await auth();
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -147,6 +154,7 @@ export async function PATCH(request: NextRequest) {
   const url = new URL(request.url);
   const pathParts = url.pathname.split('/');
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
+  console.log('Project ID (from api/projects/[projectId]):', projectId);
   try {
     // Try extracting email from different possible session cookie names
     let email = null;
@@ -158,6 +166,12 @@ export async function PATCH(request: NextRequest) {
       '__Secure-next-auth.session-token',
       'authjs.session-token',
     ];
+
+    // NEW: Direct NextAuth session
+    const session = await auth();
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     for (const cookieName of cookieNames) {
       if (request.cookies.has(cookieName)) {
@@ -218,6 +232,12 @@ export async function DELETE(request: NextRequest) {
     console.log('Deleting project:', projectId);
     // Try extracting email from different possible session cookie names
     let email = null;
+
+    // NEW: Direct NextAuth session
+    const session = await auth();
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Try each possible cookie name
     const cookieNames = [

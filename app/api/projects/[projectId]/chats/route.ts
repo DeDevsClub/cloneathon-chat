@@ -1,48 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
+import { auth } from '@/app/(auth)/auth';
 import { getProject, getProjectChats } from '@/lib/db/project';
 import { getUser } from '@/lib/db/queries';
 import { createChat } from '@/lib/db/chat';
 import { DEFAULT_VISIBILITY_TYPE } from '@/lib/constants';
-
-// Helper function to extract email from different cookie formats
-async function extractEmailFromCookie(
-  request: NextRequest,
-  cookieName: string,
-) {
-  const cookie = request.cookies.get(cookieName);
-  if (!cookie?.value) return null;
-
-  try {
-    if (cookieName.includes('auth')) {
-      // Handle JWT token from NextAuth
-      const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
-      if (!secret) return null;
-
-      try {
-        // Use getToken to decode the JWT token
-        const token = await getToken({
-          req: request,
-          secret,
-          cookieName,
-        });
-
-        return (token?.email as string) || null;
-      } catch (jwtError) {
-        console.error(`Failed to decode JWT token: ${jwtError}`);
-        return null;
-      }
-    } else {
-      // Handle JSON formatted cookies
-      const data = JSON.parse(decodeURIComponent(cookie.value));
-      return data.email;
-    }
-  } catch (error) {
-    console.error(`Error extracting email from ${cookieName}:`, error);
-    return null;
-  }
-}
 
 // Helper to validate user ownership of project
 async function validateUserOwnership(projectId: string, userEmail: string) {
@@ -88,49 +50,52 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const pathParts = url.pathname.split('/');
   const projectId = pathParts[pathParts.indexOf('projects') + 1];
+
+  console.log(
+    `DEBUG - GET project/${projectId}/chats - Starting request processing`,
+  );
+
   try {
-    console.log('Project ID:', projectId);
+    // Get session using NextAuth
+    const session = await auth();
+    console.log(
+      `DEBUG - GET project/${projectId}/chats - Session:`,
+      session ? 'Found' : 'Not found',
+    );
 
-    // Try extracting email from different possible session cookie names
-    let email = null;
-
-    // Try each possible cookie name
-    const cookieNames = [
-      'user-session',
-      'next-auth.session-token',
-      '__Secure-next-auth.session-token',
-      'authjs.session-token',
-    ];
-
-    for (const cookieName of cookieNames) {
-      if (request.cookies.has(cookieName)) {
-        email = await extractEmailFromCookie(request, cookieName);
-        if (email) break;
-      }
+    if (!session || !session.user || !session.user.email) {
+      console.log(
+        `DEBUG - GET project/${projectId}/chats - No valid session found`,
+      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!email) {
-      // console.log('No session found');
-      // For debugging purposes, allow access even without a valid session
-      // In production, you would want to return an unauthorized response
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const email = session.user.email;
+    console.log(
+      `DEBUG - GET project/${projectId}/chats - Email from session:`,
+      email,
+    );
 
-    if (email) {
-      // Validate user ownership of project
-      const validation = await validateUserOwnership(projectId, email);
-      if ('error' in validation) {
-        return NextResponse.json(
-          { error: validation.error },
-          { status: validation.status },
-        );
-      }
+    // Validate user ownership of project
+    const validation = await validateUserOwnership(projectId, email);
+    if ('error' in validation) {
+      console.log(
+        `DEBUG - GET project/${projectId}/chats - Validation failed:`,
+        validation.error,
+      );
+      return NextResponse.json(
+        { error: validation.error },
+        { status: validation.status },
+      );
     }
 
     const chats = await getProjectChats({ projectId });
+    console.log(
+      `DEBUG - GET project/${projectId}/chats - Found ${chats.length} chats`,
+    );
     return NextResponse.json({ chats });
   } catch (error) {
-    console.error('Error fetching project chats:', error);
+    console.error(`DEBUG - GET project/${projectId}/chats - Error:`, error);
     return NextResponse.json(
       { error: 'Failed to fetch project chats' },
       { status: 500 },
@@ -140,41 +105,41 @@ export async function GET(request: NextRequest) {
 
 // POST /api/projects/[projectId]/chats - Create a new chat for a specific project
 export async function POST(request: NextRequest) {
+  const url = new URL(request.url);
+  const pathParts = url.pathname.split('/');
+  const projectId = pathParts[pathParts.indexOf('projects') + 1];
   try {
-    const url = new URL(request.url);
-    const pathParts = url.pathname.split('/');
-    const projectId = pathParts[pathParts.indexOf('projects') + 1];
-    console.log('Creating chat for Project ID:', projectId);
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - Starting chat creation`,
+    );
 
-    // Try extracting email from different possible session cookie names
-    let email = null;
+    // Get session using NextAuth
+    const session = await auth();
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - Session:`,
+      session ? 'Found' : 'Not found',
+    );
 
-    // Try each possible cookie name
-    const cookieNames = [
-      'user-session',
-      'next-auth.session-token',
-      '__Secure-next-auth.session-token',
-      'authjs.session-token',
-    ];
-
-    for (const cookieName of cookieNames) {
-      if (request.cookies.has(cookieName)) {
-        email = await extractEmailFromCookie(request, cookieName);
-        if (email) {
-          // console.log(`Found valid email in cookie ${cookieName}: ${email}`);
-          break;
-        }
-      }
-    }
-
-    if (!email) {
-      console.error('No valid session found or could not extract email');
+    if (!session || !session.user || !session.user.email) {
+      console.log(
+        `DEBUG - POST project/${projectId}/chats - No valid session found`,
+      );
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const email = session.user.email;
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - Email from session:`,
+      email,
+    );
 
     // Validate user ownership of project
     const validation = await validateUserOwnership(projectId, email);
     if ('error' in validation) {
+      console.log(
+        `DEBUG - POST project/${projectId}/chats - Validation failed:`,
+        validation.error,
+      );
       return NextResponse.json(
         { error: validation.error },
         { status: validation.status },
@@ -182,12 +147,24 @@ export async function POST(request: NextRequest) {
     }
 
     const { user, project } = validation;
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - User validated, project: ${project.name}`,
+    );
 
     // Parse and validate request body
     const body = await request.json();
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - Request body:`,
+      body,
+    );
+
     const validationResult = createChatSchema.safeParse(body);
 
     if (!validationResult.success) {
+      console.log(
+        `DEBUG - POST project/${projectId}/chats - Schema validation failed:`,
+        validationResult.error.errors,
+      );
       return NextResponse.json(
         { error: validationResult.error.errors },
         { status: 400 },
@@ -196,18 +173,31 @@ export async function POST(request: NextRequest) {
 
     const { id, title, visibility } = validationResult.data;
 
-    // Create the chat
+    // Create the chat with project association
     const newChat = await createChat({
       id,
       userId: user.id,
       title: title || 'New Chat',
       visibility,
-      projectId,
+      projectId, // This is the key - associates chat with the project
     });
+
+    console.log(
+      `DEBUG - POST project/${projectId}/chats - Chat created successfully:`,
+      {
+        chatId: newChat.id,
+        title: newChat.title,
+        projectId: newChat.projectId,
+        userId: newChat.userId,
+      },
+    );
 
     return NextResponse.json({ chat: newChat }, { status: 201 });
   } catch (error) {
-    console.error('Error creating chat:', error);
+    console.error(
+      `DEBUG - POST project/${projectId}/chats - Error creating chat:`,
+      error,
+    );
     return NextResponse.json(
       { error: 'Failed to create chat' },
       { status: 500 },

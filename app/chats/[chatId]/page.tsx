@@ -37,13 +37,13 @@ export default function ChatPage(props: PageProps) {
       try {
         setLoading(true);
         const messages = await getMessagesForChat({ chatId });
-        console.log('Raw messages from database:', messages);
+        // console.log('Raw messages from database:', messages);
         if (messages) {
           // Convert database messages to UI messages format
           const uiMessages: UIMessage[] = messages.map((msg) => {
             // Extract content from either textContent or parts
             let content = msg.textContent || '';
-            
+
             // If no textContent, try to extract from parts
             if (!content && Array.isArray(msg.parts)) {
               const textParts = msg.parts
@@ -52,9 +52,12 @@ export default function ChatPage(props: PageProps) {
                 .join(' ');
               content = textParts;
             }
-            
-            console.log(`Message ${msg.id}: role=${msg.role}, textContent="${msg.textContent}", content="${content}", parts=`, msg.parts);
-            
+
+            console.log(
+              `Message ${msg.id}: role=${msg.role}, textContent="${msg.textContent}", content="${content}", parts=`,
+              msg.parts,
+            );
+
             return {
               id: msg.id,
               role: msg.role as 'user' | 'assistant' | 'system',
@@ -69,7 +72,7 @@ export default function ChatPage(props: PageProps) {
       } catch (error) {
         console.error('Failed to load messages:', error);
         // Continue with empty messages if loading fails
-        setInitialMessages([]);
+        setInitialMessages(initialMessages);
       } finally {
         setLoading(false);
       }

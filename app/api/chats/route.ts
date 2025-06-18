@@ -29,8 +29,11 @@ type MessagePart =
   | { type: 'reasoning'; reasoning: string };
 
 export async function POST(req: Request) {
+  console.log('POST /api/chats - Request received');
+
   try {
     // Extract and validate the request body
+
     const {
       messages,
       id,
@@ -47,9 +50,16 @@ export async function POST(req: Request) {
     console.log('- chatId:', id);
     console.log('- messages:', JSON.stringify(messages, null, 2));
     console.log('- messages length:', messages?.length);
+    console.log('- messages type:', typeof messages);
+    console.log('- messages is array:', Array.isArray(messages));
 
     // Validate required fields
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      console.error('Messages validation failed:', {
+        messages: messages,
+        isArray: Array.isArray(messages),
+        length: messages?.length,
+      });
       return new ChatSDKError(
         'bad_request:api',
         'Messages array is required and cannot be empty',

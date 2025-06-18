@@ -1,10 +1,5 @@
-import {
-  customProvider,
-  extractReasoningMiddleware,
-  wrapLanguageModel,
-} from 'ai';
+import { customProvider } from 'ai';
 import { openai } from '@ai-sdk/openai';
-import { groq } from '@ai-sdk/groq';
 import { isTestEnvironment } from '../constants';
 import { artifactModel, reasoningModel } from './models.test';
 import { selectAppropriateModel } from './modelSelection';
@@ -21,10 +16,7 @@ export const myProvider = isTestEnvironment
   : customProvider({
       languageModels: {
         'chat-model': openai.chat('gpt-4o'),
-        'chat-model-reasoning': wrapLanguageModel({
-          model: groq('llama-3.1-70b-versatile'),
-          middleware: extractReasoningMiddleware({ tagName: 'think' }),
-        }),
+        'chat-model-reasoning': openai.chat('gpt-4o'),
         'title-model': openai.chat('gpt-4o'),
         'artifact-model': openai.chat('gpt-4o'),
       },
@@ -39,7 +31,12 @@ export const myProvider = isTestEnvironment
  * @param forceArtifactModel - If true, always use the artifact model regardless of content
  * @returns The selected language model
  */
-export function getAppropriateModel(content: string, forceArtifactModel = false) {
-  const modelType = forceArtifactModel ? 'artifact-model' : selectAppropriateModel(content);
+export function getAppropriateModel(
+  content: string,
+  forceArtifactModel = false,
+) {
+  const modelType = forceArtifactModel
+    ? 'artifact-model'
+    : selectAppropriateModel(content);
   return myProvider.languageModel(modelType);
 }

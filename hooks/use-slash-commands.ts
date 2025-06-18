@@ -68,7 +68,7 @@ export function useSlashCommands({
     },
     onHelp: () => {
       toast.info(
-        'Available commands: /new, /clear, /search, /model, /projects, /project, /help',
+        'Available commands: /new, /clear, /search, /models, /projects, /tools, /help',
       );
     },
     onToggleTool: (toolId?: string) => {
@@ -78,7 +78,6 @@ export function useSlashCommands({
 
   const handleInputChange = (input: string): { shouldClear: boolean } => {
     const parsed = parseSlashCommand(input, config.trigger);
-    console.log('Parsed command:', parsed);
 
     if (parsed.isCommand) {
       setQuery(parsed.command || '');
@@ -91,16 +90,12 @@ export function useSlashCommands({
           cmd.name === parsed.command ||
           cmd.aliases?.includes(parsed.command || ''),
       );
-      
-      console.log('Exact command found:', exactCommand?.name, 'Has suggestions:', !!exactCommand?.suggestions, 'Args:', parsed.args);
 
       if (exactCommand && exactCommand.suggestions && !parsed.args) {
         // Show suggestions for this command when no args are provided
         setActiveCommand(exactCommand);
-        console.log('Setting active command:', exactCommand.name);
       } else {
         setActiveCommand(undefined);
-        console.log('No active command set');
       }
     } else {
       setIsVisible(false);
@@ -157,14 +152,20 @@ export function useSlashCommands({
           // Handle suggestion selection
           // We need to get the suggestions first, then select the right one
           if (activeCommand.suggestions) {
-            activeCommand.suggestions().then((suggestions) => {
-              if (suggestions.length > 0 && selectedIndex < suggestions.length) {
-                const selectedSuggestion = suggestions[selectedIndex];
-                selectCommand(activeCommand, selectedSuggestion.id);
-              }
-            }).catch((error) => {
-              console.error('Error getting suggestions:', error);
-            });
+            activeCommand
+              .suggestions()
+              .then((suggestions) => {
+                if (
+                  suggestions.length > 0 &&
+                  selectedIndex < suggestions.length
+                ) {
+                  const selectedSuggestion = suggestions[selectedIndex];
+                  selectCommand(activeCommand, selectedSuggestion.id);
+                }
+              })
+              .catch((error) => {
+                console.error('Error getting suggestions:', error);
+              });
           }
           return true;
         } else if (filteredCommands.length > 0) {

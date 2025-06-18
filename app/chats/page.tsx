@@ -35,7 +35,7 @@ const ChatsPage = () => {
       try {
         setLoading(true);
         const messages = [] as UIMessage[];
-        console.log('Raw messages from database:', messages);
+        // console.log('Raw messages from database:', messages);
         if (messages) {
           // Convert database messages to UI messages format
           const uiMessages: UIMessage[] = messages.map((msg) => {
@@ -70,7 +70,7 @@ const ChatsPage = () => {
       } catch (error) {
         console.error('Failed to load messages:', error);
         // Continue with empty messages if loading fails
-        setInitialMessages([]);
+        setInitialMessages(initialMessages);
       } finally {
         setLoading(false);
       }
@@ -170,7 +170,7 @@ const ChatsPage = () => {
             <Chat
               projectId={null}
               chatId={uuidv4()}
-              initialMessages={initialMessages || []}
+              initialMessages={initialMessages}
               initialChatModel={selectedModel || DEFAULT_CHAT_MODEL}
               initialVisibilityType={DEFAULT_VISIBILITY_TYPE}
               isReadonly={false}

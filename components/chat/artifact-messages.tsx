@@ -52,7 +52,7 @@ function PureArtifactMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
-          getUsage={getUsage}
+          getUsage={() => getUsage(message.id)}
           requiresScrollPadding={
             hasSentMessage && index === messages.length - 1
           }

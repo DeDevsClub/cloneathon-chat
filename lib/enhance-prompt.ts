@@ -1,5 +1,5 @@
-import { generateText } from "ai"
-import { openai } from "@ai-sdk/openai"
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 /**
  * Enhances a coding prompt to make it more effective for code generation
@@ -10,7 +10,7 @@ import { openai } from "@ai-sdk/openai"
 export async function enhancePrompt(originalPrompt: string): Promise<string> {
   try {
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: openai('gpt-4o'),
       system: `You are a prompt engineering expert specializing in coding prompts.
 Your task is to enhance user prompts to make them more effective for code generation.
 Follow these guidelines:
@@ -27,12 +27,11 @@ Follow these guidelines:
 "${originalPrompt}"
 
 Return only the enhanced prompt without explanations or additional text.`,
-    })
+    });
 
-    return text.trim()
+    return text.trim();
   } catch (error) {
-    console.error("Error enhancing prompt:", error)
-    throw new Error("Failed to enhance prompt")
+    console.error('Error enhancing prompt:', error);
+    throw new Error('Failed to enhance prompt');
   }
 }
-

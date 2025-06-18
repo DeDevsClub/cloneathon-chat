@@ -158,15 +158,21 @@ function PureMultimodalInput({
         switch (toolId) {
           case 'web-search':
             onToolsToggle?.(!toolsEnabled);
-            toast.success(`Web search ${toolsEnabled ? 'disabled' : 'enabled'}`);
+            toast.success(
+              `Web search ${toolsEnabled ? 'disabled' : 'enabled'}`,
+            );
             break;
           case 'canvas-mode':
             onCanvasToggle?.(!canvasEnabled);
-            toast.success(`Canvas mode ${canvasEnabled ? 'disabled' : 'enabled'}`);
+            toast.success(
+              `Canvas mode ${canvasEnabled ? 'disabled' : 'enabled'}`,
+            );
             break;
           case 'file-upload': {
             // Trigger file upload dialog
-            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            const fileInput = document.querySelector(
+              'input[type="file"]',
+            ) as HTMLInputElement;
             fileInput?.click();
             break;
           }
@@ -175,7 +181,9 @@ function PureMultimodalInput({
         }
       } else {
         // Show available tools
-        toast.info('Available tools: web-search, canvas-mode, file-upload, code-interpreter, image-generator, artifacts');
+        toast.info(
+          'Available tools: web-search, canvas-mode, file-upload, code-interpreter, image-generator, artifacts',
+        );
       }
     },
   });
@@ -346,6 +354,7 @@ function PureMultimodalInput({
       />
 
       {messages.length === 0 &&
+        !isVisible &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
           <SuggestedActions

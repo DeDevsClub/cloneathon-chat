@@ -128,24 +128,31 @@ export default function Page() {
         className="w-full md:max-w-md"
       >
         <Card className="backdrop-blur-sm bg-background/75 border border-accent/20 shadow-lg">
+          {/* Logo or branding mark */}
+          <motion.div
+            className="mb-8 text-3xl font-bold text-primary"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+          >
+            <div className="flex justify-center items-center gap-2">
+              <Icon icon="mdi:chat" className="text-primary" />
+              <span>th3.chat</span>
+            </div>
+          </motion.div>
           <CardHeader className="space-y-1 pb-2">
-            <motion.div variants={itemVariants}>
-              <CardTitle className="text-2xl font-bold text-center text-foreground/90">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                >
-                  <div className="flex items-center justify-center font-bold gap-4 w-full bg-gray-950/90 backdrop-blur-sm rounded-md  text-white">
-                    <Icon icon="mdi:chat" className="text-white size-6" />
-                    Join th3.chat
-                  </div>
-                </motion.div>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+            >
+              <CardTitle className="flex items-center gap-2 justify-center text-2xl md:text-3xl font-bold text-center text-foreground/90">
+                Create Account
               </CardTitle>
             </motion.div>
             <motion.div variants={itemVariants}>
-              <CardDescription className="text-center text-foreground w-full font-semibold">
-                Create your account to get started.
+              <CardDescription className="text-center text-muted-foreground w-full">
+                Create your account to get started with th3.chat
               </CardDescription>
             </motion.div>
           </CardHeader>

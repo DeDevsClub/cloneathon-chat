@@ -24,7 +24,7 @@ import { SuggestedActions } from '@/components/chat/suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowDown, Globe } from 'lucide-react';
+import { ArrowDown, Globe, LayoutPanelTop } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from '@/components/visibility-selector';
 import { ModelSelector } from './model-selector';
@@ -52,6 +52,8 @@ function PureMultimodalInput({
   onModelChange,
   toolsEnabled = false,
   onToolsToggle,
+  canvasEnabled = false,
+  onCanvasToggle,
 }: {
   chatId: string;
   projectId: string | null;
@@ -71,6 +73,8 @@ function PureMultimodalInput({
   onModelChange?: (modelId: string) => void;
   toolsEnabled?: boolean;
   onToolsToggle?: (enabled: boolean) => void;
+  canvasEnabled?: boolean;
+  onCanvasToggle?: (enabled: boolean) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -343,6 +347,23 @@ function PureMultimodalInput({
         >
           <Globe size={16} />
         </Button>
+        
+        {/* Canvas button for markdown/code rendering */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`p-1.5 size-8 transition-colors ${
+            canvasEnabled
+              ? 'text-purple-600 hover:text-purple-700 hover:bg-purple-50'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          }`}
+          onClick={() => onCanvasToggle?.(!canvasEnabled)}
+          disabled={status === 'submitted'}
+          title={canvasEnabled ? 'Disable canvas mode' : 'Enable canvas for code/markdown'}
+        >
+          <LayoutPanelTop size={16} />
+        </Button>
+        
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 
@@ -373,6 +394,8 @@ export const MultimodalInput = memo(
     if (prevProps.onModelChange !== nextProps.onModelChange) return false;
     if (prevProps.toolsEnabled !== nextProps.toolsEnabled) return false;
     if (prevProps.onToolsToggle !== nextProps.onToolsToggle) return false;
+    if (prevProps.canvasEnabled !== nextProps.canvasEnabled) return false;
+    if (prevProps.onCanvasToggle !== nextProps.onCanvasToggle) return false;
     return true;
   },
 );

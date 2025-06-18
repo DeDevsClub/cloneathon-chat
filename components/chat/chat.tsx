@@ -44,6 +44,9 @@ export function Chat({
   // Track tools enabled state
   const [toolsEnabled, setToolsEnabled] = useState(false);
 
+  // Track canvas mode state
+  const [canvasEnabled, setCanvasEnabled] = useState(false);
+
   // Handle model change
   const handleModelChange = (modelId: string) => {
     console.log('Chat component: Model changed to:', modelId);
@@ -54,6 +57,12 @@ export function Chat({
   const handleToolsToggle = (enabled: boolean) => {
     console.log('Chat component: Tools enabled:', enabled);
     setToolsEnabled(enabled);
+  };
+
+  // Handle canvas mode toggle
+  const handleCanvasToggle = (enabled: boolean) => {
+    console.log('Chat component: Canvas mode enabled:', enabled);
+    setCanvasEnabled(enabled);
   };
 
   const { visibilityType } = useChatVisibility({
@@ -94,6 +103,7 @@ export function Chat({
       console.log('Preparing request body with projectId:', projectId);
       console.log('Using model:', currentModel);
       console.log('Tools enabled:', toolsEnabled);
+      console.log('Canvas mode enabled:', canvasEnabled);
       console.log('Chat request body:', JSON.stringify(body, null, 2));
       // Send the messages array directly as expected by the OpenAI API
       return {
@@ -102,6 +112,7 @@ export function Chat({
         selectedChatModel: currentModel || 'chat-model',
         selectedVisibilityType: visibilityType,
         toolsEnabled: toolsEnabled,
+        forceArtifactModel: canvasEnabled,
       };
     },
   });
@@ -130,6 +141,7 @@ export function Chat({
     projectId,
     visibilityType,
     toolsEnabled,
+    canvasEnabled,
     currentModel,
     session,
     append,
@@ -181,6 +193,8 @@ export function Chat({
             onModelChange={handleModelChange}
             toolsEnabled={toolsEnabled}
             onToolsToggle={handleToolsToggle}
+            canvasEnabled={canvasEnabled}
+            onCanvasToggle={handleCanvasToggle}
           />
         )}
 

@@ -7,9 +7,11 @@ import { Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
+import { v4 as uuidv4 } from 'uuid';
 import { ProjectItem } from '@/components/project/project-item';
 import { CreateProjectDialog } from '@/components/project/create-project-dialog';
 import { ProjectTutorial } from '@/components/tutorials/project-tutorial';
+import { MobileHeader } from '@/components/chat/mobile-header';
 
 const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
@@ -121,7 +123,9 @@ const ProjectsPage = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="container py-6 max-w-5xl mx-auto">
+    <div className="container py-16 px-8 max-w-5xl mx-auto bg-background h-screen justify-center items-center">
+      <MobileHeader chatId={uuidv4()} />
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Projects</h1>
         <Button onClick={() => setOpen(true)}>

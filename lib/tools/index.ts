@@ -12,7 +12,7 @@ export const getEnabledTools = (toolsEnabled: boolean) => {
   if (!toolsEnabled) {
     return undefined;
   }
-  
+
   return {
     webSearch: webSearchTool,
   };

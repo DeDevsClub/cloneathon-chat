@@ -32,6 +32,8 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { saveChatModelAsCookie } from '@/app/chats/actions';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { SlashCommandMenu } from './slash-command-menu';
+import { useSlashCommands } from '@/hooks/use-slash-commands';
 
 function PureMultimodalInput({
   chatId,
@@ -122,9 +124,18 @@ function PureMultimodalInput({
   }, [input, setLocalStorageInput]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(event.target.value);
+    const newValue = event.target.value;
+    setInput(newValue);
     adjustHeight();
+
+    // Handle slash commands
+    const commandResult = slashCommands.handleInputChange(newValue);
+    if (commandResult.shouldClear) {
+      setInput('');
+      resetHeight();
+    }
   };
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
   const { data: session } = useSession();
@@ -220,6 +231,27 @@ function PureMultimodalInput({
     }
   }, [status, scrollToBottom]);
 
+  // Initialize slash commands
+  const slashCommands = useSlashCommands({
+    onClearChat: () => {
+      setMessages([]);
+      setInput('');
+      resetHeight();
+      setLocalStorageInput('');
+    },
+    onToggleWebSearch: () => onToolsToggle?.(!toolsEnabled),
+    onSwitchModel: (modelId) => {
+      if (modelId) {
+        onModelChange?.(modelId);
+      } else {
+        // Show available models
+        toast.info(
+          'Available models: chat-model (GPT-4o), chat-model-reasoning (Groq Llama)',
+        );
+      }
+    },
+  });
+
   return (
     <div className="relative w-full flex flex-col gap-4">
       <AnimatePresence>
@@ -293,7 +325,9 @@ function PureMultimodalInput({
         data-testid="multimodal-input"
         ref={textareaRef}
         placeholder={
-          toolsEnabled ? 'Enter your 🌐 search here' : 'Enter your message here'
+          toolsEnabled
+            ? 'Enter your 🌐 search here or type / for commands'
+            : 'Enter your message here or type / for commands'
         }
         value={input}
         onChange={handleInput}
@@ -303,7 +337,13 @@ function PureMultimodalInput({
         )}
         rows={2}
         autoFocus
-        onKeyDown={(event) => {
+        onKeyDown={(event: any) => {
+          // Handle slash command navigation first
+          const commandHandled = slashCommands.handleKeyDown(event);
+          if (commandHandled) {
+            return;
+          }
+
           if (
             event.key === 'Enter' &&
             !event.shiftKey &&
@@ -314,6 +354,17 @@ function PureMultimodalInput({
             submitForm();
           }
         }}
+      />
+
+      {/* Slash Command Menu */}
+      <SlashCommandMenu
+        commands={slashCommands.commands}
+        query={slashCommands.query}
+        isVisible={slashCommands.isVisible}
+        selectedIndex={slashCommands.selectedIndex}
+        onSelectCommand={slashCommands.selectCommand}
+        onClose={slashCommands.close}
+        config={slashCommands.config}
       />
 
       <div className="absolute bottom-0 p-1 w-fit flex flex-row justify-start bg-background rounded-lg">

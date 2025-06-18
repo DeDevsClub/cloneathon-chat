@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 
@@ -18,8 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 const ChatsPage = () => {
   const [loading, setLoading] = useState(true);
   const [chats, setChats] = useState<any[]>([]);
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
+
   const { data: session } = useSession();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);

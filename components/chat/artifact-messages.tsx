@@ -1,11 +1,11 @@
 import { PreviewMessage, ThinkingMessage } from '@/components/chat/message';
 import type { UIMessage } from 'ai';
 import { memo } from 'react';
-import equal from 'fast-deep-equal';
 import type { UIArtifact } from '@/components/chat/artifact';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
+import type { TokenUsageData } from '@/hooks/use-token-usage';
 
 interface ArtifactMessagesProps {
   chatId: string;
@@ -15,6 +15,7 @@ interface ArtifactMessagesProps {
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   artifactStatus: UIArtifact['status'];
+  getUsage: (messageId: string) => TokenUsageData | undefined;
 }
 
 function PureArtifactMessages({
@@ -24,6 +25,7 @@ function PureArtifactMessages({
   setMessages,
   reload,
   isReadonly,
+  getUsage,
 }: ArtifactMessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -50,6 +52,7 @@ function PureArtifactMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
+          getUsage={getUsage}
           requiresScrollPadding={
             hasSentMessage && index === messages.length - 1
           }

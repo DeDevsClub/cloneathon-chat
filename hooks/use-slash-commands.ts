@@ -154,7 +154,18 @@ export function useSlashCommands({
       case 'Enter':
         event.preventDefault();
         if (activeCommand?.suggestions) {
-          // Will be handled by the menu component
+          // Handle suggestion selection
+          // We need to get the suggestions first, then select the right one
+          if (activeCommand.suggestions) {
+            activeCommand.suggestions().then((suggestions) => {
+              if (suggestions.length > 0 && selectedIndex < suggestions.length) {
+                const selectedSuggestion = suggestions[selectedIndex];
+                selectCommand(activeCommand, selectedSuggestion.id);
+              }
+            }).catch((error) => {
+              console.error('Error getting suggestions:', error);
+            });
+          }
           return true;
         } else if (filteredCommands.length > 0) {
           const command = filteredCommands[selectedIndex];

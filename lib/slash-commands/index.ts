@@ -139,14 +139,14 @@ export const createSlashCommands = (handlers: {
     category: 'chat',
     action: handlers.onNewChat,
   },
-  {
-    name: 'clear',
-    description: 'Clear current chat',
-    icon: '🗑️',
-    aliases: ['reset'],
-    category: 'chat',
-    action: handlers.onClearChat,
-  },
+  // {
+  //   name: 'clear',
+  //   description: 'Clear current chat',
+  //   icon: '🗑️',
+  //   aliases: ['reset'],
+  //   category: 'chat',
+  //   action: handlers.onClearChat,
+  // },
   {
     name: 'search',
     description: 'Toggle web search',
@@ -156,7 +156,7 @@ export const createSlashCommands = (handlers: {
     action: handlers.onToggleWebSearch,
   },
   {
-    name: 'model',
+    name: 'models',
     description: 'Switch AI model for chat',
     icon: '🤖',
     aliases: ['ai', 'switch'],
@@ -173,21 +173,10 @@ export const createSlashCommands = (handlers: {
     suggestions: fetchModelSuggestions,
   },
   {
-    name: 'models',
-    description: 'Show available AI models',
-    icon: '🤖',
-    aliases: ['ai', 'models'],
-    category: 'ai',
-    action: () => {
-      handlers.onSwitchModel();
-    },
-    suggestions: fetchModelSuggestions,
-  },
-  {
     name: 'projects',
     description: 'Go to projects',
     icon: '📁',
-    aliases: ['proj'],
+    aliases: ['p'],
     category: 'navigation',
     action: (args) => {
       if (args) {
@@ -200,58 +189,20 @@ export const createSlashCommands = (handlers: {
     },
     suggestions: fetchProjectSuggestions,
   },
-  {
-    name: 'project',
-    description: 'Select or create project',
-    icon: '📂',
-    aliases: ['p'],
-    category: 'navigation',
-    action: (args) => {
-      if (args) {
-        // If args provided, try to select project by name or create new one
-        handlers.onSelectProject(args);
-      } else {
-        // If no args, show project creation dialog
-        handlers.onCreateProject();
-      }
-    },
-    suggestions: fetchProjectSuggestions,
-  },
-  {
-    name: 'projects-list',
-    description: 'Show available projects',
-    icon: '📁',
-    aliases: ['proj', 'list'],
-    category: 'navigation',
-    action: () => {
-      handlers.onNavigateToProjects();
-    },
-    suggestions: fetchProjectSuggestions,
-  },
-  {
-    name: 'help',
-    description: 'Show available commands',
-    icon: '❓',
-    aliases: ['?', 'commands'],
-    category: 'chat',
-    action: handlers.onHelp,
-  },
+  // {
+  //   name: 'help',
+  //   description: 'Show available commands',
+  //   icon: '❓',
+  //   aliases: ['?', 'commands'],
+  //   category: 'chat',
+  //   action: handlers.onHelp,
+  // },
   {
     name: 'tools',
-    description: 'Show available tools',
-    icon: '🧰',
-    aliases: ['t'],
-    category: 'tools',
-    action: () => {
-      handlers.onToggleTool();
-    },
-    suggestions: fetchToolSuggestions,
-  },
-  {
-    name: 'tool',
     description: 'Select and activate a specific tool',
     icon: '🛠️',
     category: 'tools',
+    aliases: ['t'],
     action: (args) => {
       if (args) {
         // If args provided, try to select tool by name

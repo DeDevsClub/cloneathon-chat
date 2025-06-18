@@ -71,11 +71,11 @@ export function SlashCommandMenu({
         onClose();
       }
     };
-    
+
     if (isVisible) {
       document.addEventListener('keydown', handleEscape);
     }
-    
+
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
@@ -101,7 +101,7 @@ export function SlashCommandMenu({
         onSuggestionCountChange?.(0);
       }
     };
-    
+
     loadSuggestions();
   }, [activeCommand, onSuggestionCountChange]);
 
@@ -117,7 +117,7 @@ export function SlashCommandMenu({
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'absolute bottom-full left-0 mb-2 w-full max-w-md z-50',
+            'absolute bottom-full left-0 mb-2 w-full max-w-full h-96 z-50',
             className,
           )}
         >
@@ -128,37 +128,53 @@ export function SlashCommandMenu({
                   <CommandItem disabled>
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full size-4 border-b-2 border-primary" />
-                      <span>Loading projects...</span>
+                      <span>Loading {activeCommand?.name || 'items'}...</span>
                     </div>
                   </CommandItem>
                 ) : suggestions.length > 0 ? (
-                  <CommandGroup heading={`Projects (${suggestions.length})`}>
-                    {suggestions.map((suggestion, index) => (
-                      <CommandItem
-                        key={suggestion.id}
-                        onSelect={() =>
-                          onSelectCommand(activeCommand, suggestion.id)
-                        }
-                        className={cn(
-                          'flex items-center gap-3 p-3 cursor-pointer',
-                          selectedIndex === index &&
-                            'bg-accent text-accent-foreground',
-                        )}
-                      >
-                        <span className="text-lg">📂</span>
-                        <div className="flex-1">
-                          <div className="font-medium">{suggestion.name}</div>
-                          {suggestion.description && (
-                            <div className="text-sm text-muted-foreground">
-                              {suggestion.description}
-                            </div>
+                  <CommandGroup
+                    heading={`${activeCommand?.name || 'Items'} (${suggestions.length})`}
+                  >
+                    {suggestions.map((suggestion, index) => {
+                      // Determine icon based on command type
+                      let icon = '📦'; // default
+                      if (activeCommand?.name === 'projects') {
+                        icon = '📂';
+                      } else if (activeCommand?.name === 'models') {
+                        icon = '🤖';
+                      } else if (activeCommand?.name === 'tools') {
+                        icon = '🛠️';
+                      }
+
+                      return (
+                        <CommandItem
+                          key={suggestion.id}
+                          onSelect={() =>
+                            onSelectCommand(activeCommand, suggestion.id)
+                          }
+                          className={cn(
+                            'flex items-center gap-3 p-3 cursor-pointer',
+                            selectedIndex === index &&
+                              'bg-accent text-accent-foreground',
                           )}
-                        </div>
-                      </CommandItem>
-                    ))}
+                        >
+                          <span className="text-lg">{icon}</span>
+                          <div className="flex-1">
+                            <div className="font-medium">{suggestion.name}</div>
+                            {suggestion.description && (
+                              <div className="text-sm text-muted-foreground">
+                                {suggestion.description}
+                              </div>
+                            )}
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
                   </CommandGroup>
                 ) : (
-                  <CommandEmpty>No projects found</CommandEmpty>
+                  <CommandEmpty>
+                    No {activeCommand?.name || 'items'} found
+                  </CommandEmpty>
                 )}
               </CommandList>
             </Command>
@@ -221,7 +237,7 @@ export function SlashCommandMenu({
                                 key={command.name}
                                 onSelect={() => onSelectCommand(command)}
                                 className={cn(
-                                  'flex items-center gap-3 p-3 cursor-pointer',
+                                  'flex items-center gap-2 p-2 cursor-pointer',
                                   selectedIndex === globalIndex &&
                                     'bg-accent text-accent-foreground',
                                 )}
@@ -281,7 +297,7 @@ export function SlashCommandMenu({
                       key={command.name}
                       onSelect={() => onSelectCommand(command)}
                       className={cn(
-                        'flex items-center gap-3 p-3 cursor-pointer',
+                        'flex items-center gap-2 p-2 cursor-pointer',
                         selectedIndex === index &&
                           'bg-accent text-accent-foreground',
                       )}
